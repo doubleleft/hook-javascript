@@ -1,7 +1,7 @@
 dl-api-javascript
 ===
 
-dl-api javascript client.
+dl-api javascript client. [Documentation](http://doubleleft.github.io/dl-api-javascript).
 
 How-to build
 ---
@@ -10,9 +10,3 @@ How-to build
     $ npm install
     $ grunt
 
-
-Examples
----
-
-You must run examples under `http://` protocol.
-Run `python -m SimpleHTTPServer ./examples/` to test it out.
