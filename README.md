@@ -1,12 +1,11 @@
-dl-api/client - javascript client
+dl-api-javascript
 ===
 
-To build the client, just run:
+dl-api javascript client.
 
-    $ grunt
-
-Dependencies
+How-to build
 ---
 
     $ npm install -g grunt-cli
     $ npm install
+    $ grunt
