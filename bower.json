@@ -3,10 +3,7 @@
   "description": "Doubleleft API javascript client.",
   "version": "0.1.0",
   "homepage": "https://github.com/doubleleft/dl-api-javascript",
-  "main": [
-    "./dist/dl.js",
-    "./dist/dl.min.js"
-  ],
+  "main": "./dist/dl.js",
   "ignore": [
     "src",
     "dl-ext",
