@@ -12,6 +12,12 @@ DL.KeyValues = function(client) {
  * @param {String} key
  * @param {Function} callback
  * @return {Promise}
+ *
+ * @example Get a key value
+ *
+ *     client.keys.get('my-custom-key', function(key) {
+ *       console.log(key.value);
+ *     });
  */
 DL.KeyValues.prototype.get = function(key, callback) {
   var promise = this.client.get('key/' + key);
@@ -21,6 +27,18 @@ DL.KeyValues.prototype.get = function(key, callback) {
   return promise;
 };
 
+/**
+ * @method set
+ * @param {String} key
+ * @param {String|Number} value
+ * @return {Promise}
+ *
+ * @example Set a key value
+ *
+ *     client.keys.set('my-custom-key', 'custom value').then(function(key) {
+ *       console.log(key);
+ *     });
+ */
 DL.KeyValues.prototype.set = function(key, value) {
   return this.client.post('key/' + key, { value: value });
 };

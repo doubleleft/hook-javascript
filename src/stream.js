@@ -1,5 +1,5 @@
 /**
- * @class DL.KeyValues
+ * @class DL.Stream
  * @constructor
  * @param {Client} client
  */
@@ -42,6 +42,19 @@ DL.Stream = function(collection, options) {
  * @param {String} event
  * @param {Function} callback
  * @return {Stream} this
+ *
+ * @example Registering error event
+ *
+ *     client.collection('something').stream().on('error', function(e) {
+ *       console.log("Error: ", e);
+ *     })
+ *
+ *
+ * @example Registering message event
+ *
+ *     client.collection('something').stream().on('message', function(e) {
+ *       console.log("Message: ", e);
+ *     })
  */
 DL.Stream.prototype.on = function(event, callback) {
   var that = this;

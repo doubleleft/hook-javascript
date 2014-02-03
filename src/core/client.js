@@ -1,26 +1,48 @@
 /**
+ * DL.Client is the entry-point for using dl-api.
+ *
+ * You should instantiate a global javascript client for consuming dl-api.
+ *
+ * ```javascript
+ * window.dl = new DL.Client({
+ *   url: "http://local-or-remote-dl-api-address.com/api/public/index.php/",
+ *   appId: 1,    // your app's id
+ *   key: 'test'  // your app's public key
+ * });
+ * ```
+ *
  * @class DL.Client
  * @constructor
  * @param {Object} options
  *   @param {String} options.appId
  *   @param {String} options.key
  *   @param {String} options.url default: http://dl-api.dev
+ *
  */
 DL.Client = function(options) {
-  this.url = options.url || "http://dl-api.dev/";
+  this.url = options.url || "http://dl-api.dev/api/public/index.php/";
   this.appId = options.appId;
   this.key = options.key;
 
   /**
-   * @property {KeyValues} keys
+   * @property {DL.KeyValues} keys
    */
   this.keys = new DL.KeyValues(this);
 };
 
 /**
- * Get collection instance
+ * Get collection instance.
  * @param {String} collectionName
  * @return {DL.Collection}
+ *
+ * @example Retrieve a collection reference. Your collection tables are created on demand.
+ *
+ *     // Users collection
+ *     var users = client.collection('users');
+ *
+ *     // Highscores
+ *     var highscores = client.collection('highscores');
+ *
  */
 DL.Client.prototype.collection = function(collectionName) {
   return new DL.Collection(this, collectionName);
@@ -28,8 +50,15 @@ DL.Client.prototype.collection = function(collectionName) {
 
 /**
  * Get authentication object
+ *
+ * @method auth
  * @param {String} provider
  * @return {DL.Auth}
+ *
+ * @example Retrieve facebook authentication provider. See [DL.Auth#register](DL.Auth.html#method_register) for details.
+ *
+ *     var facebook_auth = client.auth('facebook');
+ *     facebook_auth.register( ... );
  */
 DL.Client.prototype.auth = function(provider) {
   return new DL.Auth(this, provider);
