@@ -3,7 +3,7 @@
  * http://github.com/doubleleft/dl-api
  *
  * @copyright 2014 Doubleleft
- * @build 2/3/2014
+ * @build 2/4/2014
  */
 (function(window) {
 	//
@@ -8130,6 +8130,13 @@ DL.Auth.prototype.register = function(providerData) {
   return this.client.post(this.segments, providerData);
 };
 
+DL.Auth.prototype.check = function() {
+  if (typeof(providerData)==="undefined") {
+    providerData = {};
+  }
+  return this.client.post(this.segments, providerData);
+};
+
 /**
  * @class DL.Collection
  *
@@ -8189,8 +8196,8 @@ DL.Collection.prototype.create = function(data) {
  * @method get
  * @return {DL.Collection} this
  */
-DL.Collection.prototype.get = function(options) {
-  return this.client.get(this.segments, this.buildQuery(options));
+DL.Collection.prototype.get = function() {
+  return this.client.get(this.segments, this.buildQuery());
 };
 
 /**
@@ -8244,8 +8251,127 @@ DL.Collection.prototype.where = function(objects, _operation, _value) {
 };
 
 /**
+ * Group results by field
+ * @method group
+ * @param {String} field
+ * @param {String} ... more fields
+ * @return {DL.Collection} this
+ */
+DL.Collection.prototype.group = function() {
+  this._group = arguments;
+  return this;
+};
+
+/**
+ * Count the number of items on this collection
+ * @param {Function} callback [optional]
+ * @return {Promise}
+ *
+ * @example Count the elements of the current query
+ *
+ *     client.collection('posts').where('author','Vicente').count(function(total) {
+ *       console.log("Total:", total);
+ *     });
+ */
+DL.Collection.prototype.count = function() {
+  this.options.aggregation = {method: 'count', field: null};
+  var promise = this.get();
+  if (arguments.length > 0) {
+    promise.then.apply(promise, arguments);
+  }
+  return promise;
+};
+
+/**
+ * Aggregate field with 'max' values
+ * @param {String} field
+ * @param {Function} callback [optional]
+ * @return {Promise}
+ *
+ * @example Get the max value from highscore collection
+ *
+ *     client.collection('highscore').max('score', function(data) {
+ *       console.log("max: ", data);
+ *     });
+ */
+DL.Collection.prototype.max = function(field) {
+  this.options.aggregation = {method: 'max', field: field};
+  var promise = this.get();
+  if (arguments.length > 1) {
+    promise.then.apply(promise, Array.prototype.slice.call(arguments,1));
+  }
+  return promise;
+};
+
+/**
+ * Aggregate field with 'min' values
+ * @param {String} field
+ * @param {Function} callback [optional]
+ * @return {Promise}
+ *
+ * @example Get the min value from highscore collection
+ *
+ *     client.collection('highscore').min('score', function(data) {
+ *       console.log("min: ", data);
+ *     });
+ */
+DL.Collection.prototype.min = function(field) {
+  this.options.aggregation = {method: 'min', field: field};
+  var promise = this.get();
+  if (arguments.length > 1) {
+    promise.then.apply(promise, Array.prototype.slice.call(arguments,1));
+  }
+  return promise;
+};
+
+/**
+ * Aggregate field with 'avg' values
+ * @param {String} field
+ * @param {Function} callback [optional]
+ * @return {Promise}
+ *
+ * @example Get the average value from highscore collection
+ *
+ *     client.collection('highscore').avg('score', function(data) {
+ *       console.log("avg: ", data);
+ *     });
+ */
+DL.Collection.prototype.avg = function(field) {
+  this.options.aggregation = {method: 'avg', field: field};
+  var promise = this.get();
+  if (arguments.length > 1) {
+    promise.then.apply(promise, Array.prototype.slice.call(arguments,1));
+  }
+  return promise;
+};
+
+/**
+ * Aggregate field with 'sum' values
+ * @param {String} field
+ * @param {Function} callback [optional]
+ * @return {Promise}
+ *
+ * @example Get the sum value from highscore collection
+ *
+ *     client.collection('highscore').sum('score', function(data) {
+ *       console.log("sum: ", data);
+ *     });
+ */
+DL.Collection.prototype.sum = function(field) {
+  this.options.aggregation = {method: 'sum', field: field};
+  var promise = this.get();
+
+  if (arguments.length > 1) {
+    promise.then.apply(promise, Array.prototype.slice.call(arguments,1));
+  }
+  return promise;
+};
+
+/**
  * Query only the first result
  * @method first
+ * @param {Function} callback [optional]
+ * @return {Promise}
  *
  * @example Return just the first element for current query
  *
@@ -8254,7 +8380,8 @@ DL.Collection.prototype.where = function(objects, _operation, _value) {
  *     });
  */
 DL.Collection.prototype.first = function() {
-  var promise = this.get({first: true});
+  this.options.first = 1;
+  var promise = this.get();
   promise.then.apply(promise, arguments);
   return promise;
 };
@@ -8275,8 +8402,10 @@ DL.Collection.prototype.then = function() {
  * @return {DL.Collection} this
  */
 DL.Collection.prototype.reset = function() {
+  this.options = {};
   this.wheres = [];
   this.ordering = [];
+  this._group = [];
   this._limit = null;
   this._offset = null;
   return this;
@@ -8399,29 +8528,13 @@ DL.Collection.prototype.paginate = function(perPage, callback) {
     perPage = DL.defaults.perPage;
   }
 
-  this.get({paginate: perPage}).then(function(data) {
+  this.options.paginate = perPage;
+  this.get().then(function(data) {
     pagination._fetchComplete(data);
     if (callback) { callback(pagination); }
   });
 
   return pagination;
-};
-
-/**
- * Count the number of items on this collection
- * @param {Function} callback [optional]
- * @return {Promise} this
- *
- * @example Count the elements of the current query
- *
- *     client.collection('posts').where('author','Vicente').count(function(total) {
- *       console.log("Total:", total);
- *     });
- */
-DL.Collection.prototype.count = function() {
-  var promise = this.client.get(this.segments + "/count");
-  promise.then.apply(promise, arguments);
-  return promise;
 };
 
 /**
@@ -8463,11 +8576,35 @@ DL.Collection.prototype.update = function(_id, data) {
 };
 
 /**
+ * Increment a value from 'field' from all rows matching current filter.
+ * @method increment
+ * @param {String} field
+ * @param {Number} value
+ * @return {Promise}
+ */
+DL.Collection.prototype.increment = function(field, value) {
+  throw new Error("Not implemented.");
+};
+
+/**
+ * Decrement a value from 'field' from all rows matching current filter.
+ * @method decrement
+ * @param {String} field
+ * @param {Number} value
+ * @return {Promise}
+ */
+DL.Collection.prototype.decrement = function(field, value) {
+  throw new Error("Not implemented.");
+};
+
+/**
  * Update all collection's data based on `where` params.
- * @param {Object} data
+ * @param {Object} data key-value data to update from matched rows [optional]
+ * @return {Promise}
  */
 DL.Collection.prototype.updateAll = function(data) {
-  throw new Error("Not implemented.");
+  this.options.data = data;
+  return this.client.put(this.segments, this.buildQuery());
 };
 
 DL.Collection.prototype.addWhere = function(field, operation, value) {
@@ -8485,7 +8622,7 @@ DL.Collection.prototype._validateName = function(name) {
   return name;
 };
 
-DL.Collection.prototype.buildQuery = function(options) {
+DL.Collection.prototype.buildQuery = function() {
   var query = {};
 
   // apply limit / offset
@@ -8502,18 +8639,26 @@ DL.Collection.prototype.buildQuery = function(options) {
     query.s = this.ordering;
   }
 
-  // clear wheres/ordering for future calls
-  this.reset();
+  // apply group
+  if (this._group.length > 0) {
+    query.g = this._group;
+  }
 
-  if (typeof(options)!=="undefined") {
-    if (options.paginate) {
-      query.p = options.paginate;
-    }
+  var f, shortnames = {
+    paginate: 'p',
+    data: 'd',
+    first: 'f',
+    aggregation: 'aggr'
+  };
 
-    if (options.first) {
-      query.f = 1;
+  for (f in shortnames) {
+    if (this.options[f]) {
+      query[shortnames[f]] = this.options[f];
     }
   }
+
+  // clear wheres/ordering for future calls
+  this.reset();
 
   return query;
 };

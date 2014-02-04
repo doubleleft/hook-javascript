@@ -52,3 +52,10 @@ DL.Auth.prototype.register = function(providerData) {
   }
   return this.client.post(this.segments, providerData);
 };
+
+DL.Auth.prototype.check = function() {
+  if (typeof(providerData)==="undefined") {
+    providerData = {};
+  }
+  return this.client.post(this.segments, providerData);
+};
