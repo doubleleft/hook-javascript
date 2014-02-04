@@ -8264,6 +8264,7 @@ DL.Collection.prototype.group = function() {
 
 /**
  * Count the number of items on this collection
+ * @method count
  * @param {Function} callback [optional]
  * @return {Promise}
  *
@@ -8284,6 +8285,7 @@ DL.Collection.prototype.count = function() {
 
 /**
  * Aggregate field with 'max' values
+ * @method max
  * @param {String} field
  * @param {Function} callback [optional]
  * @return {Promise}
@@ -8305,6 +8307,7 @@ DL.Collection.prototype.max = function(field) {
 
 /**
  * Aggregate field with 'min' values
+ * @method min
  * @param {String} field
  * @param {Function} callback [optional]
  * @return {Promise}
@@ -8326,6 +8329,7 @@ DL.Collection.prototype.min = function(field) {
 
 /**
  * Aggregate field with 'avg' values
+ * @method avg
  * @param {String} field
  * @param {Function} callback [optional]
  * @return {Promise}
@@ -8347,6 +8351,7 @@ DL.Collection.prototype.avg = function(field) {
 
 /**
  * Aggregate field with 'sum' values
+ * @method sum
  * @param {String} field
  * @param {Function} callback [optional]
  * @return {Promise}
@@ -8360,7 +8365,6 @@ DL.Collection.prototype.avg = function(field) {
 DL.Collection.prototype.sum = function(field) {
   this.options.aggregation = {method: 'sum', field: field};
   var promise = this.get();
-
   if (arguments.length > 1) {
     promise.then.apply(promise, Array.prototype.slice.call(arguments,1));
   }
