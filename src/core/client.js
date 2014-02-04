@@ -32,6 +32,7 @@ DL.Client = function(options) {
 
 /**
  * Get collection instance.
+ * @method collection
  * @param {String} collectionName
  * @return {DL.Collection}
  *
@@ -65,14 +66,10 @@ DL.Client.prototype.auth = function(provider) {
 };
 
 /**
- * Get collection instance
- * @param {String} collectionName
- * @return {DL.Collection}
+ * @method post
+ * @param {String} segments
+ * @param {Object} data
  */
-DL.Client.prototype.collection = function(collectionName) {
-  return new DL.Collection(this, collectionName);
-};
-
 DL.Client.prototype.post = function(segments, data) {
   if (typeof(data)==="undefined") {
     data = {};

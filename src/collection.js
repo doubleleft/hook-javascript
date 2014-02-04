@@ -63,6 +63,7 @@ DL.Collection.prototype.get = function() {
 
 /**
  * Add `where` param
+ * @method where
  * @param {Object | String} where params or field name
  * @param {String} operation operation or value
  * @param {String} value value
@@ -448,7 +449,11 @@ DL.Collection.prototype.update = function(_id, data) {
  * @return {Promise}
  */
 DL.Collection.prototype.increment = function(field, value) {
-  throw new Error("Not implemented.");
+  var promise = this.client.put(this.segments, this.buildQuery());
+  if (arguments.length > 0) {
+    promise.then.apply(promise, arguments);
+  }
+  return promise;
 };
 
 /**
