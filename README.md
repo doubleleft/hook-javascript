@@ -52,8 +52,6 @@ For a more complete documentation, check the [API reference](http://doubleleft.g
 
 To build it locally, try:
 
-```bash
-
     $ mkdir ../dl-api-javascript-docs
     $ grunt yuidoc
     $ cd ../dl-api-javascript-docs
