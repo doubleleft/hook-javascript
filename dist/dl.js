@@ -1,9 +1,9 @@
 /*
- * dl-api-js v0.0.1
- * http://github.com/doubleleft/dl-api
+ * dl-api-javascript v0.1.0
+ * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 2/4/2014
+ * @build 2/5/2014
  */
 (function(window) {
 	//
@@ -7840,7 +7840,7 @@ define(function (require) {
 }.call(this));
 
 var DL = {
-  VERSION: "0.0.1" ,
+  VERSION: "0.1.0",
   defaults: {
     perPage: 50
   }
@@ -7960,7 +7960,7 @@ DL.Client.prototype.delete = function(segments) {
  * @param {Object} data
  */
 DL.Client.prototype.request = function(segments, method, data) {
-  var payload, deferred = when.defer();
+  var payload, request_headers, auth_token, deferred = when.defer();
 
   if (data) {
     payload = JSON.stringify(data);
@@ -7970,13 +7970,22 @@ DL.Client.prototype.request = function(segments, method, data) {
     }
   }
 
+  // App authentication request headers
+  request_headers = {
+    'X-App-Id': this.appId,
+    'X-App-Key': this.key,
+    'Content-Type': 'application/json' // exchange data via JSON to keep basic data types
+  };
+
+  // Forward user authentication token, if it is set
+  auth_token = window.localStorage.getItem(this.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
+  if (auth_token) {
+    request_headers['X-Auth-Token'] = auth_token;
+  }
+
   uxhr(this.url + segments, payload, {
     method: method,
-    headers: {
-      'X-App-Id': this.appId,
-      'X-App-Key': this.key,
-      'Content-Type': 'application/json' // exchange data via JSON to keep basic data types
-    },
+    headers: request_headers,
     success: function(response) {
       deferred.resolver.resolve(JSON.parse(response));
     },
@@ -8086,6 +8095,9 @@ DL.Auth = function(client, provider) {
   this.segments = 'auth/' + this.provider;
  };
 
+// Constants
+DL.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
+
 /**
  * Register user using current authentication provider.
  *
@@ -8121,17 +8133,27 @@ DL.Auth = function(client, provider) {
  *
  */
 DL.Auth.prototype.register = function(providerData) {
+  var promise;
   if (typeof(providerData)==="undefined") {
     providerData = {};
   }
-  return this.client.post(this.segments, providerData);
+  promise = this.client.post(this.segments, providerData);
+  promise.then(this.registerToken);
+  return promise;
 };
 
-DL.Auth.prototype.check = function() {
+DL.Auth.prototype.check = function(providerData) {
   if (typeof(providerData)==="undefined") {
     providerData = {};
   }
-  return this.client.post(this.segments, providerData);
+  return this.client.get(this.segments, providerData);
+};
+
+DL.Auth.prototype.registerToken = function(data) {
+  if (data.token) {
+    // register authentication token on localStorage
+    window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY, data.token.token);
+  }
 };
 
 /**

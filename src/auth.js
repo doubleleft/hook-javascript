@@ -12,6 +12,9 @@ DL.Auth = function(client, provider) {
   this.segments = 'auth/' + this.provider;
  };
 
+// Constants
+DL.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
+
 /**
  * Register user using current authentication provider.
  *
@@ -47,15 +50,25 @@ DL.Auth = function(client, provider) {
  *
  */
 DL.Auth.prototype.register = function(providerData) {
+  var promise;
   if (typeof(providerData)==="undefined") {
     providerData = {};
   }
-  return this.client.post(this.segments, providerData);
+  promise = this.client.post(this.segments, providerData);
+  promise.then(this.registerToken);
+  return promise;
 };
 
-DL.Auth.prototype.check = function() {
+DL.Auth.prototype.check = function(providerData) {
   if (typeof(providerData)==="undefined") {
     providerData = {};
   }
-  return this.client.post(this.segments, providerData);
+  return this.client.get(this.segments, providerData);
+};
+
+DL.Auth.prototype.registerToken = function(data) {
+  if (data.token) {
+    // register authentication token on localStorage
+    window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY, data.token.token);
+  }
 };

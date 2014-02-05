@@ -110,7 +110,7 @@ DL.Client.prototype.delete = function(segments) {
  * @param {Object} data
  */
 DL.Client.prototype.request = function(segments, method, data) {
-  var payload, deferred = when.defer();
+  var payload, request_headers, auth_token, deferred = when.defer();
 
   if (data) {
     payload = JSON.stringify(data);
@@ -120,13 +120,22 @@ DL.Client.prototype.request = function(segments, method, data) {
     }
   }
 
+  // App authentication request headers
+  request_headers = {
+    'X-App-Id': this.appId,
+    'X-App-Key': this.key,
+    'Content-Type': 'application/json' // exchange data via JSON to keep basic data types
+  };
+
+  // Forward user authentication token, if it is set
+  auth_token = window.localStorage.getItem(this.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
+  if (auth_token) {
+    request_headers['X-Auth-Token'] = auth_token;
+  }
+
   uxhr(this.url + segments, payload, {
     method: method,
-    headers: {
-      'X-App-Id': this.appId,
-      'X-App-Key': this.key,
-      'Content-Type': 'application/json' // exchange data via JSON to keep basic data types
-    },
+    headers: request_headers,
     success: function(response) {
       deferred.resolver.resolve(JSON.parse(response));
     },
