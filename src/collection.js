@@ -447,8 +447,15 @@ DL.Collection.prototype.update = function(_id, data) {
  * @param {String} field
  * @param {Number} value
  * @return {Promise}
+ *
+ * @example Increment user score
+ *
+ *     client.collection('users').where('_id', user_id).increment('score', 10).then(function(numRows) {
+ *       console.log(numRows, " users has been updated");
+ *     });
  */
 DL.Collection.prototype.increment = function(field, value) {
+  this.options.operation = { method: 'increment', field: field, value: value };
   var promise = this.client.put(this.segments, this.buildQuery());
   if (arguments.length > 0) {
     promise.then.apply(promise, arguments);
@@ -462,15 +469,38 @@ DL.Collection.prototype.increment = function(field, value) {
  * @param {String} field
  * @param {Number} value
  * @return {Promise}
+ *
+ * @example Decrement user score
+ *
+ *     client.collection('users').where('_id', user_id).decrement('score', 10).then(function(numRows) {
+ *       console.log(numRows, " users has been updated");
+ *     });
  */
 DL.Collection.prototype.decrement = function(field, value) {
-  throw new Error("Not implemented.");
+  this.options.operation = { method: 'decrement', field: field, value: value };
+  var promise = this.client.put(this.segments, this.buildQuery());
+  if (arguments.length > 0) {
+    promise.then.apply(promise, arguments);
+  }
+  return promise;
 };
 
 /**
  * Update all collection's data based on `where` params.
  * @param {Object} data key-value data to update from matched rows [optional]
  * @return {Promise}
+ *
+ * @example Updating all rows of the collection
+ *
+ *     client.collection('users').updateAll({category: 'everybody'}).then(function(numRows) {
+ *       console.log(numRows, " users has been updated");
+ *     });
+ *
+ * @example Updating collection filters
+ *
+ *     client.collection('users').where('age','<',18).updateAll({category: 'baby'}).then(function(numRows) {
+ *       console.log(numRows, " users has been updated");
+ *     });
  */
 DL.Collection.prototype.updateAll = function(data) {
   this.options.data = data;
@@ -518,7 +548,8 @@ DL.Collection.prototype.buildQuery = function() {
     paginate: 'p',
     data: 'd',
     first: 'f',
-    aggregation: 'aggr'
+    aggregation: 'aggr',
+    operation: 'op'
   };
 
   for (f in shortnames) {

@@ -16,6 +16,15 @@ DL.Auth = function(client, provider) {
 DL.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
 
 /**
+ * @method logout
+ * @return {DL.Auth} this
+ */
+DL.Auth.prototype.logout = function() {
+  window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
+  return this;
+};
+
+/**
  * Register user using current authentication provider.
  *
  * @param {Object} providerData
