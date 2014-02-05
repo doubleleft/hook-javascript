@@ -28,6 +28,11 @@ DL.Client = function(options) {
    * @property {DL.KeyValues} keys
    */
   this.keys = new DL.KeyValues(this);
+
+  /**
+   * @property {DL.Auth} auth
+   */
+  this.auth = new DL.Auth(this);
 };
 
 /**
@@ -47,22 +52,6 @@ DL.Client = function(options) {
  */
 DL.Client.prototype.collection = function(collectionName) {
   return new DL.Collection(this, collectionName);
-};
-
-/**
- * Get authentication object
- *
- * @method auth
- * @param {String} provider
- * @return {DL.Auth}
- *
- * @example Retrieve facebook authentication provider. See [DL.Auth#register](DL.Auth.html#method_register) for details.
- *
- *     var facebook_auth = client.auth('facebook');
- *     facebook_auth.register( ... );
- */
-DL.Client.prototype.auth = function(provider) {
-  return new DL.Auth(this, provider);
 };
 
 /**
