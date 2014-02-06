@@ -7969,10 +7969,18 @@ DL.Client.prototype.request = function(segments, method, data) {
     method: method,
     headers: request_headers,
     success: function(response) {
-      deferred.resolver.resolve(JSON.parse(response));
+      // FIXME: errors shouldn't trigger success callback, that's a uxhr problem?
+      var data = JSON.parse(response);
+      if (data.error) {
+        deferred.resolver.reject(data);
+      } else {
+        deferred.resolver.resolve(data);
+      }
     },
     error: function(response) {
-      deferred.resolver.reject(JSON.parse(response));
+      var data = JSON.parse(response);
+      console.log("Error: ", data);
+      deferred.resolver.reject(data);
     }
   });
 
@@ -8084,17 +8092,6 @@ DL.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
 DL.Auth.AUTH_DATA_KEY = 'dl-api-auth-data';
 
 /**
- * @method logout
- * @return {DL.Auth} this
- */
-DL.Auth.prototype.logout = function() {
-  this.currentUser = null;
-  window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
-  window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
-  return this;
-};
-
-/**
  * Register user using current authentication provider.
  *
  * @param {String} provider
@@ -8130,6 +8127,17 @@ DL.Auth.prototype.authenticate = function(provider, data) {
     that.registerToken(data);
   });
   return promise;
+};
+
+/**
+ * @method logout
+ * @return {DL.Auth} this
+ */
+DL.Auth.prototype.logout = function() {
+  this.currentUser = null;
+  window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
+  window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
+  return this;
 };
 
 DL.Auth.prototype.registerToken = function(data) {

@@ -126,10 +126,18 @@ DL.Client.prototype.request = function(segments, method, data) {
     method: method,
     headers: request_headers,
     success: function(response) {
-      deferred.resolver.resolve(JSON.parse(response));
+      // FIXME: errors shouldn't trigger success callback, that's a uxhr problem?
+      var data = JSON.parse(response);
+      if (data.error) {
+        deferred.resolver.reject(data);
+      } else {
+        deferred.resolver.resolve(data);
+      }
     },
     error: function(response) {
-      deferred.resolver.reject(JSON.parse(response));
+      var data = JSON.parse(response);
+      console.log("Error: ", data);
+      deferred.resolver.reject(data);
     }
   });
 

@@ -19,17 +19,6 @@ DL.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
 DL.Auth.AUTH_DATA_KEY = 'dl-api-auth-data';
 
 /**
- * @method logout
- * @return {DL.Auth} this
- */
-DL.Auth.prototype.logout = function() {
-  this.currentUser = null;
-  window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
-  window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
-  return this;
-};
-
-/**
  * Register user using current authentication provider.
  *
  * @param {String} provider
@@ -65,6 +54,17 @@ DL.Auth.prototype.authenticate = function(provider, data) {
     that.registerToken(data);
   });
   return promise;
+};
+
+/**
+ * @method logout
+ * @return {DL.Auth} this
+ */
+DL.Auth.prototype.logout = function() {
+  this.currentUser = null;
+  window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
+  window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
+  return this;
 };
 
 DL.Auth.prototype.registerToken = function(data) {

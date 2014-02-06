@@ -15,7 +15,7 @@
     "bower_components"
   ],
   "dependencies": {
-    "uxhr": "*",
+    "uxhr": "~1.0.3",
     "qunit": "*",
     "when": "~2.8.0",
     "lodash": "~2.4.0"
