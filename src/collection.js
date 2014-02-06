@@ -512,7 +512,7 @@ DL.Collection.prototype.addWhere = function(field, operation, value) {
 };
 
 DL.Collection.prototype._validateName = function(name) {
-  var regexp = /^[a-z]+$/;
+  var regexp = /^[a-z_]+$/;
 
   if (!regexp.test(name)) {
     throw new Error("Invalid name: " + name);
