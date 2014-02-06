@@ -1,3 +1,326 @@
+/*
+ * dl-api-javascript v0.1.0
+ * https://github.com/doubleleft/dl-api-javascript
+ *
+ * @copyright 2014 Doubleleft
+ * @build 2/5/2014
+ */
+(function(define) { 'use strict';
+define(function (require) {
+
+
+var DL = {
+  VERSION: "0.1.0",
+  defaults: {
+    perPage: 50
+  }
+};
+
+window.DL = DL;
+
+/**
+ * DL.Client is the entry-point for using dl-api.
+ *
+ * You should instantiate a global javascript client for consuming dl-api.
+ *
+ * ```javascript
+ * window.dl = new DL.Client({
+ *   url: "http://local-or-remote-dl-api-address.com/api/public/index.php/",
+ *   appId: 1,    // your app's id
+ *   key: 'test'  // your app's public key
+ * });
+ * ```
+ *
+ * @class DL.Client
+ * @constructor
+ * @param {Object} options
+ *   @param {String} options.appId
+ *   @param {String} options.key
+ *   @param {String} options.url default: http://dl-api.dev
+ *
+ */
+DL.Client = function(options) {
+  this.url = options.url || "http://dl-api.dev/api/public/index.php/";
+  this.appId = options.appId;
+  this.key = options.key;
+
+  /**
+   * @property {DL.KeyValues} keys
+   */
+  this.keys = new DL.KeyValues(this);
+
+  /**
+   * @property {DL.Auth} auth
+   */
+  this.auth = new DL.Auth(this);
+};
+
+/**
+ * Get collection instance.
+ * @method collection
+ * @param {String} collectionName
+ * @return {DL.Collection}
+ *
+ * @example Retrieve a collection reference. Your collection tables are created on demand.
+ *
+ *     // Users collection
+ *     var users = client.collection('users');
+ *
+ *     // Highscores
+ *     var highscores = client.collection('highscores');
+ *
+ */
+DL.Client.prototype.collection = function(collectionName) {
+  return new DL.Collection(this, collectionName);
+};
+
+/**
+ * @method post
+ * @param {String} segments
+ * @param {Object} data
+ */
+DL.Client.prototype.post = function(segments, data) {
+  if (typeof(data)==="undefined") {
+    data = {};
+  }
+  return this.request(segments, "POST", data);
+};
+
+/**
+ * @method get
+ * @param {String} segments
+ * @param {Object} data
+ */
+DL.Client.prototype.get = function(segments, data) {
+  return this.request(segments, "GET", data);
+};
+
+/**
+ * @method put
+ * @param {String} segments
+ * @param {Object} data
+ */
+DL.Client.prototype.put = function(segments, data) {
+  return this.request(segments, "PUT", data);
+};
+
+/**
+ * @method delete
+ * @param {String} segments
+ */
+DL.Client.prototype.delete = function(segments) {
+  return this.request(segments, "DELETE");
+};
+
+/**
+ * @method request
+ * @param {String} segments
+ * @param {String} method
+ * @param {Object} data
+ */
+DL.Client.prototype.request = function(segments, method, data) {
+  var payload, request_headers, auth_token, deferred = when.defer();
+
+  if (data) {
+    payload = JSON.stringify(data);
+
+    if (method === "GET") {
+      payload = encodeURIComponent(payload);
+    }
+  }
+
+  // App authentication request headers
+  request_headers = {
+    'X-App-Id': this.appId,
+    'X-App-Key': this.key,
+    'Content-Type': 'application/json' // exchange data via JSON to keep basic data types
+  };
+
+  // Forward user authentication token, if it is set
+  auth_token = window.localStorage.getItem(this.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
+  if (auth_token) {
+    request_headers['X-Auth-Token'] = auth_token;
+  }
+
+  uxhr(this.url + segments, payload, {
+    method: method,
+    headers: request_headers,
+    success: function(response) {
+      deferred.resolver.resolve(JSON.parse(response));
+    },
+    error: function(response) {
+      deferred.resolver.reject(JSON.parse(response));
+    }
+  });
+
+  return deferred.promise;
+};
+
+DL.Client.prototype.serialize = function(obj, prefix) {
+  var str = [];
+  for (var p in obj) {
+    if (obj.hasOwnProperty(p)) {
+      var k = prefix ? prefix + "[" + p + "]" : p,
+      v = obj[p];
+      str.push(typeof v == "object" ? this.serialize(v, k) : encodeURIComponent(k) + "=" + encodeURIComponent(v));
+    }
+  }
+  return str.join("&");
+};
+
+/**
+ * Iterable is for internal use only.
+ * @class DL.Iterable
+ */
+DL.Iterable = function() { };
+DL.Iterable.prototype = {
+  /**
+   * @method each
+   * @param {Function} callback
+   */
+  each : function(callback) { return this._iterate('each', callback); },
+
+  /**
+   * @method find
+   * @param {Function} callback
+   */
+  find : function(callback) { return this._iterate('find', callback); },
+
+  /**
+   * @method filter
+   * @param {Function} callback
+   */
+  filter : function(callback) { return this._iterate('filter', callback); },
+
+  /**
+   * @method max
+   * @param {Function} callback
+   */
+  max : function(callback) { return this._iterate('max', callback); },
+
+  /**
+   * @method min
+   * @param {Function} callback
+   */
+  min : function(callback) { return this._iterate('min', callback); },
+
+  /**
+   * @method every
+   * @param {Function} callback
+   */
+  every : function(callback, accumulator) { return this._iterate('every', callback); },
+
+  /**
+   * @method reject
+   * @param {Function} callback
+   */
+  reject : function(callback, accumulator) { return this._iterate('reject', callback, accumulator); },
+
+  /**
+   * @method groupBy
+   * @param {Function} callback
+   */
+  groupBy : function(callback, accumulator) { return this._iterate('groupBy', callback, accumulator); },
+
+  /**
+   * Iterate using lodash function
+   * @method _iterate
+   * @param {String} method
+   * @param {Function} callback
+   * @param {Object} argument
+   */
+  _iterate : function(method, callback, arg3) {
+    var that = this;
+
+    this.then(function(data) {
+      _[method].call(that, data, callback, arg3);
+    });
+
+    return this;
+  }
+};
+
+/**
+ * Deals with user registration/authentication
+ * @class DL.Auth
+ * @param {DL.Client} client
+ * @constructor
+ */
+DL.Auth = function(client) {
+  this.client = client;
+
+  // Get current user reference
+  this.currentUser = window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
+  if (this.currentUser) {
+    this.currentUser = JSON.parse(this.currentUser); // localStorage only supports recording strings, so we need to parse it
+  }
+};
+
+// Constants
+DL.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
+DL.Auth.AUTH_DATA_KEY = 'dl-api-auth-data';
+
+/**
+ * @method logout
+ * @return {DL.Auth} this
+ */
+DL.Auth.prototype.logout = function() {
+  this.currentUser = null;
+  window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
+  window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
+  return this;
+};
+
+/**
+ * Register user using current authentication provider.
+ *
+ * @param {String} provider
+ * @param {Object} data
+ * @method authenticate
+ *
+ * @example Authenticating with email address
+ *
+ *     client.auth.authenticate('email', {
+ *       email: "daliberti@doubleleft.com",
+ *       name: "Danilo Aliberti",
+ *       password: "123"
+ *     }).then(function(user) {
+ *       console.log("Registered user: ", user);
+ *     });
+ *
+ * @example Authenticating with Facebook
+ *
+ *     FB.login(function(response) {
+ *       client.auth.authenticate('facebook', response.authResponse).then(function(user) {
+ *         console.log("Registered user: ", user);
+ *       });
+ *     }, {scope: 'email'});
+ *
+ *
+ */
+DL.Auth.prototype.authenticate = function(provider, data) {
+  var promise, that = this;
+  if (typeof(data)==="undefined") { data = {}; }
+
+  promise = this.client.post('auth/' + provider, data);
+  promise.then(function(data) {
+    that.registerToken(data);
+  });
+  return promise;
+};
+
+DL.Auth.prototype.registerToken = function(data) {
+  if (data.token) {
+    // register authentication token on localStorage
+    window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY, data.token.token);
+    delete data.token;
+
+    // Store curent user
+    this.currentUser = data;
+    window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY, JSON.stringify(this.currentUser));
+  }
+};
+
 /**
  * @class DL.Collection
  *
@@ -563,3 +886,226 @@ DL.Collection.prototype.buildQuery = function() {
   return query;
 };
 
+
+DL.File = function(client) {
+  this.client = client;
+
+  this.upload = function() {
+    //this.client.
+  };
+};
+
+
+/**
+ * @class DL.KeyValues
+ * @constructor
+ * @param {DL.Client} client
+ */
+DL.KeyValues = function(client) {
+  this.client = client;
+};
+
+/**
+ * @method get
+ * @param {String} key
+ * @param {Function} callback
+ * @return {Promise}
+ *
+ * @example Get a key value
+ *
+ *     client.keys.get('my-custom-key', function(key) {
+ *       console.log(key.value);
+ *     });
+ */
+DL.KeyValues.prototype.get = function(key, callback) {
+  var promise = this.client.get('key/' + key);
+  if (callback) {
+    promise.then.apply(promise, [callback]);
+  }
+  return promise;
+};
+
+/**
+ * @method set
+ * @param {String} key
+ * @param {String|Number} value
+ * @return {Promise}
+ *
+ * @example Set a key value
+ *
+ *     client.keys.set('my-custom-key', 'custom value').then(function(key) {
+ *       console.log(key);
+ *     });
+ */
+DL.KeyValues.prototype.set = function(key, value) {
+  return this.client.post('key/' + key, { value: value });
+};
+
+/**
+ * @class DL.Pagination
+ * @param {DL.Collection} collection
+ * @param {Number} perPage
+ * @constructor
+ */
+DL.Pagination = function(collection) {
+  this.fetching = true;
+
+  /**
+   * @property collection
+   * @type {DL.Collection}
+   */
+  this.collection = collection;
+};
+
+DL.Pagination.prototype._fetchComplete = function(response) {
+  this.fetching = false;
+
+  /**
+   * @property total
+   * @type {Number}
+   */
+  this.total = response.total;
+
+  /**
+   * @property per_page
+   * @type {Number}
+   */
+  this.per_page = response.per_page;
+
+  /**
+   * @property current_page
+   * @type {Number}
+   */
+  this.current_page = response.current_page;
+
+  /**
+   * @property last_page
+   * @type {Number}
+   */
+  this.last_page = response.last_page;
+
+  /**
+   * @property from
+   * @type {Number}
+   */
+  this.from = response.from;
+
+  /**
+   * @property to
+   * @type {Number}
+   */
+  this.to = response.to;
+
+  /**
+   * @property data
+   * @type {Object}
+   */
+  this.data = response.data;
+};
+
+/**
+ * @method hasNext
+ * @return {Boolean}
+ */
+DL.Pagination.prototype.hasNext = function() {
+  return (this.current_page < this.to);
+};
+
+/**
+ * @method isFetching
+ * @return {Booelan}
+ */
+DL.Pagination.prototype.isFetching = function() {
+  return this.fetching;
+};
+
+DL.Pagination.prototype.then = function() {
+};
+
+/**
+ * @class DL.Stream
+ * @constructor
+ * @param {Client} client
+ */
+DL.Stream = function(collection, options) {
+  if (!options) { options = {}; }
+
+  this.collection = collection;
+
+  // time to wait for retry, after connection closes
+  this.retry_timeout = options.retry_timeout || 5;
+  this.refresh_timeout = options.refresh_timeout || 5;
+  this.from_now = options.from_now || false;
+
+  var query = this.collection.buildQuery();
+  query['X-App-Id'] = this.collection.client.appId;
+  query['X-App-Key'] = this.collection.client.key;
+  query.from_now = this.from_now;
+  query.stream = {
+    'retry': this.retry_timeout,
+    'refreh': this.refresh_timeout
+  };
+
+  this.event_source = new EventSource(this.collection.client.url + this.collection.segments + "?" + JSON.stringify(query), {
+    withCredentials: true
+  });
+
+  // bind event source
+  if (typeof(options)==="function") {
+    this.on('message', options);
+  } else {
+    for (var event in options) {
+      this.on(event, options[event]);
+    }
+  }
+};
+
+/**
+ * Register event handler
+ * @method on
+ * @param {String} event
+ * @param {Function} callback
+ * @return {Stream} this
+ *
+ * @example Registering error event
+ *
+ *     client.collection('something').stream().on('error', function(e) {
+ *       console.log("Error: ", e);
+ *     })
+ *
+ *
+ * @example Registering message event
+ *
+ *     client.collection('something').stream().on('message', function(e) {
+ *       console.log("Message: ", e);
+ *     })
+ */
+DL.Stream.prototype.on = function(event, callback) {
+  var that = this;
+
+  if (event == 'message') {
+    this.event_source.onmessage = function(e) {
+      callback.apply(that, [JSON.parse(e.data), e]);
+    };
+  } else {
+    this.event_source['on' + event] = function(e) {
+      callback.apply(that, [e]);
+    };
+  }
+
+  return this;
+};
+
+/**
+ * Close streaming connection
+ * @method close
+ * @return {Stream} this
+ */
+DL.Stream.prototype.close = function() {
+  this.event_source.close();
+  return this;
+};
+
+return DL;
+});
+})(typeof define === 'function' && define.amd ? define : function (factory) { module.exports = factory(require); });

@@ -6,21 +6,23 @@
  * @build 2/5/2014
  */
 (function(window) {
-	//
-	// compatibility with amd
+  //
+  // compatibility with amd
   // WARNING: i'm fucking weird, please fix me
-	//
-	window.define = function(factory, func) {
-		try{ delete window.define; } catch(e){ window.define = void 0; } // IE
+  //
+  if (typeof(window.define)==="undefined") {
+    window.define = function(factory, func) {
+      try{ delete window.define; } catch(e){ window.define = void 0; } // IE
 
-    if (typeof(factory)==="function") {
-      // whenjs
-      window.when = factory();
-    } else {
-      window[factory] = func();
-    }
-	};
-	window.define.amd = {};
+      if (typeof(factory)==="function") {
+        // whenjs
+        window.when = factory();
+      } else {
+        window[factory] = func();
+      }
+    };
+    window.define.amd = {};
+  }
 
 /** @license MIT License (c) copyright 2011-2013 original author or authors */
 
@@ -8097,11 +8099,11 @@ DL.Auth.prototype.logout = function() {
  *
  * @param {String} provider
  * @param {Object} data
- * @method register
+ * @method authenticate
  *
  * @example Authenticating with email address
  *
- *     client.auth.register('email', {
+ *     client.auth.authenticate('email', {
  *       email: "daliberti@doubleleft.com",
  *       name: "Danilo Aliberti",
  *       password: "123"
@@ -8112,14 +8114,14 @@ DL.Auth.prototype.logout = function() {
  * @example Authenticating with Facebook
  *
  *     FB.login(function(response) {
- *       client.auth.register('facebook', response.authResponse).then(function(user) {
+ *       client.auth.authenticate('facebook', response.authResponse).then(function(user) {
  *         console.log("Registered user: ", user);
  *       });
  *     }, {scope: 'email'});
  *
  *
  */
-DL.Auth.prototype.register = function(provider, data) {
+DL.Auth.prototype.authenticate = function(provider, data) {
   var promise, that = this;
   if (typeof(data)==="undefined") { data = {}; }
 
@@ -8128,13 +8130,6 @@ DL.Auth.prototype.register = function(provider, data) {
     that.registerToken(data);
   });
   return promise;
-};
-
-DL.Auth.prototype.check = function(provider, data) {
-  if (typeof(data)==="undefined") {
-    data = {};
-  }
-  return this.client.get('auth/' + provider, data);
 };
 
 DL.Auth.prototype.registerToken = function(data) {
@@ -8162,8 +8157,7 @@ DL.Collection = function(client, name) {
   this.name = this._validateName(name);
   this.reset();
 
-  var custom_collections = ['files'];
-  this.segments = (custom_collections.indexOf(this.name) !== -1) ? this.name : 'collection/' + this.name;
+  this.segments = 'collection/' + this.name;
 };
 
 // Inherits from DL.Iterable

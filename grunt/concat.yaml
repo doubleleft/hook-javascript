@@ -19,3 +19,11 @@ javascripts:
     - 'src/*.js'
     - 'src/wrap/end.js'
   dest: 'dist/dl.js'
+
+amd:
+  src:
+    - 'src/wrap/amd-begin.js'
+    - 'src/core/*.js'
+    - 'src/*.js'
+    - 'src/wrap/amd-end.js'
+  dest: 'dist/amd/dl.js'

@@ -8,6 +8,23 @@
 	<script type="text/javascript" src="../dist/dl.js"></script>
 </head>
 <body>
+  <div id="fb-root"></div>
+  <script type="text/javascript">
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '1446628695568830',
+        status     : true,
+        xfbml      : true
+      });
+    };
+    (function(d, s, id){
+       var js, fjs = d.getElementsByTagName(s)[0];
+       if (d.getElementById(id)) {return;}
+       js = d.createElement(s); js.id = id;
+       js.src = "//connect.facebook.net/en_US/all.js";
+       fjs.parentNode.insertBefore(js, fjs);
+     }(document, 'script', 'facebook-jssdk'));
+  </script>
 
 	<div id="qunit"></div>
 	<div id="qunit-fixture"></div>
@@ -18,8 +35,9 @@
 	<script src="pagination.js"></script>
 	<script src="stream.js"></script>
 	<script src="key_value.js"></script>
-	<script src="auth.js"></script>
 	<!-- <script src="collection_calls.js"></script> -->
+	<script src="auth/email.js"></script>
+	<!-- <script src="auth/facebook.js"></script> -->
 
 </body>
 </html>

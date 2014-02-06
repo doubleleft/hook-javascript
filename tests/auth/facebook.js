@@ -1,0 +1,16 @@
+asyncTest("Authentication: Facebook", function() {
+  expect(3);
+
+  FB.login(function(response) {
+    client.auth.register('facebook', response.authResponse).then(function() {
+      FB.api('/me', function(me) { // match registered data with actual user info
+        ok(client.auth.currentUser.email == me.email, "currentUser.email");
+        ok(client.auth.currentUser.name == me.name, "currentUser.name");
+        client.auth.logout();
+        ok(client.auth.currentUser == null, "logout");
+        start();
+      });
+    });
+  }, {scope: 'email'});
+});
+
