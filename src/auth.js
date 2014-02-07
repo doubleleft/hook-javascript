@@ -48,8 +48,32 @@ DL.Auth.AUTH_DATA_KEY = 'dl-api-auth-data';
 DL.Auth.prototype.authenticate = function(provider, data) {
   var promise, that = this;
   if (typeof(data)==="undefined") { data = {}; }
-
   promise = this.client.post('auth/' + provider, data);
+  promise.then(function(data) {
+    that.registerToken(data);
+  });
+  return promise;
+};
+
+/**
+ * Verify if user is already registered, and log-in if succeed.
+ * @method verify
+ * @param {String} provider
+ * @param {Object} data
+ * @return {Promise}
+ *
+ * @example
+ *
+ *     client.auth.check('email', {email: "edreyer@doubleleft.com", password: "123"}).then(function(data){
+ *       console.log("User found: ", data);
+ *     }, function(data){
+ *       console.log("User not found or password invalid.", data);
+ *     });
+ */
+DL.Auth.prototype.verify = function(provider, data) {
+  var promise, that = this;
+  if (typeof(data)==="undefined") { data = {}; }
+  promise = this.client.post('auth/' + provider + '/check', data);
   promise.then(function(data) {
     that.registerToken(data);
   });

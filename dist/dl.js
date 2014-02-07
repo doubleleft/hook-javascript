@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 2/6/2014
+ * @build 2/7/2014
  */
 (function(window) {
   //
@@ -7971,7 +7971,7 @@ DL.Client.prototype.request = function(segments, method, data) {
     success: function(response) {
       // FIXME: errors shouldn't trigger success callback, that's a uxhr problem?
       var data = JSON.parse(response);
-      if (data.error) {
+      if (!data || data.error) {
         deferred.resolver.reject(data);
       } else {
         deferred.resolver.resolve(data);
@@ -8121,8 +8121,32 @@ DL.Auth.AUTH_DATA_KEY = 'dl-api-auth-data';
 DL.Auth.prototype.authenticate = function(provider, data) {
   var promise, that = this;
   if (typeof(data)==="undefined") { data = {}; }
-
   promise = this.client.post('auth/' + provider, data);
+  promise.then(function(data) {
+    that.registerToken(data);
+  });
+  return promise;
+};
+
+/**
+ * Verify if user is already registered, and log-in if succeed.
+ * @method verify
+ * @param {String} provider
+ * @param {Object} data
+ * @return {Promise}
+ *
+ * @example
+ *
+ *     client.auth.check('email', {email: "edreyer@doubleleft.com", password: "123"}).then(function(data){
+ *       console.log("User found: ", data);
+ *     }, function(data){
+ *       console.log("User not found or password invalid.", data);
+ *     });
+ */
+DL.Auth.prototype.verify = function(provider, data) {
+  var promise, that = this;
+  if (typeof(data)==="undefined") { data = {}; }
+  promise = this.client.post('auth/' + provider + '/check', data);
   promise.then(function(data) {
     that.registerToken(data);
   });
@@ -8718,14 +8742,25 @@ DL.Collection.prototype.buildQuery = function() {
 };
 
 
-DL.File = function(client) {
+/**
+ */
+DL.Files = function(client) {
   this.client = client;
-
-  this.upload = function() {
-    //this.client.
-  };
 };
 
+/**
+ * @return {Promise}
+ */
+DL.Files.prototype.upload = function(provider, data) {
+  this.client.post('/files', data);
+};
+
+/**
+ * @return {Promise}
+ */
+DL.Files.prototype.get = function(_id) {
+  return this.client.get('/files', { _id: _id });
+};
 
 /**
  * @class DL.KeyValues
