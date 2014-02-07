@@ -8137,7 +8137,7 @@ DL.Auth.prototype.authenticate = function(provider, data) {
  *
  * @example
  *
- *     client.auth.check('email', {email: "edreyer@doubleleft.com", password: "123"}).then(function(data){
+ *     client.auth.verify('email', {email: "edreyer@doubleleft.com", password: "123"}).then(function(data){
  *       console.log("User found: ", data);
  *     }, function(data){
  *       console.log("User not found or password invalid.", data);
@@ -8146,7 +8146,7 @@ DL.Auth.prototype.authenticate = function(provider, data) {
 DL.Auth.prototype.verify = function(provider, data) {
   var promise, that = this;
   if (typeof(data)==="undefined") { data = {}; }
-  promise = this.client.post('auth/' + provider + '/check', data);
+  promise = this.client.post('auth/' + provider + '/verify', data);
   promise.then(function(data) {
     that.registerToken(data);
   });
