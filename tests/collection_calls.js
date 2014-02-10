@@ -1,5 +1,5 @@
 asyncTest("Collection calls", function() {
-  expect(9);
+  expect(1);
 
   var posts = client.collection('posts');
   var past_time = Math.round(((new Date).getTime() - 2000) / 1000);

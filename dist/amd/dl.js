@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 2/7/2014
+ * @build 2/10/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -1089,7 +1089,7 @@ DL.Stream = function(collection, options) {
 
   // time to wait for retry, after connection closes
   query.stream = {
-    'retry': options.retry_timeout || 5,
+    'retry': options.retry_timeout || 1,
     'refreh': options.refresh_timeout || 5
   };
 

@@ -22,7 +22,7 @@ DL.Stream = function(collection, options) {
 
   // time to wait for retry, after connection closes
   query.stream = {
-    'retry': options.retry_timeout || 5,
+    'retry': options.retry_timeout || 1,
     'refreh': options.refresh_timeout || 5
   };
 
