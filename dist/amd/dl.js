@@ -419,7 +419,7 @@ DL.Collection.prototype.get = function() {
  * Add `where` param
  * @method where
  * @param {Object | String} where params or field name
- * @param {String} operation operation or value
+ * @param {String} operation '<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between'
  * @param {String} value value
  * @return {DL.Collection} this
  *
