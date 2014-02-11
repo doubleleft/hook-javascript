@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 2/10/2014
+ * @build 2/11/2014
  */
 (function(window) {
   //
@@ -8264,6 +8264,12 @@ DL.Collection.prototype.get = function() {
  *       console.log(result);
  *     })
  *
+ * @example Filtering 'in' value list.
+ *
+ *     client.collection('posts').where('author_id', 'in', [500, 501]).then(function(result) {
+ *       console.log(result);
+ *     })
+ *
  */
 DL.Collection.prototype.where = function(objects, _operation, _value) {
   var field,
@@ -8685,7 +8691,7 @@ DL.Collection.prototype.updateAll = function(data) {
 };
 
 DL.Collection.prototype.addWhere = function(field, operation, value) {
-  this.wheres.push([field, operation, value]);
+  this.wheres.push([field, operation.toLowerCase(), value]);
   return this;
 };
 
