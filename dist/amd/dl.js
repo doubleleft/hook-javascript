@@ -3,12 +3,15 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 2/11/2014
+ * @build 2/12/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
 
 
+/**
+ * @module DL
+ */
 var DL = {
   VERSION: "0.1.0",
   defaults: {
@@ -53,6 +56,11 @@ DL.Client = function(options) {
    * @property {DL.Auth} auth
    */
   this.auth = new DL.Auth(this);
+
+  /**
+   * @property {DL.System} system
+   */
+  this.system = new DL.System(this);
 };
 
 /**
@@ -1157,6 +1165,28 @@ DL.Stream.prototype.on = function(event, callback) {
 DL.Stream.prototype.close = function() {
   this.event_source.close();
   return this;
+};
+
+/**
+ * @class DL.System
+ * @constructor
+ * @param {Client} client
+ */
+DL.System = function(client) {
+  this.client = client;
+};
+
+/**
+ * Return server's system time.
+ * @method time
+ * @return {Promise}
+ */
+DL.System.prototype.time = function() {
+  var promise = this.client.get('system/time');
+  if (arguments.length > 0) {
+    promise.then.apply(promise, arguments);
+  }
+  return promise;
 };
 
 return DL;

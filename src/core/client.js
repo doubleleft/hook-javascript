@@ -33,6 +33,11 @@ DL.Client = function(options) {
    * @property {DL.Auth} auth
    */
   this.auth = new DL.Auth(this);
+
+  /**
+   * @property {DL.System} system
+   */
+  this.system = new DL.System(this);
 };
 
 /**
