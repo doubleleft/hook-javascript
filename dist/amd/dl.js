@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 2/12/2014
+ * @build 2/14/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -621,6 +621,30 @@ DL.Collection.prototype.first = function() {
 };
 
 /**
+ * First or create
+ * @method first
+ * @param {Object} data
+ * @param {Function} callback
+ * @return {Promise}
+ *
+ * @example Return the first match for 'data' param, or create it.
+ *
+ *     client.collection('uniques').firstOrCreate({type: "something"}).then(function(data) {
+ *       console.log("Unique row: ", data);
+ *     });
+ */
+DL.Collection.prototype.firstOrCreate = function(data) {
+  throw new Error("Not implemented");
+  // var promise;
+  // this.options.first = 1;
+  // promise = this.client.post(this.segments, { data: data, options: this.buildQuery() });
+  // if (arguments.length > 1) {
+  //   promise.then(arguments[1]);
+  // }
+  // return promise;
+};
+
+/**
  * Alias for get & then
  * @method then
  */
@@ -1104,7 +1128,7 @@ DL.Stream = function(collection, options) {
   // time to wait for retry, after connection closes
   query.stream = {
     'retry': options.retry_timeout || 1,
-    'refreh': options.refresh_timeout || 5
+    'refresh': options.refresh_timeout || 5
   };
 
   this.event_source = new EventSource(this.collection.client.url + this.collection.segments + "?" + JSON.stringify(query), {
