@@ -22,8 +22,8 @@ DL.Stream = function(collection, options) {
 
   // time to wait for retry, after connection closes
   query.stream = {
-    'retry': options.retry_timeout || 1,
-    'refresh': options.refresh_timeout || 5
+    'refresh': options.refresh_timeout || 1,
+    'retry': options.retry_timeout || 5
   };
 
   this.event_source = new EventSource(this.collection.client.url + this.collection.segments + "?" + JSON.stringify(query), {
