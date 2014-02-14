@@ -8087,12 +8087,28 @@ DL.Iterable.prototype = {
  */
 DL.Auth = function(client) {
   this.client = client;
+  this._currentUser = null;
 
-  // Get current user reference
-  this.currentUser = window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
-  if (this.currentUser) {
-    this.currentUser = JSON.parse(this.currentUser); // localStorage only supports recording strings, so we need to parse it
-  }
+  Object.defineProperty(this, 'currentUser', {
+    get: function() {
+      if (!this._currentUser) {
+        this._currentUser = window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
+        if (this._currentUser) {
+          this._currentUser = JSON.parse(this.currentUser); // localStorage only supports recording strings, so we need to parse it
+        }
+      }
+      return this._currentUser;
+    },
+    set: function(data) {
+      this._currentUser = data;
+      if (!data) {
+        window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
+        window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
+      } else {
+        window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY, JSON.stringify(data));
+      }
+    }
+  });
 };
 
 // Constants
@@ -8162,13 +8178,58 @@ DL.Auth.prototype.verify = function(provider, data) {
 };
 
 /**
+ * Send a 'forgot password' confirmation email to target user email address.
+ * @method forgotPassword
+ * @param {Object} data
+ * @return {Promise}
+ *
+ * @example
+ *
+ *     client.auth.forgotPassword({
+ *       email: "edreyer@doubleleft.com",
+ *       template: "Hi {{name}}, click here to reset your password http://custom-project.com/pass-recovery-path.html?token={{token}}"
+ *     }).then(function(data){
+ *       console.log("Email enviado!", data);
+ *     }, function(data){
+ *       console.log("User not found: ", data);
+ *     });
+ */
+DL.Auth.prototype.forgotPassword = function(data) {
+  if (typeof(data)==="undefined") { data = {}; }
+  return this.client.post('auth/email/forgotPassword', data);
+};
+
+/**
+ * Reset user password
+ * @method resetPassword
+ * @param {Object} token [optional]
+ * @return {Promise}
+ *
+ * @example
+ *
+ *     client.auth.resetPassword().then(function(data){
+ *       console.log("Email enviado!", data);
+ *     }, function(data){
+ *       console.log("User not found: ", data);
+ *     });
+ */
+DL.Auth.prototype.resetPassword = function(token) {
+  if (!token) {
+    token = window.location.href.match(/\?token=([a-z0-9]+)/);
+    token = (token && token[1]);
+  }
+  if (typeof(token)!=="string") {
+    throw new Error("forgot password token required. Remember to use 'auth.forgotPassword' before 'auth.resetPassword'.");
+  }
+  return this.client.post('auth/email/resetPassword', { token: token });
+};
+
+/**
  * @method logout
  * @return {DL.Auth} this
  */
 DL.Auth.prototype.logout = function() {
   this.currentUser = null;
-  window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
-  window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
   return this;
 };
 
@@ -8180,7 +8241,6 @@ DL.Auth.prototype.registerToken = function(data) {
 
     // Store curent user
     this.currentUser = data;
-    window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY, JSON.stringify(this.currentUser));
   }
 };
 
