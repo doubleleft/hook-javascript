@@ -8208,25 +8208,31 @@ DL.Auth.prototype.forgotPassword = function(data) {
  *   @param {Object} data.token [optional]
  * @return {Promise}
  *
- * @example
+ * @example Getting token automatically from query string
  *
- *     client.auth.resetPassword({password: "my-new-password-123"}).then(function(data){
+ *     client.auth.resetPassword("my-new-password-123").then(function(data){
  *       console.log("Password reseted! ", data);
  *     }, function(data){
  *       console.log("Error", data.error);
  *     });
+ *
+ * @example Providing a token manually
+ *
+ *     client.auth.resetPassword({token: "xxx", password: "my-new-password-123"}).then(function(data){
+ *       console.log("Password reseted! ", data);
+ *     }, function(data){
+ *       console.log("Error", data.error);
+ *     });
+ *
  */
 DL.Auth.prototype.resetPassword = function(data) {
+  if (typeof(data)==="string") { data = { password: data }; }
   if (typeof(data.token)==="undefined") {
-    data.token = window.location.href.match(/\?token=([a-z0-9]+)/);
+    data.token = window.location.href.match(/[\?|&]token=([a-z0-9]+)/);
     data.token = (data.token && data.token[1]);
   }
-  if (typeof(data.token)!=="string") {
-    throw new Error("forgot password token required. Remember to use 'auth.forgotPassword' before 'auth.resetPassword'.");
-  }
-  if (typeof(data.password)!=="string") {
-    throw new Error("new password required.");
-  }
+  if (typeof(data.token)!=="string") { throw new Error("forgot password token required. Remember to use 'auth.forgotPassword' before 'auth.resetPassword'."); }
+  if (typeof(data.password)!=="string") { throw new Error("new password required."); }
   return this.client.post('auth/email/resetPassword', data);
 };
 
