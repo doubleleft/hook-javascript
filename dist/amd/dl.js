@@ -364,6 +364,7 @@ DL.Auth.prototype.verify = function(provider, data) {
  *
  *     client.auth.forgotPassword({
  *       email: "edreyer@doubleleft.com",
+ *       subject: "Project name: Forgot your password?",
  *       template: "Hi {{name}}, click here to reset your password http://custom-project.com/pass-recovery-path.html?token={{token}}"
  *     }).then(function(data){
  *       console.log("Email enviado!", data);
@@ -379,26 +380,31 @@ DL.Auth.prototype.forgotPassword = function(data) {
 /**
  * Reset user password
  * @method resetPassword
- * @param {Object} token [optional]
+ * @param {Object} data
+ *   @param {Object} data.password
+ *   @param {Object} data.token [optional]
  * @return {Promise}
  *
  * @example
  *
- *     client.auth.resetPassword().then(function(data){
- *       console.log("Email enviado!", data);
+ *     client.auth.resetPassword({password: "my-new-password-123"}).then(function(data){
+ *       console.log("Password reseted! ", data);
  *     }, function(data){
- *       console.log("User not found: ", data);
+ *       console.log("Error", data.error);
  *     });
  */
-DL.Auth.prototype.resetPassword = function(token) {
-  if (!token) {
-    token = window.location.href.match(/\?token=([a-z0-9]+)/);
-    token = (token && token[1]);
+DL.Auth.prototype.resetPassword = function(data) {
+  if (typeof(data.token)==="undefined") {
+    data.token = window.location.href.match(/\?token=([a-z0-9]+)/);
+    data.token = (data.token && data.token[1]);
   }
-  if (typeof(token)!=="string") {
+  if (typeof(data.token)!=="string") {
     throw new Error("forgot password token required. Remember to use 'auth.forgotPassword' before 'auth.resetPassword'.");
   }
-  return this.client.post('auth/email/resetPassword', { token: token });
+  if (typeof(data.password)!=="string") {
+    throw new Error("new password required.");
+  }
+  return this.client.post('auth/email/resetPassword', data);
 };
 
 /**
