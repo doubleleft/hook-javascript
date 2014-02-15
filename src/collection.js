@@ -258,6 +258,30 @@ DL.Collection.prototype.first = function() {
 };
 
 /**
+ * First or create
+ * method firstorCreate
+ * param {Object} data
+ * param {Function} callback
+ * return {Promise}
+ *
+ * example Return the first match for 'data' param, or create it.
+ *
+ *     client.collection('uniques').firstOrCreate({type: "something"}).then(function(data) {
+ *       console.log("Unique row: ", data);
+ *     });
+ */
+DL.Collection.prototype.firstOrCreate = function(data) {
+  throw new Error("Not implemented");
+  // var promise;
+  // this.options.first = 1;
+  // promise = this.client.post(this.segments, { data: data, options: this.buildQuery() });
+  // if (arguments.length > 1) {
+  //   promise.then(arguments[1]);
+  // }
+  // return promise;
+};
+
+/**
  * Alias for get & then
  * @method then
  */

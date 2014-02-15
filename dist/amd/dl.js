@@ -688,12 +688,12 @@ DL.Collection.prototype.first = function() {
 
 /**
  * First or create
- * @method first
- * @param {Object} data
- * @param {Function} callback
- * @return {Promise}
+ * method firstorCreate
+ * param {Object} data
+ * param {Function} callback
+ * return {Promise}
  *
- * @example Return the first match for 'data' param, or create it.
+ * example Return the first match for 'data' param, or create it.
  *
  *     client.collection('uniques').firstOrCreate({type: "something"}).then(function(data) {
  *       console.log("Unique row: ", data);
