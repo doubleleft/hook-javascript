@@ -370,42 +370,23 @@ DL.Collection.prototype.offset = function(int) {
 };
 
 /**
- * Stream
- * @method stream
+ * Get channel for this collection.
+ * @method channel
  * @param {Object|Function} callback_or_bindings
- * @return {DL.Stream}
+ * @return {DL.Channel}
  *
  * @example Streaming collection data
  *
- *     client.collection('messages').where('type', 'new-game').stream(function(data) {
+ *     client.collection('messages').where('type', 'new-game').channel(function(data) {
  *       console.log("Received new-game message: ", data);
  *     });
  *
  *     client.collection('messages').create({type: 'sad', text: "i'm sad because streaming won't catch me"});
  *     client.collection('messages').create({type: 'new-game', text: "yey, streaming will catch me!"});
  *
- * @example Getting only newly updated items from collection
- *
- *     client.collection('messages').stream({
- *       from_now: true,
- *       message: function(data) {
- *         console.log("Just created/updated:", data);
- *       }
- *     });
- *
- * @example Setting custom timeout configs
- *
- *     client.collection('messages').stream({
- *       retry_timeout: 10,   // re-open streaming after 10 seconds
- *       refresh_timeout: 2,  // refresh streaming data every 2 seconds
- *       message: function(data) {
- *         console.log("Just created/updated:", data);
- *       }
- *     });
- *
  */
-DL.Collection.prototype.stream = function(bindings) {
-  return new DL.Stream(this, bindings);
+DL.Collection.prototype.channel = function() {
+  return new DL.Channel(this.client, this);
 };
 
 /**

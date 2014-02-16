@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 2/14/2014
+ * @build 2/16/2014
  */
 (function(window) {
   //
@@ -7906,6 +7906,23 @@ DL.Client.prototype.collection = function(collectionName) {
 };
 
 /**
+ * Get channel instance.
+ * @method collection
+ * @param {String} channelName
+ * @return {DL.Channel}
+ *
+ * @example Retrieve a channel reference.
+ *
+ *     var messages = client.channel('messages');
+ *
+ */
+DL.Client.prototype.channel = function(channelName) {
+  var collection = this.collection(channelName);
+  collection.segments = collection.segments.replace('collection/', 'channels/');
+  return new DL.Channel(this, collection);
+};
+
+/**
  * @method post
  * @param {String} segments
  * @param {Object} data
@@ -7976,6 +7993,7 @@ DL.Client.prototype.request = function(segments, method, data) {
   uxhr(this.url + segments, payload, {
     method: method,
     headers: request_headers,
+    sync: data._sync || false,
     success: function(response) {
       // FIXME: errors shouldn't trigger success callback, that's a uxhr problem?
       var data = JSON.parse(response);
@@ -8254,6 +8272,150 @@ DL.Auth.prototype.registerToken = function(data) {
     // Store curent user
     this.currentUser = data;
   }
+};
+
+/**
+ * @class DL.Channel
+ * @constructor
+ * @param {Client} client
+ */
+DL.Channel = function(client, collection) {
+  this.collection = collection;
+  this.client_id = null;
+};
+
+/**
+ * Subscribe to event
+ * @method subscribe
+ * @param {String} event
+ * @param {Function} callback
+ * @return {DL.Channel} this
+ *
+ * @example Registering for all messages
+ *
+ *     channel.subscribe('message', function(e) {
+ *       console.log("Message: ", e);
+ *     })
+ *
+ * @example Registering for a single custom event
+ *
+ *     channel.subscribe('custom-event', function(e) {
+ *       console.log("Custom event triggered: ", e);
+ *     })
+ *
+ * @example Registering error event
+ *
+ *     channel.subscribe('error', function(e) {
+ *       console.log("Error: ", e);
+ *     })
+ *
+ *
+ */
+DL.Channel.prototype.subscribe = function(event, callback) {
+  var that = this;
+  this.connect().then(function() {
+    if (event == 'error') {
+      that.event_source.addEventListener(event, function(e) {
+        callback.apply(that, [e]);
+      }, false);
+    } else {
+      that.event_source.addEventListener(event, function(e) {
+        callback.apply(that, [JSON.parse(e.data), e]);
+      }, false);
+    }
+  });
+  return this;
+};
+
+
+/**
+ * Unsubscribe to a event listener
+ * @param {String} event
+ */
+DL.Channel.prototype.unsubscribe = function(event) {
+  this.event_source['on' + event] = null;
+};
+
+/**
+ * Publish event message
+ * @param {String} event
+ * @param {Object} message
+ * @param {Boolean} synchronous optional; default=false
+ * @return {Promise}
+ */
+DL.Channel.prototype.publish = function(event, message, sync) {
+  var data = {
+    event: event,
+    message: data,
+    client_id: this.client_id
+  };
+
+  if (typeof(sync)==="undefined") {
+    sync = false;
+  } else {
+    data._sync = sync;
+  }
+
+  return this.collection.create(data);
+};
+
+/**
+ * @return {Promise}
+ */
+DL.Channel.prototype.connect = function() {
+  // Return success if already connected.
+  if (this.event_source) {
+    var deferred = when.defer();
+    deferred.resolver.resolve();
+    return deferred.promise;
+  }
+
+  var that = this,
+      options = {},
+      query = this.collection.buildQuery();
+
+  query['X-App-Id'] = this.collection.client.appId;
+  query['X-App-Key'] = this.collection.client.key;
+
+  // Forward user authentication token, if it is set
+  var auth_token = window.localStorage.getItem(query['X-App-Id'] + '-' + DL.Auth.AUTH_TOKEN_KEY);
+  if (auth_token) {
+    query['X-Auth-Token'] = auth_token;
+  }
+
+  // time to wait for retry, after connection closes
+  query.stream = {
+    'refresh': options.refresh_timeout || 1,
+    'retry': options.retry_timeout || 1
+  };
+
+  return this.publish('connected', {
+    client_id: this.collection.client.auth.currentUser && this.collection.client.auth.currentUser._id
+  }).then(function(data) {
+    that.client_id = data.client_id;
+    console.log("Connected: ", that.client_id);
+    that.event_source = new EventSource(that.collection.client.url + that.collection.segments + "?" + JSON.stringify(query), {
+      withCredentials: true
+    });
+    // bind unload function to force user disconnection
+    window.addEventListener('unload', function(e) {
+      that.disconnect();
+    });
+  });
+};
+
+/**
+ * Close streaming connection
+ * @method close
+ * @return {Channel} this
+ */
+DL.Channel.prototype.disconnect = function() {
+  if (this.event_source) {
+    this.event_source.close();
+    // send synchronous disconnect event
+    this.publish('disconnected', { client_id: this.client_id }, true);
+  }
+  return this;
 };
 
 /**
@@ -8628,42 +8790,23 @@ DL.Collection.prototype.offset = function(int) {
 };
 
 /**
- * Stream
- * @method stream
+ * Get channel for this collection.
+ * @method channel
  * @param {Object|Function} callback_or_bindings
- * @return {DL.Stream}
+ * @return {DL.Channel}
  *
  * @example Streaming collection data
  *
- *     client.collection('messages').where('type', 'new-game').stream(function(data) {
+ *     client.collection('messages').where('type', 'new-game').channel(function(data) {
  *       console.log("Received new-game message: ", data);
  *     });
  *
  *     client.collection('messages').create({type: 'sad', text: "i'm sad because streaming won't catch me"});
  *     client.collection('messages').create({type: 'new-game', text: "yey, streaming will catch me!"});
  *
- * @example Getting only newly updated items from collection
- *
- *     client.collection('messages').stream({
- *       from_now: true,
- *       message: function(data) {
- *         console.log("Just created/updated:", data);
- *       }
- *     });
- *
- * @example Setting custom timeout configs
- *
- *     client.collection('messages').stream({
- *       retry_timeout: 10,   // re-open streaming after 10 seconds
- *       refresh_timeout: 2,  // refresh streaming data every 2 seconds
- *       message: function(data) {
- *         console.log("Just created/updated:", data);
- *       }
- *     });
- *
  */
-DL.Collection.prototype.stream = function(bindings) {
-  return new DL.Stream(this, bindings);
+DL.Collection.prototype.channel = function() {
+  return new DL.Channel(this.client, this);
 };
 
 /**
@@ -8996,94 +9139,6 @@ DL.Pagination.prototype.isFetching = function() {
 };
 
 DL.Pagination.prototype.then = function() {
-};
-
-/**
- * @class DL.Stream
- * @constructor
- * @param {Client} client
- */
-DL.Stream = function(collection, options) {
-  if (!options) { options = {}; }
-
-  this.collection = collection;
-
-  var query = this.collection.buildQuery();
-  query['X-App-Id'] = this.collection.client.appId;
-  query['X-App-Key'] = this.collection.client.key;
-
-  // Forward user authentication token, if it is set
-  var auth_token = window.localStorage.getItem(query['X-App-Id'] + '-' + DL.Auth.AUTH_TOKEN_KEY);
-  if (auth_token) {
-    query['X-Auth-Token'] = auth_token;
-  }
-
-  query.only_new = options.only_new || false;
-
-  // time to wait for retry, after connection closes
-  query.stream = {
-    'refresh': options.refresh_timeout || 1,
-    'retry': options.retry_timeout || 5
-  };
-
-  this.event_source = new EventSource(this.collection.client.url + this.collection.segments + "?" + JSON.stringify(query), {
-    withCredentials: true
-  });
-
-  // bind event source
-  if (typeof(options)==="function") {
-    this.on('message', options);
-  } else {
-    for (var event in options) {
-      this.on(event, options[event]);
-    }
-  }
-};
-
-/**
- * Register event handler
- * @method on
- * @param {String} event
- * @param {Function} callback
- * @return {Stream} this
- *
- * @example Registering error event
- *
- *     client.collection('something').stream().on('error', function(e) {
- *       console.log("Error: ", e);
- *     })
- *
- *
- * @example Registering message event
- *
- *     client.collection('something').stream().on('message', function(e) {
- *       console.log("Message: ", e);
- *     })
- */
-DL.Stream.prototype.on = function(event, callback) {
-  var that = this;
-
-  if (event == 'message') {
-    this.event_source.onmessage = function(e) {
-      callback.apply(that, [JSON.parse(e.data), e]);
-    };
-  } else {
-    this.event_source['on' + event] = function(e) {
-      callback.apply(that, [e]);
-    };
-  }
-
-  return this;
-};
-
-/**
- * Close streaming connection
- * @method close
- * @return {Stream} this
- */
-DL.Stream.prototype.close = function() {
-  this.event_source.close();
-  return this;
 };
 
 /**
