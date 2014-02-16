@@ -139,8 +139,10 @@ DL.Channel.prototype.disconnect = function() {
     var data = { client_id: this.client_id },
         currentUserId = this.collection.client.auth.currentUser && this.collection.client.auth.currentUser._id;
 
-    if (currentUserId) { data.user_id = currentUserId; }
-    this.publish('disconnected', , true);
+    if (currentUserId) {
+      data.user_id = currentUserId;
+    }
+    this.publish('disconnected', data, true);
   }
   return this;
 };

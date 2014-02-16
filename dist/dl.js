@@ -8390,10 +8390,9 @@ DL.Channel.prototype.connect = function() {
   };
 
   return this.publish('connected', {
-    client_id: this.collection.client.auth.currentUser && this.collection.client.auth.currentUser._id
+    user_id: this.collection.client.auth.currentUser && this.collection.client.auth.currentUser._id
   }).then(function(data) {
     that.client_id = data.client_id;
-    console.log("Connected: ", that.client_id);
     that.event_source = new EventSource(that.collection.client.url + that.collection.segments + "?" + JSON.stringify(query), {
       withCredentials: true
     });
@@ -8413,7 +8412,13 @@ DL.Channel.prototype.disconnect = function() {
   if (this.event_source) {
     this.event_source.close();
     // send synchronous disconnect event
-    this.publish('disconnected', { client_id: this.client_id }, true);
+    var data = { client_id: this.client_id },
+        currentUserId = this.collection.client.auth.currentUser && this.collection.client.auth.currentUser._id;
+
+    if (currentUserId) {
+      data.user_id = currentUserId;
+    }
+    this.publish('disconnected', data, true);
   }
   return this;
 };
