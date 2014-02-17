@@ -67,19 +67,12 @@ DL.Channel.prototype.unsubscribe = function(event) {
  * @param {Boolean} synchronous optional; default=false
  * @return {Promise}
  */
-DL.Channel.prototype.publish = function(event, message, sync) {
+DL.Channel.prototype.publish = function(event, message) {
   var data = {
     event: event,
     message: data,
     client_id: this.client_id
   };
-
-  if (typeof(sync)==="undefined") {
-    sync = false;
-  } else {
-    data._sync = sync;
-  }
-
   return this.collection.create(data);
 };
 
@@ -122,7 +115,8 @@ DL.Channel.prototype.connect = function() {
     });
     // bind unload function to force user disconnection
     window.addEventListener('unload', function(e) {
-      that.disconnect();
+      // send synchronous disconnected event
+      that.disconnect(true);
     });
   });
 };
@@ -130,14 +124,17 @@ DL.Channel.prototype.connect = function() {
 /**
  * Close streaming connection
  * @method close
+ * @param {Boolean} synchronous default = false
  * @return {Channel} this
  */
-DL.Channel.prototype.disconnect = function() {
+DL.Channel.prototype.disconnect = function(sync) {
   if (this.event_source) {
     this.event_source.close();
-    // send synchronous disconnect event
-    var data = { client_id: this.client_id },
-        currentUserId = this.collection.client.auth.currentUser && this.collection.client.auth.currentUser._id;
+
+    var data = {
+      client_id: this.client_id,
+      _sync: ((typeof(sync)!=="undefined") && sync)
+    };
 
     if (currentUserId) {
       data.user_id = currentUserId;
