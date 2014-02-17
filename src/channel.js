@@ -64,7 +64,6 @@ DL.Channel.prototype.unsubscribe = function(event) {
  * Publish event message
  * @param {String} event
  * @param {Object} message
- * @param {Boolean} synchronous optional; default=false
  * @return {Promise}
  */
 DL.Channel.prototype.publish = function(event, message) {
@@ -139,7 +138,7 @@ DL.Channel.prototype.disconnect = function(sync) {
     if (currentUserId) {
       data.user_id = currentUserId;
     }
-    this.publish('disconnected', data, true);
+    this.publish('disconnected', data);
   }
   return this;
 };
