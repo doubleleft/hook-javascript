@@ -62,7 +62,8 @@ DL.Client.prototype.collection = function(collectionName) {
 /**
  * Get channel instance.
  * @method collection
- * @param {String} channelName
+ * @param {String} name
+ * @param {Object} options
  * @return {DL.Channel}
  *
  * @example Retrieve a channel reference.
@@ -70,10 +71,10 @@ DL.Client.prototype.collection = function(collectionName) {
  *     var messages = client.channel('messages');
  *
  */
-DL.Client.prototype.channel = function(channelName) {
-  var collection = this.collection(channelName);
+DL.Client.prototype.channel = function(name, options) {
+  var collection = this.collection(name);
   collection.segments = collection.segments.replace('collection/', 'channels/');
-  return new DL.Channel(this, collection);
+  return new DL.Channel(this, collection, options);
 };
 
 /**
@@ -147,7 +148,7 @@ DL.Client.prototype.request = function(segments, method, data) {
   uxhr(this.url + segments, payload, {
     method: method,
     headers: request_headers,
-    sync: data._sync || false,
+    sync: (data && data._sync) || false,
     success: function(response) {
       // FIXME: errors shouldn't trigger success callback, that's a uxhr problem?
       var data = JSON.parse(response);

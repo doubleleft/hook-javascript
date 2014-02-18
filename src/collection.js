@@ -372,12 +372,12 @@ DL.Collection.prototype.offset = function(int) {
 /**
  * Get channel for this collection.
  * @method channel
- * @param {Object|Function} callback_or_bindings
+ * @param {Object} options (optional)
  * @return {DL.Channel}
  *
  * @example Streaming collection data
  *
- *     client.collection('messages').where('type', 'new-game').channel(function(data) {
+ *     client.collection('messages').where('type', 'new-game').channel().subscribe(function(event, data) {
  *       console.log("Received new-game message: ", data);
  *     });
  *
@@ -385,8 +385,8 @@ DL.Collection.prototype.offset = function(int) {
  *     client.collection('messages').create({type: 'new-game', text: "yey, streaming will catch me!"});
  *
  */
-DL.Collection.prototype.channel = function() {
-  return new DL.Channel(this.client, this);
+DL.Collection.prototype.channel = function(options) {
+  return new DL.Channel(this.client, this, options);
 };
 
 /**
@@ -523,7 +523,7 @@ DL.Collection.prototype.addWhere = function(field, operation, value) {
 };
 
 DL.Collection.prototype._validateName = function(name) {
-  var regexp = /^[a-z_]+$/;
+  var regexp = /^[a-z_\/]+$/;
 
   if (!regexp.test(name)) {
     throw new Error("Invalid name: " + name);
