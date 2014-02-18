@@ -552,6 +552,7 @@ DL.Channel.prototype._trigger = function(event, data) {
 
 /**
  * Is EventSource listenning to messages?
+ * @method isConnected
  * @return {Boolean}
  */
 DL.Channel.prototype.isConnected = function() {
@@ -560,6 +561,7 @@ DL.Channel.prototype.isConnected = function() {
 
 /**
  * Unsubscribe to a event listener
+ * @method unsubscribe
  * @param {String} event
  */
 DL.Channel.prototype.unsubscribe = function(event) {
@@ -570,6 +572,7 @@ DL.Channel.prototype.unsubscribe = function(event) {
 
 /**
  * Publish event message
+ * @method publish
  * @param {String} event
  * @param {Object} message
  * @return {Promise}
@@ -634,7 +637,7 @@ DL.Channel.prototype.connect = function() {
 
 /**
  * Close streaming connection
- * @method close
+ * @method disconnect
  * @param {Boolean} synchronous default = false
  * @return {Channel} this
  */
