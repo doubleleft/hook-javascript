@@ -171,7 +171,7 @@ DL.Client.prototype.request = function(segments, method, data) {
   uxhr(this.url + segments, payload, {
     method: method,
     headers: request_headers,
-    sync: (data && data._sync) || false,
+    sync: (data && data.data && data.data._sync) || false, // FIXME: find a better way to write this
     success: function(response) {
       // FIXME: errors shouldn't trigger success callback, that's a uxhr problem?
       var data = JSON.parse(response);
