@@ -1036,7 +1036,8 @@ DL.Collection.prototype.offset = function(int) {
  *
  */
 DL.Collection.prototype.channel = function(options) {
-  return new DL.Channel(this.client, this, options);
+  throw new Error("Not implemented.");
+  // return new DL.Channel(this.client, this, options);
 };
 
 /**
