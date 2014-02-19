@@ -61,9 +61,9 @@ DL.Client.prototype.collection = function(collectionName) {
 
 /**
  * Get channel instance.
- * @method collection
+ * @method channel
  * @param {String} name
- * @param {Object} options
+ * @param {Object} options (optional)
  * @return {DL.Channel}
  *
  * @example Retrieve a channel reference.

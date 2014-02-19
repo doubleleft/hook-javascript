@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 2/18/2014
+ * @build 2/19/2014
  */
 (function(window) {
   //
@@ -7907,9 +7907,9 @@ DL.Client.prototype.collection = function(collectionName) {
 
 /**
  * Get channel instance.
- * @method collection
+ * @method channel
  * @param {String} name
- * @param {Object} options
+ * @param {Object} options (optional)
  * @return {DL.Channel}
  *
  * @example Retrieve a channel reference.
@@ -8106,33 +8106,36 @@ DL.Iterable.prototype = {
  */
 DL.Auth = function(client) {
   this.client = client;
-  this._currentUser = null;
 
-  Object.defineProperty(this, 'currentUser', {
-    get: function() {
-      if (!this._currentUser) {
-        this._currentUser = window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
-        if (this._currentUser) {
-          this._currentUser = JSON.parse(this.currentUser); // localStorage only supports recording strings, so we need to parse it
-        }
-      }
-      return this._currentUser;
-    },
-    set: function(data) {
-      this._currentUser = data;
-      if (!data) {
-        window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
-        window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
-      } else {
-        window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY, JSON.stringify(data));
-      }
-    }
-  });
+  /**
+   * @property currentUser
+   * @type {Object}
+   */
+  this.currentUser = window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
+  if (this.currentUser) {
+    this.currentUser = JSON.parse(this.currentUser); // localStorage only supports recording strings, so we need to parse it
+  }
 };
 
 // Constants
 DL.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
 DL.Auth.AUTH_DATA_KEY = 'dl-api-auth-data';
+
+/**
+ * @method setUserData
+ * @param {Object} data
+ * @return {DL.Auth} this
+ */
+DL.Auth.prototype.setCurrentUser = function(data) {
+  this.currentUser = data;
+  if (!data) {
+    window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
+    window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
+  } else {
+    window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY, JSON.stringify(data));
+  }
+  return this;
+};
 
 /**
  * Register user using current authentication provider.
@@ -8260,8 +8263,7 @@ DL.Auth.prototype.resetPassword = function(data) {
  * @return {DL.Auth} this
  */
 DL.Auth.prototype.logout = function() {
-  this.currentUser = null;
-  return this;
+  return this.setCurrentUser(null);
 };
 
 DL.Auth.prototype.registerToken = function(data) {
@@ -8271,7 +8273,7 @@ DL.Auth.prototype.registerToken = function(data) {
     delete data.token;
 
     // Store curent user
-    this.currentUser = data;
+    this.setCurrentUser(data);
   }
 };
 
@@ -8379,7 +8381,7 @@ DL.Channel.prototype._trigger = function(event, data) {
  * @return {Boolean}
  */
 DL.Channel.prototype.isConnected = function() {
-  return (this.event_source !== null);
+  return (this.readyState !== null && this.readyState !== EventSource.CLOSED);
 };
 
 /**
@@ -8467,6 +8469,7 @@ DL.Channel.prototype.connect = function() {
 DL.Channel.prototype.disconnect = function(sync) {
   if (this.event_source) {
     this.event_source.close();
+    this.readyState = EventSource.CLOSED;
     this.publish('disconnected', {
       _sync: ((typeof(sync)!=="undefined") && sync)
     });
@@ -9049,6 +9052,23 @@ DL.Collection.prototype.buildQuery = function() {
   this.reset();
 
   return query;
+};
+
+
+/**
+ * @class DL.CollectionItem
+ *
+ * @param {DL.Collection} collection
+ * @param {Number|String} _id
+ * @constructor
+ */
+DL.CollectionItem = function(collection, _id) {
+  this.collection = collection;
+
+  this.name = this._validateName(name);
+  this.reset();
+
+  this.segments = 'collection/' + this.name;
 };
 
 

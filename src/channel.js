@@ -102,7 +102,7 @@ DL.Channel.prototype._trigger = function(event, data) {
  * @return {Boolean}
  */
 DL.Channel.prototype.isConnected = function() {
-  return (this.event_source !== null);
+  return (this.readyState !== null && this.readyState !== EventSource.CLOSED);
 };
 
 /**
@@ -190,6 +190,7 @@ DL.Channel.prototype.connect = function() {
 DL.Channel.prototype.disconnect = function(sync) {
   if (this.event_source) {
     this.event_source.close();
+    this.readyState = EventSource.CLOSED;
     this.publish('disconnected', {
       _sync: ((typeof(sync)!=="undefined") && sync)
     });
