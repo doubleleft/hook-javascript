@@ -134,7 +134,7 @@ DL.Client.prototype.put = function(segments, data) {
  * @method delete
  * @param {String} segments
  */
-DL.Client.prototype.delete = function(segments) {
+DL.Client.prototype.remove = function(segments) {
   return this.request(segments, "DELETE");
 };
 
@@ -1075,7 +1075,7 @@ DL.Collection.prototype.paginate = function(perPage, callback) {
  * @return {Promise}
  */
 DL.Collection.prototype.drop = function() {
-  return this.client.delete(this.segments);
+  return this.client.remove(this.segments);
 };
 
 /**
@@ -1085,12 +1085,12 @@ DL.Collection.prototype.drop = function() {
  *
  * @example Deleting a row by id
  *
- *     client.collection('posts').delete(1).then(function(data) {
+ *     client.collection('posts').remove(1).then(function(data) {
  *       console.log("Success:", data.success);
  *     });
  */
-DL.Collection.prototype.delete = function(_id) {
-  return this.client.delete(this.segments + '/' + _id);
+DL.Collection.prototype.remove = function(_id) {
+  return this.client.remove(this.segments + '/' + _id);
 };
 
 /**
