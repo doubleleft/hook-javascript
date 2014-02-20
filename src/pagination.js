@@ -54,10 +54,10 @@ DL.Pagination.prototype._fetchComplete = function(response) {
   this.to = response.to;
 
   /**
-   * @property data
+   * @property items
    * @type {Object}
    */
-  this.data = response.data;
+  this.items = response.data;
 };
 
 /**

@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 2/19/2014
+ * @build 2/20/2014
  */
 (function(window) {
   //
@@ -7968,7 +7968,14 @@ DL.Client.prototype.remove = function(segments) {
  * @param {Object} data
  */
 DL.Client.prototype.request = function(segments, method, data) {
-  var payload, request_headers, auth_token, deferred = when.defer();
+  var payload, request_headers, auth_token, deferred = when.defer(),
+      synchronous = false;
+
+  // FIXME: find a better way to write this
+  if (data && data.data && data.data._sync) {
+    delete data.data._sync;
+    synchronous = true;
+  }
 
   if (data) {
     payload = JSON.stringify(data);
@@ -7994,7 +8001,7 @@ DL.Client.prototype.request = function(segments, method, data) {
   uxhr(this.url + segments, payload, {
     method: method,
     headers: request_headers,
-    sync: (data && data.data && data.data._sync) || false, // FIXME: find a better way to write this
+    sync: synchronous,
     success: function(response) {
       // FIXME: errors shouldn't trigger success callback, that's a uxhr problem?
       var data = JSON.parse(response);
@@ -8874,21 +8881,22 @@ DL.Collection.prototype.channel = function(options) {
  * @return {DL.Pagination}
  *
  * @param {Mixed} perpage_or_callback
- * @param {Function} callback
+ * @param {Function} onComplete
+ * @param {Function} onError (optional)
  */
-DL.Collection.prototype.paginate = function(perPage, callback) {
+DL.Collection.prototype.paginate = function(perPage, onComplete, onError) {
   var pagination = new DL.Pagination(this);
 
-  if (!callback) {
-    callback = perPage;
+  if (!onComplete) {
+    onComplete = perPage;
     perPage = DL.defaults.perPage;
   }
 
   this.options.paginate = perPage;
-  this.get().then(function(data) {
+  this.then(function(data) {
     pagination._fetchComplete(data);
-    if (callback) { callback(pagination); }
-  });
+    if (onComplete) { onComplete(pagination); }
+  }, onError);
 
   return pagination;
 };
@@ -9193,10 +9201,10 @@ DL.Pagination.prototype._fetchComplete = function(response) {
   this.to = response.to;
 
   /**
-   * @property data
+   * @property items
    * @type {Object}
    */
-  this.data = response.data;
+  this.items = response.data;
 };
 
 /**

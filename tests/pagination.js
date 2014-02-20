@@ -5,6 +5,8 @@ asyncTest("Pagination", function() {
   posts.sort('created_at', -1);
 
   posts.paginate(function(pagination) {
+    console.log(data);
+
     ok(pagination.isFetching() == false, "is fetching");
     ok(pagination.per_page === 50, "per_page");
     ok(pagination.current_page === 1, "current_page");
@@ -14,6 +16,8 @@ asyncTest("Pagination", function() {
     ok(pagination.data.length > 0, "data");
 
     start();
+  }, function(error) {
+    console.log(error);
   });
 });
 

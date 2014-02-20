@@ -122,7 +122,14 @@ DL.Client.prototype.remove = function(segments) {
  * @param {Object} data
  */
 DL.Client.prototype.request = function(segments, method, data) {
-  var payload, request_headers, auth_token, deferred = when.defer();
+  var payload, request_headers, auth_token, deferred = when.defer(),
+      synchronous = false;
+
+  // FIXME: find a better way to write this
+  if (data && data.data && data.data._sync) {
+    delete data.data._sync;
+    synchronous = true;
+  }
 
   if (data) {
     payload = JSON.stringify(data);
@@ -148,7 +155,7 @@ DL.Client.prototype.request = function(segments, method, data) {
   uxhr(this.url + segments, payload, {
     method: method,
     headers: request_headers,
-    sync: (data && data.data && data.data._sync) || false, // FIXME: find a better way to write this
+    sync: synchronous,
     success: function(response) {
       // FIXME: errors shouldn't trigger success callback, that's a uxhr problem?
       var data = JSON.parse(response);

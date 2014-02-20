@@ -395,21 +395,22 @@ DL.Collection.prototype.channel = function(options) {
  * @return {DL.Pagination}
  *
  * @param {Mixed} perpage_or_callback
- * @param {Function} callback
+ * @param {Function} onComplete
+ * @param {Function} onError (optional)
  */
-DL.Collection.prototype.paginate = function(perPage, callback) {
+DL.Collection.prototype.paginate = function(perPage, onComplete, onError) {
   var pagination = new DL.Pagination(this);
 
-  if (!callback) {
-    callback = perPage;
+  if (!onComplete) {
+    onComplete = perPage;
     perPage = DL.defaults.perPage;
   }
 
   this.options.paginate = perPage;
-  this.get().then(function(data) {
+  this.then(function(data) {
     pagination._fetchComplete(data);
-    if (callback) { callback(pagination); }
-  });
+    if (onComplete) { onComplete(pagination); }
+  }, onError);
 
   return pagination;
 };
