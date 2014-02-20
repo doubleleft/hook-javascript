@@ -8298,7 +8298,7 @@ DL.Channel = function(client, collection, options) {
 };
 
 /**
- * Subscribe to event
+ * Subscribe to channel. Publishes a 'connected' message on the first time.
  * @method subscribe
  * @param {String} event (optional)
  * @param {Function} callback
@@ -8456,6 +8456,7 @@ DL.Channel.prototype.connect = function() {
     that.event_source = new EventSource(that.collection.client.url + that.collection.segments + "?" + JSON.stringify(query), {
       withCredentials: true
     });
+
     // bind unload function to force user disconnection
     window.addEventListener('unload', function(e) {
       // send synchronous disconnected event
@@ -8468,19 +8469,29 @@ DL.Channel.prototype.connect = function() {
 };
 
 /**
- * Close streaming connection
+ * Disconnect from channel, publishing a 'disconnected' message.
  * @method disconnect
  * @param {Boolean} synchronous default = false
  * @return {Channel} this
  */
 DL.Channel.prototype.disconnect = function(sync) {
+  this.close();
+  this.publish('disconnected', {
+    _sync: ((typeof(sync)!=="undefined") && sync)
+  });
+  return this;
+};
+
+/**
+ * Close event source connection.
+ * @method close
+ * @return {Channel} this
+ */
+DL.Channel.prototype.close = function() {
   if (this.event_source) {
     this.event_source.close();
-    this.readyState = EventSource.CLOSED;
-    this.publish('disconnected', {
-      _sync: ((typeof(sync)!=="undefined") && sync)
-    });
   }
+  this.readyState = EventSource.CLOSED;
   return this;
 };
 
