@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 2/20/2014
+ * @build 2/21/2014
  */
 (function(window) {
   //
@@ -8475,10 +8475,12 @@ DL.Channel.prototype.connect = function() {
  * @return {Channel} this
  */
 DL.Channel.prototype.disconnect = function(sync) {
-  this.close();
-  this.publish('disconnected', {
-    _sync: ((typeof(sync)!=="undefined") && sync)
-  });
+  if (this.isConnected()) {
+    this.close();
+    this.publish('disconnected', {
+      _sync: ((typeof(sync)!=="undefined") && sync)
+    });
+  }
   return this;
 };
 
@@ -9090,6 +9092,29 @@ DL.CollectionItem = function(collection, _id) {
   this.segments = 'collection/' + this.name;
 };
 
+
+/**
+ * @class DL.Events
+ */
+DL.Events = function(client) {
+  this.client = client;
+  this.events = {};
+};
+
+DL.Events.prototype.on = function(event, callback, context) {
+  if (!this.events[event]) { this.events[event] = []; }
+  this.events[event].push({callback: callback, context: context});
+};
+
+DL.Events.prototype.trigger = function(event, data) {
+  var c, args = arguments.slice(1);
+  if (this.events[event]) {
+    for (var i=0,length=this.events[event].length;i<length;i++)  {
+      c = this.events[event][i];
+      c.callback.apply(c.context || this.client, args);
+    }
+  }
+};
 
 /**
  */
