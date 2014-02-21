@@ -189,10 +189,12 @@ DL.Channel.prototype.connect = function() {
  * @return {Channel} this
  */
 DL.Channel.prototype.disconnect = function(sync) {
-  this.close();
-  this.publish('disconnected', {
-    _sync: ((typeof(sync)!=="undefined") && sync)
-  });
+  if (this.isConnected()) {
+    this.close();
+    this.publish('disconnected', {
+      _sync: ((typeof(sync)!=="undefined") && sync)
+    });
+  }
   return this;
 };
 
