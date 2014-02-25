@@ -19,12 +19,12 @@ DL.Files.prototype.upload = function(provider, data, fileName, mimeType){
 	return deferred.promise;
   }
   formData.append('file', data, fileName || "dlApiFile");
-  return this.client.post('/files/' + provider, formData);
+  return this.client.post('files/' + provider, formData);
 };
 
 /**
  * @return {Promise}
  */
 DL.Files.prototype.get = function(_id) {
-  return this.client.get('/files', { _id: _id });
+  return this.client.get('files', { _id: _id });
 };
