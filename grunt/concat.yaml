@@ -15,6 +15,7 @@ javascripts:
     - 'bower_components/uxhr/uxhr.js'
     - 'bower_components/lodash/dist/lodash.js'
     - 'bower_components/lodash/dist/lodash.js'
+    - 'bower_components/blueimp-canvas-to-blob/js/canvas-to-blob.min.js'
     - 'src/core/*.js'
     - 'src/*.js'
     - 'src/wrap/end.js'

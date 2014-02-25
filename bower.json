@@ -15,9 +15,10 @@
     "bower_components"
   ],
   "dependencies": {
-    "uxhr": "~1.0.3",
+    "uxhr": "git@github.com:gabriel-laet/uxhr.git",
     "qunit": "~1.9.0",
     "when": "~2.8.0",
-    "lodash": "~2.4.0"
+    "lodash": "~2.4.0",
+	"blueimp-canvas-to-blob": "~2.1.0"
   }
 }

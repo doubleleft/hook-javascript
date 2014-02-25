@@ -7,8 +7,20 @@ DL.Files = function(client) {
 /**
  * @return {Promise}
  */
-DL.Files.prototype.upload = function(provider, data) {
-  this.client.post('/files', data);
+DL.Files.prototype.upload = function(provider, data, fileName, mimeType){
+  var formData = new FormData();
+  if(data instanceof HTMLCanvasElement && data.toBlob){
+	console.log("YAY CANVAS");
+	var deferred = when.defer();
+    var self = this;
+    data.toBlob(function(blob){
+      self.upload(provider, blob, fileName, mimeType).then(deferred.resolver.resolve, deferred.resolver.reject);
+    }, mimeType || "image/png");
+
+	return deferred.promise;
+  }
+  formData.append('file', data, fileName || "dlApiFile");
+  return this.client.post('/files/' + provider, formData);
 };
 
 /**

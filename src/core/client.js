@@ -35,6 +35,11 @@ DL.Client = function(options) {
   this.auth = new DL.Auth(this);
 
   /**
+   * @property {DL.Fiels} files
+   */
+  this.files = new DL.Files(this);
+
+  /**
    * @property {DL.System} system
    */
   this.system = new DL.System(this);
@@ -132,7 +137,11 @@ DL.Client.prototype.request = function(segments, method, data) {
   }
 
   if (data) {
-    payload = JSON.stringify(data);
+    if(data instanceof FormData){
+      payload = data;
+	}else{
+	  payload = JSON.stringify(data);
+	}
 
     if (method === "GET") {
       payload = encodeURIComponent(payload);
@@ -143,8 +152,11 @@ DL.Client.prototype.request = function(segments, method, data) {
   request_headers = {
     'X-App-Id': this.appId,
     'X-App-Key': this.key,
-    'Content-Type': 'application/json' // exchange data via JSON to keep basic data types
   };
+  
+  if(!(payload instanceof FormData)){
+    request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
+  }
 
   // Forward user authentication token, if it is set
   auth_token = window.localStorage.getItem(this.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);

@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 2/21/2014
+ * @build 2/25/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -56,6 +56,11 @@ DL.Client = function(options) {
    * @property {DL.Auth} auth
    */
   this.auth = new DL.Auth(this);
+
+  /**
+   * @property {DL.Fiels} files
+   */
+  this.files = new DL.Files(this);
 
   /**
    * @property {DL.System} system
@@ -155,7 +160,11 @@ DL.Client.prototype.request = function(segments, method, data) {
   }
 
   if (data) {
-    payload = JSON.stringify(data);
+    if(data instanceof FormData){
+      payload = data;
+	}else{
+	  payload = JSON.stringify(data);
+	}
 
     if (method === "GET") {
       payload = encodeURIComponent(payload);
@@ -166,8 +175,11 @@ DL.Client.prototype.request = function(segments, method, data) {
   request_headers = {
     'X-App-Id': this.appId,
     'X-App-Key': this.key,
-    'Content-Type': 'application/json' // exchange data via JSON to keep basic data types
   };
+  
+  if(!(payload instanceof FormData)){
+    request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
+  }
 
   // Forward user authentication token, if it is set
   auth_token = window.localStorage.getItem(this.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
@@ -1254,46 +1266,6 @@ DL.Collection.prototype.buildQuery = function() {
 
 
 /**
- * @class DL.CollectionItem
- *
- * @param {DL.Collection} collection
- * @param {Number|String} _id
- * @constructor
- */
-DL.CollectionItem = function(collection, _id) {
-  this.collection = collection;
-
-  this.name = this._validateName(name);
-  this.reset();
-
-  this.segments = 'collection/' + this.name;
-};
-
-
-/**
- * @class DL.Events
- */
-DL.Events = function(client) {
-  this.client = client;
-  this.events = {};
-};
-
-DL.Events.prototype.on = function(event, callback, context) {
-  if (!this.events[event]) { this.events[event] = []; }
-  this.events[event].push({callback: callback, context: context});
-};
-
-DL.Events.prototype.trigger = function(event, data) {
-  var c, args = arguments.slice(1);
-  if (this.events[event]) {
-    for (var i=0,length=this.events[event].length;i<length;i++)  {
-      c = this.events[event][i];
-      c.callback.apply(c.context || this.client, args);
-    }
-  }
-};
-
-/**
  */
 DL.Files = function(client) {
   this.client = client;
@@ -1302,8 +1274,20 @@ DL.Files = function(client) {
 /**
  * @return {Promise}
  */
-DL.Files.prototype.upload = function(provider, data) {
-  this.client.post('/files', data);
+DL.Files.prototype.upload = function(provider, data, fileName, mimeType){
+  var formData = new FormData();
+  if(data instanceof HTMLCanvasElement && data.toBlob){
+	console.log("YAY CANVAS");
+	var deferred = when.defer();
+    var self = this;
+    data.toBlob(function(blob){
+      self.upload(provider, blob, fileName, mimeType).then(deferred.resolver.resolve, deferred.resolver.reject);
+    }, mimeType || "image/png");
+
+	return deferred.promise;
+  }
+  formData.append('file', data, fileName || "dlApiFile");
+  return this.client.post('/files/' + provider, formData);
 };
 
 /**

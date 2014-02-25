@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 2/21/2014
+ * @build 2/25/2014
  */
 (function(window) {
   //
@@ -7832,6 +7832,7 @@ define(function (require) {
   }
 }.call(this));
 
+!function(a){"use strict";var b=a.HTMLCanvasElement&&a.HTMLCanvasElement.prototype,c=a.Blob&&function(){try{return Boolean(new Blob)}catch(a){return!1}}(),d=c&&a.Uint8Array&&function(){try{return 100===new Blob([new Uint8Array(100)]).size}catch(a){return!1}}(),e=a.BlobBuilder||a.WebKitBlobBuilder||a.MozBlobBuilder||a.MSBlobBuilder,f=(c||e)&&a.atob&&a.ArrayBuffer&&a.Uint8Array&&function(a){var b,f,g,h,i,j;for(b=a.split(",")[0].indexOf("base64")>=0?atob(a.split(",")[1]):decodeURIComponent(a.split(",")[1]),f=new ArrayBuffer(b.length),g=new Uint8Array(f),h=0;h<b.length;h+=1)g[h]=b.charCodeAt(h);return i=a.split(",")[0].split(":")[1].split(";")[0],c?new Blob([d?g:f],{type:i}):(j=new e,j.append(f),j.getBlob(i))};a.HTMLCanvasElement&&!b.toBlob&&(b.mozGetAsFile?b.toBlob=function(a,c,d){d&&b.toDataURL&&f?a(f(this.toDataURL(c,d))):a(this.mozGetAsFile("blob",c))}:b.toDataURL&&f&&(b.toBlob=function(a,b,c){a(f(this.toDataURL(b,c)))})),"function"==typeof define&&define.amd?define(function(){return f}):a.dataURLtoBlob=f}(this);
 /**
  * @module DL
  */
@@ -7879,6 +7880,11 @@ DL.Client = function(options) {
    * @property {DL.Auth} auth
    */
   this.auth = new DL.Auth(this);
+
+  /**
+   * @property {DL.Fiels} files
+   */
+  this.files = new DL.Files(this);
 
   /**
    * @property {DL.System} system
@@ -7978,7 +7984,11 @@ DL.Client.prototype.request = function(segments, method, data) {
   }
 
   if (data) {
-    payload = JSON.stringify(data);
+    if(data instanceof FormData){
+      payload = data;
+	}else{
+	  payload = JSON.stringify(data);
+	}
 
     if (method === "GET") {
       payload = encodeURIComponent(payload);
@@ -7989,8 +7999,11 @@ DL.Client.prototype.request = function(segments, method, data) {
   request_headers = {
     'X-App-Id': this.appId,
     'X-App-Key': this.key,
-    'Content-Type': 'application/json' // exchange data via JSON to keep basic data types
   };
+  
+  if(!(payload instanceof FormData)){
+    request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
+  }
 
   // Forward user authentication token, if it is set
   auth_token = window.localStorage.getItem(this.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
@@ -9077,46 +9090,6 @@ DL.Collection.prototype.buildQuery = function() {
 
 
 /**
- * @class DL.CollectionItem
- *
- * @param {DL.Collection} collection
- * @param {Number|String} _id
- * @constructor
- */
-DL.CollectionItem = function(collection, _id) {
-  this.collection = collection;
-
-  this.name = this._validateName(name);
-  this.reset();
-
-  this.segments = 'collection/' + this.name;
-};
-
-
-/**
- * @class DL.Events
- */
-DL.Events = function(client) {
-  this.client = client;
-  this.events = {};
-};
-
-DL.Events.prototype.on = function(event, callback, context) {
-  if (!this.events[event]) { this.events[event] = []; }
-  this.events[event].push({callback: callback, context: context});
-};
-
-DL.Events.prototype.trigger = function(event, data) {
-  var c, args = arguments.slice(1);
-  if (this.events[event]) {
-    for (var i=0,length=this.events[event].length;i<length;i++)  {
-      c = this.events[event][i];
-      c.callback.apply(c.context || this.client, args);
-    }
-  }
-};
-
-/**
  */
 DL.Files = function(client) {
   this.client = client;
@@ -9125,8 +9098,20 @@ DL.Files = function(client) {
 /**
  * @return {Promise}
  */
-DL.Files.prototype.upload = function(provider, data) {
-  this.client.post('/files', data);
+DL.Files.prototype.upload = function(provider, data, fileName, mimeType){
+  var formData = new FormData();
+  if(data instanceof HTMLCanvasElement && data.toBlob){
+	console.log("YAY CANVAS");
+	var deferred = when.defer();
+    var self = this;
+    data.toBlob(function(blob){
+      self.upload(provider, blob, fileName, mimeType).then(deferred.resolver.resolve, deferred.resolver.reject);
+    }, mimeType || "image/png");
+
+	return deferred.promise;
+  }
+  formData.append('file', data, fileName || "dlApiFile");
+  return this.client.post('/files/' + provider, formData);
 };
 
 /**
