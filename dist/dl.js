@@ -9101,7 +9101,6 @@ DL.Files = function(client) {
 DL.Files.prototype.upload = function(provider, data, fileName, mimeType){
   var formData = new FormData();
   if(data instanceof HTMLCanvasElement && data.toBlob){
-	console.log("YAY CANVAS");
 	var deferred = when.defer();
     var self = this;
     data.toBlob(function(blob){
