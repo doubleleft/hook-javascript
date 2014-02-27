@@ -18,6 +18,7 @@
     "uxhr": "~1.0.3",
     "qunit": "~1.9.0",
     "when": "~2.8.0",
-    "lodash": "~2.4.0"
+    "lodash": "~2.4.0",
+    "eventsource": "Yaffle/EventSource"
   }
 }
