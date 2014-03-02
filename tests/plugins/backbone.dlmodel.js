@@ -25,9 +25,5 @@ asyncTest("Plugin: Backbone.DLModel", function() {
     console.log("Saved!");
   });
 
-  entry.on('save', function(model, response, options) {
-    console.log("Saved!");
-  });
-
   entry.save();
 });
