@@ -3,11 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
-<<<<<<< HEAD
  * @build 3/2/2014
-=======
- * @build 2/27/2014
->>>>>>> 45053cacbecc4dcaae63a914b8a3a0d2b3966463
  */
 (function(window) {
   //
@@ -9567,8 +9563,6 @@ DL.Collection.prototype.buildQuery = function() {
 
 
 /**
-<<<<<<< HEAD
-=======
  * @class DL.CollectionItem
  *
  * @param {DL.Collection} collection
@@ -9586,30 +9580,6 @@ DL.CollectionItem = function(collection, _id) {
 
 
 /**
- * @class DL.Events
- */
-DL.Events = function(client) {
-  this.client = client;
-  this.events = {};
-};
-
-DL.Events.prototype.on = function(event, callback, context) {
-  if (!this.events[event]) { this.events[event] = []; }
-  this.events[event].push({callback: callback, context: context});
-};
-
-DL.Events.prototype.trigger = function(event, data) {
-  var c, args = arguments.slice(1);
-  if (this.events[event]) {
-    for (var i=0,length=this.events[event].length;i<length;i++)  {
-      c = this.events[event][i];
-      c.callback.apply(c.context || this.client, args);
-    }
-  }
-};
-
-/**
->>>>>>> 45053cacbecc4dcaae63a914b8a3a0d2b3966463
  */
 DL.Files = function(client) {
   this.client = client;
