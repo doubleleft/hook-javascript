@@ -3,7 +3,11 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
+<<<<<<< HEAD
  * @build 3/2/2014
+=======
+ * @build 2/27/2014
+>>>>>>> 45053cacbecc4dcaae63a914b8a3a0d2b3966463
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -303,15 +307,22 @@ DL.Auth = function(client) {
    * @property currentUser
    * @type {Object}
    */
-  this.currentUser = window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
-  if (this.currentUser) {
-    this.currentUser = JSON.parse(this.currentUser); // localStorage only supports recording strings, so we need to parse it
+  this.currentUser = null;
+
+  var now = new Date(),
+      tokenExpiration = new Date(parseInt((window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_EXPIRATION)) || 0, 10) * 1000),
+      currentUser = window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
+
+  // Fill current user only when it isn't expired yet.
+  if (currentUser && now.getTime() < tokenExpiration.getTime()) {
+    this.currentUser = JSON.parse(currentUser); // localStorage only supports recording strings, so we need to parse it
   }
 };
 
 // Constants
-DL.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
 DL.Auth.AUTH_DATA_KEY = 'dl-api-auth-data';
+DL.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
+DL.Auth.AUTH_TOKEN_EXPIRATION = 'dl-api-auth-token-expiration';
 
 /**
  * @method setUserData
@@ -462,6 +473,7 @@ DL.Auth.prototype.registerToken = function(data) {
   if (data.token) {
     // register authentication token on localStorage
     window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY, data.token.token);
+    window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_EXPIRATION, data.token.expire_at);
     delete data.token;
 
     // Store curent user
@@ -660,10 +672,12 @@ DL.Channel.prototype.connect = function() {
  * @return {Channel} this
  */
 DL.Channel.prototype.disconnect = function(sync) {
-  this.close();
-  this.publish('disconnected', {
-    _sync: ((typeof(sync)!=="undefined") && sync)
-  });
+  if (this.isConnected()) {
+    this.close();
+    this.publish('disconnected', {
+      _sync: ((typeof(sync)!=="undefined") && sync)
+    });
+  }
   return this;
 };
 
@@ -1259,6 +1273,49 @@ DL.Collection.prototype.buildQuery = function() {
 
 
 /**
+<<<<<<< HEAD
+=======
+ * @class DL.CollectionItem
+ *
+ * @param {DL.Collection} collection
+ * @param {Number|String} _id
+ * @constructor
+ */
+DL.CollectionItem = function(collection, _id) {
+  this.collection = collection;
+
+  this.name = this._validateName(name);
+  this.reset();
+
+  this.segments = 'collection/' + this.name;
+};
+
+
+/**
+ * @class DL.Events
+ */
+DL.Events = function(client) {
+  this.client = client;
+  this.events = {};
+};
+
+DL.Events.prototype.on = function(event, callback, context) {
+  if (!this.events[event]) { this.events[event] = []; }
+  this.events[event].push({callback: callback, context: context});
+};
+
+DL.Events.prototype.trigger = function(event, data) {
+  var c, args = arguments.slice(1);
+  if (this.events[event]) {
+    for (var i=0,length=this.events[event].length;i<length;i++)  {
+      c = this.events[event][i];
+      c.callback.apply(c.context || this.client, args);
+    }
+  }
+};
+
+/**
+>>>>>>> 45053cacbecc4dcaae63a914b8a3a0d2b3966463
  */
 DL.Files = function(client) {
   this.client = client;

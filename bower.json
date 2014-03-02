@@ -19,6 +19,7 @@
     "qunit": "~1.9.0",
     "when": "~2.8.0",
     "lodash": "~2.4.0",
+    "eventsource": "Yaffle/EventSource",
 
     "backbone": "~1.1.2",
     "jquery": "~2.1.0"
