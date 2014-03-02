@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 2/20/2014
+ * @build 3/2/2014
  */
 (function(window) {
   //
@@ -7968,7 +7968,7 @@ DL.Client.prototype.remove = function(segments) {
  * @param {Object} data
  */
 DL.Client.prototype.request = function(segments, method, data) {
-  var payload, request_headers, auth_token, deferred = when.defer(),
+  var payload, auth_token, deferred = when.defer(),
       synchronous = false;
 
   // FIXME: find a better way to write this
@@ -7985,22 +7985,9 @@ DL.Client.prototype.request = function(segments, method, data) {
     }
   }
 
-  // App authentication request headers
-  request_headers = {
-    'X-App-Id': this.appId,
-    'X-App-Key': this.key,
-    'Content-Type': 'application/json' // exchange data via JSON to keep basic data types
-  };
-
-  // Forward user authentication token, if it is set
-  auth_token = window.localStorage.getItem(this.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
-  if (auth_token) {
-    request_headers['X-Auth-Token'] = auth_token;
-  }
-
   uxhr(this.url + segments, payload, {
     method: method,
-    headers: request_headers,
+    headers: this.getHeaders(),
     sync: synchronous,
     success: function(response) {
       // FIXME: errors shouldn't trigger success callback, that's a uxhr problem?
@@ -8020,6 +8007,27 @@ DL.Client.prototype.request = function(segments, method, data) {
 
   return deferred.promise;
 };
+
+/**
+ * Get XHR headers for app/auth context.
+ * @method getHeaders
+ * @return {Object}
+ */
+DL.Client.prototype.getHeaders = function() {
+  // App authentication request headers
+  var request_headers = {
+    'X-App-Id': this.appId,
+    'X-App-Key': this.key,
+    'Content-Type': 'application/json' // exchange data via JSON to keep basic data types
+  };
+
+  // Forward user authentication token, if it is set
+  auth_token = window.localStorage.getItem(this.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
+  if (auth_token) {
+    request_headers['X-Auth-Token'] = auth_token;
+  }
+  return request_headers;
+}
 
 DL.Client.prototype.serialize = function(obj, prefix) {
   var str = [];
@@ -9055,7 +9063,6 @@ DL.Collection.prototype.buildQuery = function() {
 
   var f, shortnames = {
     paginate: 'p',
-    data: 'd',
     first: 'f',
     aggregation: 'aggr',
     operation: 'op'
@@ -9071,23 +9078,6 @@ DL.Collection.prototype.buildQuery = function() {
   this.reset();
 
   return query;
-};
-
-
-/**
- * @class DL.CollectionItem
- *
- * @param {DL.Collection} collection
- * @param {Number|String} _id
- * @constructor
- */
-DL.CollectionItem = function(collection, _id) {
-  this.collection = collection;
-
-  this.name = this._validateName(name);
-  this.reset();
-
-  this.segments = 'collection/' + this.name;
 };
 
 

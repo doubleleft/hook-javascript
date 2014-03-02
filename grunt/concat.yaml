@@ -27,3 +27,8 @@ amd:
     - 'src/*.js'
     - 'src/wrap/amd-end.js'
   dest: 'dist/amd/dl.js'
+
+plugin_backbone:
+  src:
+    - 'src/plugins/backbone.js'
+  dest: 'dist/plugins/backbone.js'

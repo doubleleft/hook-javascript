@@ -558,7 +558,6 @@ DL.Collection.prototype.buildQuery = function() {
 
   var f, shortnames = {
     paginate: 'p',
-    data: 'd',
     first: 'f',
     aggregation: 'aggr',
     operation: 'op'
