@@ -1,7 +1,11 @@
 asyncTest("Plugin: Backbone.DLModel", function() {
   expect(1);
-
-  Backbone.dlapi = client;
+  var dl = new DL.Client({
+    url: 'http://dl-api.dev/api/index.php/',
+    appId: 5,
+    key: "567dca583723adc1ec8bfceaddc52ddf"
+  });
+  Backbone.dlapi = dl;
 
   var Post = Backbone.DLModel.extend({name: "posts"});
   var entry = new Post({

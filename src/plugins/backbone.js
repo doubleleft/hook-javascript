@@ -34,7 +34,11 @@
     },
 
     url: function() {
-      return Backbone.dlapi.url + this.remote.segments;
+      var url = Backbone.dlapi.url + this.remote.segments
+      if (this.get('_id')) {
+        url += '/' + this.get('_id');
+      }
+      return url;
     }
   });
 
