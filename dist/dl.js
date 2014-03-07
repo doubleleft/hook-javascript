@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 3/6/2014
+ * @build 3/7/2014
  */
 (function(window) {
   //
@@ -974,14 +974,13 @@ define(function (require) {
 	"use strict";
 
 	return function (url, data, options) {
-
 		data = data || '';
 		options = options || {};
 
 		var complete = options.complete || function(){},
 			success = options.success || function(){},
 			error = options.error || function(){},
-			headers = options.headers || {},
+			headers = options.headers,
 			method = options.method || 'GET',
 			sync = options.sync || false,
 			req = (function() {
@@ -1014,38 +1013,87 @@ define(function (require) {
 
 		// listen for XHR events
 		req.onload = function () {
-			complete(req.responseText, req.status);
-			success(req.responseText);
+			complete(this.responseText, this.status);
+			success(this.responseText);
 		};
 		req.onerror = function () {
-			complete(req.responseText);
-			error(req.responseText, req.status);
+			complete(this.responseText);
+			error(this.responseText, this.status);
 		};
 
 		try{
 			req.open(method, (method === 'GET' && data ? url+'?'+data : url), !sync);
-			for (var header in headers) {
-				req.setRequestHeader(header, headers[header]);
+			if(headers != null){
+				for (var header in headers) {
+					req.setRequestHeader(header, headers[header]);
+				}
 			}
 			req.send(method !== 'GET' ? data : null);
 
 		}catch(e){
 			if (typeof XDomainRequest !== 'undefined') {
-				var xdr = new XDomainRequest();
-				xdr.onload = req.onload;
-				xdr.onerror = req.onerror;
-				xdr.open(method, method === 'GET' && data ? url+'?'+data : url);
-				xdr.send(method !== 'GET' ? data : null);
-				req = xdr;
+				if(sync || headers != null){
+					//XDomainRequest does not suport custom headers
+					//or synchronous method with CORS
+					var a = document.createElement("a"); a.href = url;
+					var iframe = document.createElement("iframe");	
+					document.body.appendChild(iframe);
+					iframe.id = "uxhr-crossdomain";
+					iframe.src = a.protocol + "//" + a.hostname  + "/crossdomain.html";
+					iframe.style.display = "none";
+					var w = iframe.contentWindow;
+					window.addEventListener("message", function(e){
+						var d = e.data.split("|");
+						var key = d[0], val = d[1], json = d[2];
+						if(key == "uxhr"){
+							if(val == "ready"){
+								var r = {url:url, data:data, options:options};
+								w.postMessage("uxhr|"+JSON.stringify(r), iframe.src);
+							}else if(val == "error"){
+								error(json);
+							}else if(val == "complete"){
+								complete(json);
+							}
+						}
+					}, false);
+				}else{
+					var xdr = new XDomainRequest();
+					xdr.onload = req.onload;
+					xdr.onerror = req.onerror;
+					xdr.open(method, method === 'GET' && data ? url+'?'+data : url);
+					xdr.send(method !== 'GET' ? data : null);
+					req = xdr;
+				}
 			}
 		}
 
 		// send it	
 		return req;
 	};
-
 }));
 
+window.uxhr_crossdomain = function(){
+	var url = (window.location != window.parent.location) ? document.referrer: document.location;
+	var w = parent;
+	var onMessage = function(e){
+		var d = e.data.split("|");
+		var key = d[0], val = d[1];
+		if(key == "uxhr"){
+			var r = JSON.parse(val);	
+			var options = r.options;
+			options.complete = function(response){
+				w.postMessage("uxhr|complete|"+JSON.stringify(response), url);
+			};
+			options.error = function(response){
+				w.postMessage("uxhr|error|"+JSON.stringify(response), url);
+			};
+			uxhr(r.url, r.data, options);
+		}
+		window.removeEventListener("message", onMessage);
+	};
+	w.postMessage("uxhr|ready", url);
+	window.addEventListener('message', onMessage, false);
+};
 
 /**
  * @license

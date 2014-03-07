@@ -1,5 +1,5 @@
 window.client = new DL.Client({
-  url: "http://dl-api.dev/api/index.php/",
+  url: "http://dl-api.dll.co/",
   appId: '1',
   key: "test"
 });
