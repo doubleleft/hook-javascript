@@ -998,12 +998,19 @@ define(function (require) {
 		}
 
 		// serialize data?
-		if (typeof data !== 'string' && !(data instanceof typeof("FormData"))) {
+		if (typeof data !== 'string'){
 			var serialized = [];
+			var skip = false;
 			for (var datum in data) {
+				if(typeof(data[datum]) == "function"){
+					skip = true;
+					break;
+				}
 				serialized.push(datum + '=' + data[datum]);
 			}
-			data = serialized.join('&');
+			if(!skip){
+				data = serialized.join('&');
+			}
 		}
 
 		// set timeout
