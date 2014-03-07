@@ -144,8 +144,13 @@ DL.Client.prototype.request = function(segments, method, data) {
     headers: this.getHeaders(),
     sync: synchronous,
     success: function(response) {
-      // FIXME: errors shouldn't trigger success callback, that's a uxhr problem?
-      var data = JSON.parse(response);
+      var data = null;
+      try{
+        data = JSON.parse(response);
+      }catch(e){
+        //something wrong with JSON. IE throws exception on JSON.parse 
+      }
+      
       if (!data || data.error) {
         deferred.resolver.reject(data);
       } else {
