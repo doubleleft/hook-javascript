@@ -1051,7 +1051,7 @@ define(function (require) {
 					var w = iframe.contentWindow;
 					window.addEventListener("message", function(e){
 						var d = e.data.split("|");
-						var key = d[0], val = d[1], json = JSON.parse(d[2]);
+						var key = d[0], val = d[1], json = d[2] == null ? {} : JSON.parse(d[2]);
 						if(key == "uxhr"){
 							if(val == "ready"){
 								var r = {url:url, data:data, options:options};
