@@ -1051,17 +1051,17 @@ define(function (require) {
 					var w = iframe.contentWindow;
 					window.addEventListener("message", function(e){
 						var d = e.data.split("|");
-						var key = d[0], val = d[1], json = d[2];
+						var key = d[0], val = d[1], json = JSON.parse(d[2]);
 						if(key == "uxhr"){
 							if(val == "ready"){
 								var r = {url:url, data:data, options:options};
 								w.postMessage("uxhr|"+JSON.stringify(r), iframe.src);
 							}else if(val == "error"){
-								complete(json);
-								error(json);
+								complete(json.data);
+								error(json.data);
 							}else if(val == "complete"){
-								complete(json);
-								success(json);
+								complete(json.data);
+								success(json.data);
 							}
 						}
 					}, false);
@@ -1091,10 +1091,10 @@ window.uxhr_crossdomain = function(){
 			var r = JSON.parse(val);	
 			var options = r.options;
 			options.complete = function(response){
-				w.postMessage("uxhr|complete|"+JSON.stringify(response), url);
+				w.postMessage("uxhr|complete|"+JSON.stringify({data:response}), url);
 			};
 			options.error = function(response){
-				w.postMessage("uxhr|error|"+JSON.stringify(response), url);
+				w.postMessage("uxhr|error|"+JSON.stringify({data:response}), url);
 			};
 			uxhr(r.url, r.data, options);
 		}
