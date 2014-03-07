@@ -8476,8 +8476,12 @@ DL.Client.prototype.request = function(segments, method, data) {
       }
     },
     error: function(response) {
-      var data = JSON.parse(response);
-      console.log("Error: ", data);
+      var data = null;
+      try{
+        data = JSON.parse(response);
+	  }catch(e){
+      }
+      console.log("Error: ", data || "invalid json response");
       deferred.resolver.reject(data);
     }
   });
