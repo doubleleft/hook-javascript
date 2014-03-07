@@ -1057,9 +1057,11 @@ define(function (require) {
 								var r = {url:url, data:data, options:options};
 								w.postMessage("uxhr|"+JSON.stringify(r), iframe.src);
 							}else if(val == "error"){
+								complete(json);
 								error(json);
 							}else if(val == "complete"){
 								complete(json);
+								success(json);
 							}
 						}
 					}, false);
