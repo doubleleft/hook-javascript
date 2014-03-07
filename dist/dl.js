@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 3/2/2014
+ * @build 3/6/2014
  */
 (function(window) {
   //
@@ -985,15 +985,7 @@ define(function (require) {
 			method = options.method || 'GET',
 			sync = options.sync || false,
 			req = (function() {
-
 				if (typeof 'XMLHttpRequest' !== 'undefined') {
-
-					// CORS (IE8-9)
-					if (url.indexOf('http') === 0 && typeof XDomainRequest !== 'undefined') {
-						return new XDomainRequest();
-					}
-
-					// local, CORS (other browsers)
 					return new XMLHttpRequest();
 
 				} else if (typeof 'ActiveXObject' !== 'undefined') {
@@ -1007,7 +999,7 @@ define(function (require) {
 		}
 
 		// serialize data?
-		if (typeof data !== 'string') {
+		if (typeof data !== 'string' && !(data instanceof typeof("FormData"))) {
 			var serialized = [];
 			for (var datum in data) {
 				serialized.push(datum + '=' + data[datum]);
@@ -1030,21 +1022,30 @@ define(function (require) {
 			error(req.responseText, req.status);
 		};
 
-		// open connection
-		req.open(method, (method === 'GET' && data ? url+'?'+data : url), !sync);
+		try{
+			req.open(method, (method === 'GET' && data ? url+'?'+data : url), !sync);
+			for (var header in headers) {
+				req.setRequestHeader(header, headers[header]);
+			}
+			req.send(method !== 'GET' ? data : null);
 
-		// set headers
-		for (var header in headers) {
-			req.setRequestHeader(header, headers[header]);
+		}catch(e){
+			if (typeof XDomainRequest !== 'undefined') {
+				var xdr = new XDomainRequest();
+				xdr.onload = req.onload;
+				xdr.onerror = req.onerror;
+				xdr.open(method, method === 'GET' && data ? url+'?'+data : url);
+				xdr.send(method !== 'GET' ? data : null);
+				req = xdr;
+			}
 		}
 
-		// send it
-		req.send(method !== 'GET' ? data : null);
-
+		// send it	
 		return req;
 	};
 
 }));
+
 
 /**
  * @license
@@ -8461,8 +8462,13 @@ DL.Client.prototype.request = function(segments, method, data) {
     headers: this.getHeaders(),
     sync: synchronous,
     success: function(response) {
-      // FIXME: errors shouldn't trigger success callback, that's a uxhr problem?
-      var data = JSON.parse(response);
+      var data = null;
+      try{
+        data = JSON.parse(response);
+      }catch(e){
+        //something wrong with JSON. IE throws exception on JSON.parse 
+      }
+      
       if (!data || data.error) {
         deferred.resolver.reject(data);
       } else {

@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 3/2/2014
+ * @build 3/6/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -167,8 +167,13 @@ DL.Client.prototype.request = function(segments, method, data) {
     headers: this.getHeaders(),
     sync: synchronous,
     success: function(response) {
-      // FIXME: errors shouldn't trigger success callback, that's a uxhr problem?
-      var data = JSON.parse(response);
+      var data = null;
+      try{
+        data = JSON.parse(response);
+      }catch(e){
+        //something wrong with JSON. IE throws exception on JSON.parse 
+      }
+      
       if (!data || data.error) {
         deferred.resolver.reject(data);
       } else {
