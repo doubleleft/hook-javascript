@@ -1,4 +1,5 @@
 /**
+ * @module DL
  * @class DL.CollectionItem
  *
  * @param {DL.Collection} collection

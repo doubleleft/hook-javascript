@@ -1,6 +1,8 @@
 /**
  * Deals with user registration/authentication
+ * @module DL
  * @class DL.Auth
+ *
  * @param {DL.Client} client
  * @constructor
  */

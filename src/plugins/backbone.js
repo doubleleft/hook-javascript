@@ -1,10 +1,10 @@
 (function(window) {
   /**
-   * @namespace Backbone
+   * @module Backbone
    */
 
   /**
-   * @class DLModel
+   * @class Backbone.DLModel
    */
   Backbone.DLModel = Backbone.Model.extend({
     idAttribute: '_id',
@@ -43,7 +43,7 @@
   });
 
   /**
-   * @class DLCollection
+   * @class Backbone.DLCollection
    */
   Backbone.DLCollection = Backbone.Collection.extend({
     initialize: function() {

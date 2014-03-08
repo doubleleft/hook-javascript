@@ -1,7 +1,9 @@
 /**
+ * @module DL
  * @class DL.System
- * @constructor
+ *
  * @param {Client} client
+ * @constructor
  */
 DL.System = function(client) {
   this.client = client;

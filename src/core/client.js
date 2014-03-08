@@ -11,13 +11,15 @@
  * });
  * ```
  *
+ * @module DL
  * @class DL.Client
- * @constructor
+ *
  * @param {Object} options
  *   @param {String} options.appId
  *   @param {String} options.key
  *   @param {String} options.url default: http://dl-api.dev
  *
+ * @constructor
  */
 DL.Client = function(options) {
   this.url = options.url || "http://dl-api.dev/api/public/index.php/";
@@ -148,9 +150,9 @@ DL.Client.prototype.request = function(segments, method, data) {
       try{
         data = JSON.parse(response);
       }catch(e){
-        //something wrong with JSON. IE throws exception on JSON.parse 
+        //something wrong with JSON. IE throws exception on JSON.parse
       }
-      
+
       if (!data || data.error) {
         deferred.resolver.reject(data);
       } else {

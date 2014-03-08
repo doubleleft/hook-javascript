@@ -1,4 +1,6 @@
 /**
+ * @module DL
+ * @class DL.Files
  */
 DL.Files = function(client) {
   this.client = client;

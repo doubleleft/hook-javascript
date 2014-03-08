@@ -1,4 +1,5 @@
 /**
+ * @module DL
  * @class DL.Collection
  *
  * @param {DL.Client} client

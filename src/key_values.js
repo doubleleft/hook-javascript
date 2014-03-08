@@ -1,7 +1,9 @@
 /**
+ * @module DL
  * @class DL.KeyValues
- * @constructor
+ *
  * @param {DL.Client} client
+ * @constructor
  */
 DL.KeyValues = function(client) {
   this.client = client;
