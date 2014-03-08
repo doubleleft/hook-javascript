@@ -440,6 +440,7 @@ DL.Collection.prototype.remove = function(_id) {
 
 /**
  * Update a single collection entry
+ * @method update
  * @param {Number | String} _id
  * @param {Object} data
  *
