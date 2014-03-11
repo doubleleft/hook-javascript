@@ -426,6 +426,7 @@ DL.Collection.prototype.drop = function() {
 
 /**
  * Remove a single row by id
+ * @method remove
  * @param {String} id
  * @return {Promise}
  *
