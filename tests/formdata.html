@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>tests - formdata</title>
+	<meta charset="utf-8">
+
+	<script type="text/javascript" src="../dist/dl.js"></script>
+</head>
+<body>
+  <div id="fb-root"></div>
+  <script type="text/javascript">
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '1446628695568830',
+        status     : true,
+        xfbml      : true
+      });
+    };
+    (function(d, s, id){
+       var js, fjs = d.getElementsByTagName(s)[0];
+       if (d.getElementById(id)) {return;}
+       js = d.createElement(s); js.id = id;
+       js.src = "//connect.facebook.net/en_US/all.js";
+       fjs.parentNode.insertBefore(js, fjs);
+     }(document, 'script', 'facebook-jssdk'));
+  </script>
+
+  <!-- devDependencies -->
+	<script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8">
+    $(function() {
+      window.client = new DL.Client({
+        url: "http://dl-api.dev/api/index.php/",
+        appId: '5',
+        key: "567dca583723adc1ec8bfceaddc52ddf"
+      });
+
+      $('form').submit(function(e) {
+        e.preventDefault();
+
+        var with_files = window.client.collection('with_files');
+        with_files.create({
+          file1: $('#file1').get(0),
+          file2: $('#file2').get(0),
+          time: 123456,
+          floating: 9.99,
+          some_string: "Hello there."
+        });
+      })
+    });
+  </script>
+
+  <form action="" method="get" accept-charset="utf-8">
+    <label for="file1">file1</label><input type="file" name="file1" id="file1">
+    <label for="file2">file2</label><input type="file" name="file2" id="file2">
+    <label for="text">text</label><input type="text" name="text" id="text">
+
+
+    <input type="submit" value="Continue →">
+  </form>
+
+</body>
+</html>
+
