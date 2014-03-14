@@ -1,6 +1,8 @@
 /**
  * Deals with user registration/authentication
+ * @module DL
  * @class DL.Auth
+ *
  * @param {DL.Client} client
  * @constructor
  */
@@ -11,15 +13,22 @@ DL.Auth = function(client) {
    * @property currentUser
    * @type {Object}
    */
-  this.currentUser = window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
-  if (this.currentUser) {
-    this.currentUser = JSON.parse(this.currentUser); // localStorage only supports recording strings, so we need to parse it
+  this.currentUser = null;
+
+  var now = new Date(),
+      tokenExpiration = new Date(parseInt((window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_EXPIRATION)) || 0, 10) * 1000),
+      currentUser = window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
+
+  // Fill current user only when it isn't expired yet.
+  if (currentUser && now.getTime() < tokenExpiration.getTime()) {
+    this.currentUser = JSON.parse(currentUser); // localStorage only supports recording strings, so we need to parse it
   }
 };
 
 // Constants
-DL.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
 DL.Auth.AUTH_DATA_KEY = 'dl-api-auth-data';
+DL.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
+DL.Auth.AUTH_TOKEN_EXPIRATION = 'dl-api-auth-token-expiration';
 
 /**
  * @method setUserData
@@ -170,6 +179,7 @@ DL.Auth.prototype.registerToken = function(data) {
   if (data.token) {
     // register authentication token on localStorage
     window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY, data.token.token);
+    window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_EXPIRATION, data.token.expire_at);
     delete data.token;
 
     // Store curent user

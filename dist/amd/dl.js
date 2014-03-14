@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 2/25/2014
+ * @build 3/14/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -34,13 +34,15 @@ window.DL = DL;
  * });
  * ```
  *
+ * @module DL
  * @class DL.Client
- * @constructor
+ *
  * @param {Object} options
  *   @param {String} options.appId
  *   @param {String} options.key
  *   @param {String} options.url default: http://dl-api.dev
  *
+ * @constructor
  */
 DL.Client = function(options) {
   this.url = options.url || "http://dl-api.dev/api/public/index.php/";
@@ -150,7 +152,7 @@ DL.Client.prototype.remove = function(segments) {
  * @param {Object} data
  */
 DL.Client.prototype.request = function(segments, method, data) {
-  var payload, request_headers, auth_token, deferred = when.defer(),
+  var payload, request_headers, deferred = when.defer(),
       synchronous = false;
 
   // FIXME: find a better way to write this
@@ -159,32 +161,13 @@ DL.Client.prototype.request = function(segments, method, data) {
     synchronous = true;
   }
 
-  if (data) {
-    if(data instanceof FormData){
-      payload = data;
-	}else{
-	  payload = JSON.stringify(data);
-	}
+  // Compute payload
+  payload = this.getPayload(method, data);
 
-    if (method === "GET") {
-      payload = encodeURIComponent(payload);
-    }
-  }
-
-  // App authentication request headers
-  request_headers = {
-    'X-App-Id': this.appId,
-    'X-App-Key': this.key,
-  };
-  
+  // Compute request headers
+  request_headers = this.getHeaders();
   if(!(payload instanceof FormData)){
     request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
-  }
-
-  // Forward user authentication token, if it is set
-  auth_token = window.localStorage.getItem(this.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
-  if (auth_token) {
-    request_headers['X-Auth-Token'] = auth_token;
   }
 
   uxhr(this.url + segments, payload, {
@@ -192,8 +175,13 @@ DL.Client.prototype.request = function(segments, method, data) {
     headers: request_headers,
     sync: synchronous,
     success: function(response) {
-      // FIXME: errors shouldn't trigger success callback, that's a uxhr problem?
-      var data = JSON.parse(response);
+      var data = null;
+      try{
+        data = JSON.parse(response);
+      } catch(e) {
+        //something wrong with JSON. IE throws exception on JSON.parse
+      }
+
       if (!data || data.error) {
         deferred.resolver.reject(data);
       } else {
@@ -201,14 +189,85 @@ DL.Client.prototype.request = function(segments, method, data) {
       }
     },
     error: function(response) {
-      var data = JSON.parse(response);
-      console.log("Error: ", data);
+      var data = null;
+      try{
+        data = JSON.parse(response);
+      }catch(e){
+      }
+      console.log("Error: ", data || "invalid json response");
       deferred.resolver.reject(data);
     }
   });
 
   return deferred.promise;
 };
+
+/**
+ * Get XHR headers for app/auth context.
+ * @method getHeaders
+ * @return {Object}
+ */
+DL.Client.prototype.getHeaders = function() {
+  // App authentication request headers
+  var request_headers = {
+    'X-App-Id': this.appId,
+    'X-App-Key': this.key,
+  }, auth_token;
+
+  // Forward user authentication token, if it is set
+  var auth_token = window.localStorage.getItem(this.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
+  if (auth_token) {
+    request_headers['X-Auth-Token'] = auth_token;
+  }
+  return request_headers;
+}
+
+/**
+ * Get payload of given data
+ * @method getPayload
+ * @param {String} requestMethod
+ * @param {Object} data
+ * @return {String|FormData}
+ */
+DL.Client.prototype.getPayload = function(method, data) {
+  var payload = null;
+  if (data) {
+
+    if (data.data) {
+      if (data instanceof FormData){
+        payload = data;
+      } else {
+        var field, value,
+            formdata = new FormData(),
+            worth = false;
+        for (field in data.data) {
+          value = data.data[field];
+
+          debugger;
+          if (value instanceof HTMLInputElement) {
+            value = value.files[0];
+            worth = true;
+          }
+
+          //
+          // Consider serialization to keep data types here: http://phpjs.org/functions/serialize/
+          //
+          formdata.append('data['+ field +']', value);
+        }
+
+        if (worth) {
+          payload = formdata;
+        }
+      }
+    }
+
+    payload = payload || JSON.stringify(data);
+    if (method==="GET" && typeof(payload)==="string") {
+      payload = encodeURIComponent(payload);
+    }
+  }
+  return payload;
+}
 
 DL.Client.prototype.serialize = function(obj, prefix) {
   var str = [];
@@ -224,6 +283,7 @@ DL.Client.prototype.serialize = function(obj, prefix) {
 
 /**
  * Iterable is for internal use only.
+ * @module DL
  * @class DL.Iterable
  */
 DL.Iterable = function() { };
@@ -296,7 +356,9 @@ DL.Iterable.prototype = {
 
 /**
  * Deals with user registration/authentication
+ * @module DL
  * @class DL.Auth
+ *
  * @param {DL.Client} client
  * @constructor
  */
@@ -307,15 +369,22 @@ DL.Auth = function(client) {
    * @property currentUser
    * @type {Object}
    */
-  this.currentUser = window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
-  if (this.currentUser) {
-    this.currentUser = JSON.parse(this.currentUser); // localStorage only supports recording strings, so we need to parse it
+  this.currentUser = null;
+
+  var now = new Date(),
+      tokenExpiration = new Date(parseInt((window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_EXPIRATION)) || 0, 10) * 1000),
+      currentUser = window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
+
+  // Fill current user only when it isn't expired yet.
+  if (currentUser && now.getTime() < tokenExpiration.getTime()) {
+    this.currentUser = JSON.parse(currentUser); // localStorage only supports recording strings, so we need to parse it
   }
 };
 
 // Constants
-DL.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
 DL.Auth.AUTH_DATA_KEY = 'dl-api-auth-data';
+DL.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
+DL.Auth.AUTH_TOKEN_EXPIRATION = 'dl-api-auth-token-expiration';
 
 /**
  * @method setUserData
@@ -466,6 +535,7 @@ DL.Auth.prototype.registerToken = function(data) {
   if (data.token) {
     // register authentication token on localStorage
     window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY, data.token.token);
+    window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_EXPIRATION, data.token.expire_at);
     delete data.token;
 
     // Store curent user
@@ -474,9 +544,11 @@ DL.Auth.prototype.registerToken = function(data) {
 };
 
 /**
+ * @module DL
  * @class DL.Channel
- * @constructor
+ *
  * @param {Client} client
+ * @constructor
  */
 DL.Channel = function(client, collection, options) {
   this.collection = collection;
@@ -687,6 +759,7 @@ DL.Channel.prototype.close = function() {
 };
 
 /**
+ * @module DL
  * @class DL.Collection
  *
  * @param {DL.Client} client
@@ -1113,6 +1186,7 @@ DL.Collection.prototype.drop = function() {
 
 /**
  * Remove a single row by id
+ * @method remove
  * @param {String} id
  * @return {Promise}
  *
@@ -1128,6 +1202,7 @@ DL.Collection.prototype.remove = function(_id) {
 
 /**
  * Update a single collection entry
+ * @method update
  * @param {Number | String} _id
  * @param {Object} data
  *
@@ -1246,7 +1321,6 @@ DL.Collection.prototype.buildQuery = function() {
 
   var f, shortnames = {
     paginate: 'p',
-    data: 'd',
     first: 'f',
     aggregation: 'aggr',
     operation: 'op'
@@ -1266,6 +1340,49 @@ DL.Collection.prototype.buildQuery = function() {
 
 
 /**
+ * @module DL
+ * @class DL.CollectionItem
+ *
+ * @param {DL.Collection} collection
+ * @param {Number|String} _id
+ * @constructor
+ */
+DL.CollectionItem = function(collection, _id) {
+  this.collection = collection;
+
+  this.name = this._validateName(name);
+  this.reset();
+
+  this.segments = 'collection/' + this.name;
+};
+
+
+/**
+ * @class DL.Events
+ */
+DL.Events = function(client) {
+  this.client = client;
+  this.events = {};
+};
+
+DL.Events.prototype.on = function(event, callback, context) {
+  if (!this.events[event]) { this.events[event] = []; }
+  this.events[event].push({callback: callback, context: context});
+};
+
+DL.Events.prototype.trigger = function(event, data) {
+  var c, args = arguments.slice(1);
+  if (this.events[event]) {
+    for (var i=0,length=this.events[event].length;i<length;i++)  {
+      c = this.events[event][i];
+      c.callback.apply(c.context || this.client, args);
+    }
+  }
+};
+
+/**
+ * @module DL
+ * @class DL.Files
  */
 DL.Files = function(client) {
   this.client = client;
@@ -1297,9 +1414,11 @@ DL.Files.prototype.get = function(_id) {
 };
 
 /**
+ * @module DL
  * @class DL.KeyValues
- * @constructor
+ *
  * @param {DL.Client} client
+ * @constructor
  */
 DL.KeyValues = function(client) {
   this.client = client;
@@ -1342,7 +1461,9 @@ DL.KeyValues.prototype.set = function(key, value) {
 };
 
 /**
+ * @module DL
  * @class DL.Pagination
+ *
  * @param {DL.Collection} collection
  * @param {Number} perPage
  * @constructor
@@ -1423,9 +1544,85 @@ DL.Pagination.prototype.then = function() {
 };
 
 /**
+ * @class DL.Query
+ */
+DL.Query = function () {
+  this.wheres = [];
+  this.ordering = [];
+  this._group = [];
+  this._limit = null;
+  this._offset = null;
+};
+
+/**
+ * Add `where` param
+ * @method where
+ * @param {Object | String} where params or field name
+ * @param {String} operation '<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between'
+ * @param {String} value value
+ * @return {DL.Collection} this
+ *
+ * @example Multiple 'where' calls
+ *
+ *     var c = client.collection('posts');
+ *     c.where('author','Vicente'); // equal operator may be omitted
+ *     c.where('stars','>',10);     // support '<' and '>' operators
+ *     c.then(function(result) {
+ *       console.log(result);
+ *     });
+ *
+ * @example One 'where' call
+ *
+ *     client.collection('posts').where({
+ *       author: 'Vicente',
+ *       stars: ['>', 10]
+ *     }).then(function(result) {
+ *       console.log(result);
+ *     })
+ *
+ * @example Filtering 'in' value list.
+ *
+ *     client.collection('posts').where('author_id', 'in', [500, 501]).then(function(result) {
+ *       console.log(result);
+ *     })
+ *
+ */
+DL.Query.prototype.where = function(objects, _operation, _value, _boolean) {
+  var field,
+      operation = (typeof(_value)==="undefined") ? '=' : _operation,
+      value = (typeof(_value)==="undefined") ? _operation : _value,
+      boolean = (typeof(_boolean)==="undefined") ? 'and' : _boolean;
+
+  if (typeof(objects)==="object") {
+    for (field in objects) {
+      if (objects.hasOwnProperty(field)) {
+        if (objects[field] instanceof Array) {
+          operation = objects[field][0];
+          value = objects[field][1];
+        } else {
+          value = objects[field];
+        }
+        this.addWhere(field, operation, value);
+      }
+    }
+  } else {
+    this.addWhere(objects, operation, value);
+  }
+
+  return this;
+};
+
+DL.Query.prototype.addWhere = function(field, operation, value) {
+  this.wheres.push([field, operation.toLowerCase(), value]);
+  return this;
+};
+
+/**
+ * @module DL
  * @class DL.System
- * @constructor
+ *
  * @param {Client} client
+ * @constructor
  */
 DL.System = function(client) {
   this.client = client;

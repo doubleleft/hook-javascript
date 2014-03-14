@@ -1,5 +1,6 @@
 /**
  * Iterable is for internal use only.
+ * @module DL
  * @class DL.Iterable
  */
 DL.Iterable = function() { };

@@ -14,11 +14,15 @@
     "node_modules",
     "bower_components"
   ],
-  "dependencies": {
+  "devDependencies": {
     "uxhr": "gabriel-laet/uxhr#7aa7bfd05e30382ce851b2a09e2a974c843c4573",
     "qunit": "~1.9.0",
     "when": "~2.8.0",
     "lodash": "~2.4.0",
-	"blueimp-canvas-to-blob": "~2.1.0"
+    "blueimp-canvas-to-blob": "~2.1.0",
+    "eventsource": "Yaffle/EventSource",
+
+    "backbone": "~1.1.2",
+    "jquery": "~2.1.0"
   }
 }

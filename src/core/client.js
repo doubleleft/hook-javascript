@@ -11,13 +11,15 @@
  * });
  * ```
  *
+ * @module DL
  * @class DL.Client
- * @constructor
+ *
  * @param {Object} options
  *   @param {String} options.appId
  *   @param {String} options.key
  *   @param {String} options.url default: http://dl-api.dev
  *
+ * @constructor
  */
 DL.Client = function(options) {
   this.url = options.url || "http://dl-api.dev/api/public/index.php/";
@@ -127,7 +129,7 @@ DL.Client.prototype.remove = function(segments) {
  * @param {Object} data
  */
 DL.Client.prototype.request = function(segments, method, data) {
-  var payload, request_headers, auth_token, deferred = when.defer(),
+  var payload, request_headers, deferred = when.defer(),
       synchronous = false;
 
   // FIXME: find a better way to write this
@@ -136,32 +138,13 @@ DL.Client.prototype.request = function(segments, method, data) {
     synchronous = true;
   }
 
-  if (data) {
-    if(data instanceof FormData){
-      payload = data;
-	}else{
-	  payload = JSON.stringify(data);
-	}
+  // Compute payload
+  payload = this.getPayload(method, data);
 
-    if (method === "GET") {
-      payload = encodeURIComponent(payload);
-    }
-  }
-
-  // App authentication request headers
-  request_headers = {
-    'X-App-Id': this.appId,
-    'X-App-Key': this.key,
-  };
-  
+  // Compute request headers
+  request_headers = this.getHeaders();
   if(!(payload instanceof FormData)){
     request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
-  }
-
-  // Forward user authentication token, if it is set
-  auth_token = window.localStorage.getItem(this.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
-  if (auth_token) {
-    request_headers['X-Auth-Token'] = auth_token;
   }
 
   uxhr(this.url + segments, payload, {
@@ -169,8 +152,13 @@ DL.Client.prototype.request = function(segments, method, data) {
     headers: request_headers,
     sync: synchronous,
     success: function(response) {
-      // FIXME: errors shouldn't trigger success callback, that's a uxhr problem?
-      var data = JSON.parse(response);
+      var data = null;
+      try{
+        data = JSON.parse(response);
+      } catch(e) {
+        //something wrong with JSON. IE throws exception on JSON.parse
+      }
+
       if (!data || data.error) {
         deferred.resolver.reject(data);
       } else {
@@ -178,14 +166,85 @@ DL.Client.prototype.request = function(segments, method, data) {
       }
     },
     error: function(response) {
-      var data = JSON.parse(response);
-      console.log("Error: ", data);
+      var data = null;
+      try{
+        data = JSON.parse(response);
+      }catch(e){
+      }
+      console.log("Error: ", data || "invalid json response");
       deferred.resolver.reject(data);
     }
   });
 
   return deferred.promise;
 };
+
+/**
+ * Get XHR headers for app/auth context.
+ * @method getHeaders
+ * @return {Object}
+ */
+DL.Client.prototype.getHeaders = function() {
+  // App authentication request headers
+  var request_headers = {
+    'X-App-Id': this.appId,
+    'X-App-Key': this.key,
+  }, auth_token;
+
+  // Forward user authentication token, if it is set
+  var auth_token = window.localStorage.getItem(this.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
+  if (auth_token) {
+    request_headers['X-Auth-Token'] = auth_token;
+  }
+  return request_headers;
+}
+
+/**
+ * Get payload of given data
+ * @method getPayload
+ * @param {String} requestMethod
+ * @param {Object} data
+ * @return {String|FormData}
+ */
+DL.Client.prototype.getPayload = function(method, data) {
+  var payload = null;
+  if (data) {
+
+    if (data.data) {
+      if (data instanceof FormData){
+        payload = data;
+      } else {
+        var field, value,
+            formdata = new FormData(),
+            worth = false;
+        for (field in data.data) {
+          value = data.data[field];
+
+          debugger;
+          if (value instanceof HTMLInputElement) {
+            value = value.files[0];
+            worth = true;
+          }
+
+          //
+          // Consider serialization to keep data types here: http://phpjs.org/functions/serialize/
+          //
+          formdata.append('data['+ field +']', value);
+        }
+
+        if (worth) {
+          payload = formdata;
+        }
+      }
+    }
+
+    payload = payload || JSON.stringify(data);
+    if (method==="GET" && typeof(payload)==="string") {
+      payload = encodeURIComponent(payload);
+    }
+  }
+  return payload;
+}
 
 DL.Client.prototype.serialize = function(obj, prefix) {
   var str = [];

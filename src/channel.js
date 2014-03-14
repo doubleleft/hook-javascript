@@ -1,7 +1,9 @@
 /**
+ * @module DL
  * @class DL.Channel
- * @constructor
+ *
  * @param {Client} client
+ * @constructor
  */
 DL.Channel = function(client, collection, options) {
   this.collection = collection;

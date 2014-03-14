@@ -1,4 +1,5 @@
 /**
+ * @module DL
  * @class DL.Collection
  *
  * @param {DL.Client} client
@@ -425,6 +426,7 @@ DL.Collection.prototype.drop = function() {
 
 /**
  * Remove a single row by id
+ * @method remove
  * @param {String} id
  * @return {Promise}
  *
@@ -440,6 +442,7 @@ DL.Collection.prototype.remove = function(_id) {
 
 /**
  * Update a single collection entry
+ * @method update
  * @param {Number | String} _id
  * @param {Object} data
  *
@@ -558,7 +561,6 @@ DL.Collection.prototype.buildQuery = function() {
 
   var f, shortnames = {
     paginate: 'p',
-    data: 'd',
     first: 'f',
     aggregation: 'aggr',
     operation: 'op'

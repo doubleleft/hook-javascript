@@ -1,5 +1,7 @@
 /**
+ * @module DL
  * @class DL.Pagination
+ *
  * @param {DL.Collection} collection
  * @param {Number} perPage
  * @constructor
