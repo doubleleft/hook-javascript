@@ -54,6 +54,5 @@ To build it locally, try:
 
     $ mkdir ../dl-api-javascript-docs
     $ grunt yuidoc
-    $ cd ../dl-api-javascript-docs
     $ # publish on gh-pages
-    $ git init && git remote add origin git@github.com:doubleleft/dl-api-javascript.git && g checkout -b gh-pages && git add . && git commit -m "update public documentation" && git push origin gh-pages -f
+    $ cd ../dl-api-javascript-docs && git init && git remote add origin git@github.com:doubleleft/dl-api-javascript.git && g checkout -b gh-pages && git add . && git commit -m "update public documentation" && git push origin gh-pages -f

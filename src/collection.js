@@ -285,6 +285,7 @@ DL.Collection.prototype.firstOrCreate = function(data) {
 /**
  * Alias for get & then
  * @method then
+ * @return {Promise}
  */
 DL.Collection.prototype.then = function() {
   var promise = this.get();

@@ -217,10 +217,10 @@ DL.Client.prototype.getPayload = function(method, data) {
         var field, value,
             formdata = new FormData(),
             worth = false;
+
         for (field in data.data) {
           value = data.data[field];
 
-          debugger;
           if (value instanceof HTMLInputElement) {
             value = value.files[0];
             worth = true;
