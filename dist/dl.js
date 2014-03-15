@@ -9680,10 +9680,21 @@ DL.Files.prototype.upload = function(data, fileName, mimeType){
 };
 
 /**
+ * Get file data by id.
+ * @method get
  * @return {Promise}
  */
 DL.Files.prototype.get = function(_id) {
-  return this.client.get('files', { _id: _id });
+  return this.client.get('files/' + _id);
+};
+
+/**
+ * Remove file by id.
+ * @method remove
+ * @return {Promise}
+ */
+DL.Files.prototype.remove = function(_id) {
+  return this.client.remove('files/' + _id);
 };
 
 /**
