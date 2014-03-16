@@ -239,7 +239,7 @@ DL.Client.prototype.getPayload = function(method, data) {
       } else {
         var field, value, filename,
             formdata = new FormData(),
-            worth = false
+            worth = false;
 
         for (field in data.data) {
           value = data.data[field];
