@@ -214,22 +214,30 @@ DL.Client.prototype.getPayload = function(method, data) {
       if (data instanceof FormData){
         payload = data;
       } else {
-        var field, value,
+        var field, value, filename,
             formdata = new FormData(),
-            worth = false;
+            worth = false
 
         for (field in data.data) {
           value = data.data[field];
+          filename = null;
 
           if (value instanceof HTMLInputElement) {
             value = value.files[0];
             worth = true;
+          } else if (value instanceof HTMLCanvasElement && value.toBlob) {
+            value = dataURLtoBlob(value.toDataURL());
+            worth = true;
+            filename = 'canvas.png';
+          } else if (value instanceof Blob) {
+            worth = true;
+            filename = 'blob.' + value.type.match(/\/(.*)/)[1]; // get extension from blob mime/type
           }
 
           //
           // Consider serialization to keep data types here: http://phpjs.org/functions/serialize/
           //
-          formdata.append('data['+ field +']', value);
+          formdata.append('data['+ field +']', value, filename || "file");
         }
 
         if (worth) {

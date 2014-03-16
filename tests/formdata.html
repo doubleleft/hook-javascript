@@ -36,17 +36,30 @@
         key: "567dca583723adc1ec8bfceaddc52ddf"
       });
 
+      var canvas = $('canvas').get(0),
+          ctx = $('canvas').get(0).getContext('2d');
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      var img = new Image();
+      img.src = "fixtures/doubleleft.png";
+      img.onload = function() {
+        ctx.drawImage(img, (canvas.width/2) - (this.width / 2), (canvas.height/2) - (this.height / 2));
+      }
+
       $('form').submit(function(e) {
         e.preventDefault();
 
-        var with_files = window.client.collection('with_files');
-        with_files.create({
-          file1: $('#file1').get(0),
-          file2: $('#file2').get(0),
-          time: 123456,
-          floating: 9.99,
-          some_string: "Hello there."
-        });
+var with_files = window.client.collection('with_files');
+with_files.create({
+  file1: $('#file1').get(0),
+  file2: $('#file2').get(0),
+  with_canvas: canvas,
+  with_blob: dataURLtoBlob(canvas.toDataURL()),
+  time: 123456,
+  floating: 9.99,
+  some_string: "Hello there."
+});
+
       })
     });
   </script>
@@ -55,6 +68,7 @@
     <label for="file1">file1</label><input type="file" name="file1" id="file1">
     <label for="file2">file2</label><input type="file" name="file2" id="file2">
     <label for="text">text</label><input type="text" name="text" id="text">
+    <canvas width="800" height="600"></canvas>
 
 
     <input type="submit" value="Continue →">
