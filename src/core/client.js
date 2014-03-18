@@ -225,7 +225,7 @@ DL.Client.prototype.getPayload = function(method, data) {
           if (value instanceof HTMLInputElement) {
             value = value.files[0];
             worth = true;
-          } else if (value instanceof HTMLCanvasElement && value.toBlob) {
+          } else if (value instanceof HTMLCanvasElement) {
             value = dataURLtoBlob(value.toDataURL());
             worth = true;
             filename = 'canvas.png';

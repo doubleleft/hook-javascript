@@ -7,6 +7,10 @@ DL.Files = function(client) {
 };
 
 /**
+ * @method upload
+ * @param {Canvas|Blob} data
+ * @param {String} filename [optional]
+ * @param {String} mimeType [optional]
  * @return {Promise}
  */
 DL.Files.prototype.upload = function(data, fileName, mimeType){
@@ -27,6 +31,7 @@ DL.Files.prototype.upload = function(data, fileName, mimeType){
 /**
  * Get file data by id.
  * @method get
+ * @param {Number|String} _id
  * @return {Promise}
  */
 DL.Files.prototype.get = function(_id) {
@@ -36,6 +41,7 @@ DL.Files.prototype.get = function(_id) {
 /**
  * Remove file by id.
  * @method remove
+ * @param {Number|String} _id
  * @return {Promise}
  */
 DL.Files.prototype.remove = function(_id) {

@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 3/15/2014
+ * @build 3/18/2014
  */
 (function(window) {
   //
@@ -8543,7 +8543,7 @@ DL.Client.prototype.getPayload = function(method, data) {
           if (value instanceof HTMLInputElement) {
             value = value.files[0];
             worth = true;
-          } else if (value instanceof HTMLCanvasElement && value.toBlob) {
+          } else if (value instanceof HTMLCanvasElement) {
             value = dataURLtoBlob(value.toDataURL());
             worth = true;
             filename = 'canvas.png';
@@ -9662,6 +9662,29 @@ DL.CollectionItem = function(collection, _id) {
 
 
 /**
+ * @class DL.Events
+ */
+DL.Events = function(client) {
+  this.client = client;
+  this.events = {};
+};
+
+DL.Events.prototype.on = function(event, callback, context) {
+  if (!this.events[event]) { this.events[event] = []; }
+  this.events[event].push({callback: callback, context: context});
+};
+
+DL.Events.prototype.trigger = function(event, data) {
+  var c, args = arguments.slice(1);
+  if (this.events[event]) {
+    for (var i=0,length=this.events[event].length;i<length;i++)  {
+      c = this.events[event][i];
+      c.callback.apply(c.context || this.client, args);
+    }
+  }
+};
+
+/**
  * @module DL
  * @class DL.Files
  */
@@ -9670,6 +9693,10 @@ DL.Files = function(client) {
 };
 
 /**
+ * @method upload
+ * @param {Canvas|Blob} data
+ * @param {String} filename [optional]
+ * @param {String} mimeType [optional]
  * @return {Promise}
  */
 DL.Files.prototype.upload = function(data, fileName, mimeType){
@@ -9690,6 +9717,7 @@ DL.Files.prototype.upload = function(data, fileName, mimeType){
 /**
  * Get file data by id.
  * @method get
+ * @param {Number|String} _id
  * @return {Promise}
  */
 DL.Files.prototype.get = function(_id) {
@@ -9699,6 +9727,7 @@ DL.Files.prototype.get = function(_id) {
 /**
  * Remove file by id.
  * @method remove
+ * @param {Number|String} _id
  * @return {Promise}
  */
 DL.Files.prototype.remove = function(_id) {
@@ -9833,6 +9862,80 @@ DL.Pagination.prototype.isFetching = function() {
 };
 
 DL.Pagination.prototype.then = function() {
+};
+
+/**
+ * @class DL.Query
+ */
+DL.Query = function () {
+  this.wheres = [];
+  this.ordering = [];
+  this._group = [];
+  this._limit = null;
+  this._offset = null;
+};
+
+/**
+ * Add `where` param
+ * @method where
+ * @param {Object | String} where params or field name
+ * @param {String} operation '<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between'
+ * @param {String} value value
+ * @return {DL.Collection} this
+ *
+ * @example Multiple 'where' calls
+ *
+ *     var c = client.collection('posts');
+ *     c.where('author','Vicente'); // equal operator may be omitted
+ *     c.where('stars','>',10);     // support '<' and '>' operators
+ *     c.then(function(result) {
+ *       console.log(result);
+ *     });
+ *
+ * @example One 'where' call
+ *
+ *     client.collection('posts').where({
+ *       author: 'Vicente',
+ *       stars: ['>', 10]
+ *     }).then(function(result) {
+ *       console.log(result);
+ *     })
+ *
+ * @example Filtering 'in' value list.
+ *
+ *     client.collection('posts').where('author_id', 'in', [500, 501]).then(function(result) {
+ *       console.log(result);
+ *     })
+ *
+ */
+DL.Query.prototype.where = function(objects, _operation, _value, _boolean) {
+  var field,
+      operation = (typeof(_value)==="undefined") ? '=' : _operation,
+      value = (typeof(_value)==="undefined") ? _operation : _value,
+      boolean = (typeof(_boolean)==="undefined") ? 'and' : _boolean;
+
+  if (typeof(objects)==="object") {
+    for (field in objects) {
+      if (objects.hasOwnProperty(field)) {
+        if (objects[field] instanceof Array) {
+          operation = objects[field][0];
+          value = objects[field][1];
+        } else {
+          value = objects[field];
+        }
+        this.addWhere(field, operation, value);
+      }
+    }
+  } else {
+    this.addWhere(objects, operation, value);
+  }
+
+  return this;
+};
+
+DL.Query.prototype.addWhere = function(field, operation, value) {
+  this.wheres.push([field, operation.toLowerCase(), value]);
+  return this;
 };
 
 /**
