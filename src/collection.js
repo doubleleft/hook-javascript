@@ -49,7 +49,7 @@ DL.Collection.prototype.constructor = DL.Collection;
  *
  */
 DL.Collection.prototype.create = function(data) {
-  return this.client.post(this.segments, { data: data });
+  return this.client.post(this.segments, data);
 };
 
 /**
@@ -454,7 +454,7 @@ DL.Collection.prototype.remove = function(_id) {
  *     });
  */
 DL.Collection.prototype.update = function(_id, data) {
-  return this.client.post(this.segments + '/' + _id, { data: data });
+  return this.client.post(this.segments + '/' + _id, data);
 };
 
 /**

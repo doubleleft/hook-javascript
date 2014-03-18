@@ -8451,8 +8451,8 @@ DL.Client.prototype.request = function(segments, method, data) {
       synchronous = false;
 
   // FIXME: find a better way to write this
-  if (data && data.data && data.data._sync) {
-    delete data.data._sync;
+  if (data && data._sync) {
+    delete data._sync;
     synchronous = true;
   }
 
@@ -8528,39 +8528,37 @@ DL.Client.prototype.getPayload = function(method, data) {
   var payload = null;
   if (data) {
 
-    if (data.data) {
-      if (data instanceof FormData){
-        payload = data;
-      } else {
-        var field, value, filename,
-            formdata = new FormData(),
-            worth = false;
+    if (data instanceof FormData){
+      payload = data;
+    } else {
+      var field, value, filename,
+          formdata = new FormData(),
+          worth = false;
 
-        for (field in data.data) {
-          value = data.data[field];
-          filename = null;
+      for (field in data) {
+        value = data[field];
+        filename = null;
 
-          if (value instanceof HTMLInputElement) {
-            value = value.files[0];
-            worth = true;
-          } else if (value instanceof HTMLCanvasElement) {
-            value = dataURLtoBlob(value.toDataURL());
-            worth = true;
-            filename = 'canvas.png';
-          } else if (value instanceof Blob) {
-            worth = true;
-            filename = 'blob.' + value.type.match(/\/(.*)/)[1]; // get extension from blob mime/type
-          }
-
-          //
-          // Consider serialization to keep data types here: http://phpjs.org/functions/serialize/
-          //
-          formdata.append('data['+ field +']', value, filename || "file");
+        if (value instanceof HTMLInputElement) {
+          value = value.files[0];
+          worth = true;
+        } else if (value instanceof HTMLCanvasElement) {
+          value = dataURLtoBlob(value.toDataURL());
+          worth = true;
+          filename = 'canvas.png';
+        } else if (value instanceof Blob) {
+          worth = true;
+          filename = 'blob.' + value.type.match(/\/(.*)/)[1]; // get extension from blob mime/type
         }
 
-        if (worth) {
-          payload = formdata;
-        }
+        //
+        // Consider serialization to keep data types here: http://phpjs.org/functions/serialize/
+        //
+        formdata.append(field, value, filename || "file");
+      }
+
+      if (worth) {
+        payload = formdata;
       }
     }
 
@@ -9112,7 +9110,7 @@ DL.Collection.prototype.constructor = DL.Collection;
  *
  */
 DL.Collection.prototype.create = function(data) {
-  return this.client.post(this.segments, { data: data });
+  return this.client.post(this.segments, data);
 };
 
 /**
@@ -9517,7 +9515,7 @@ DL.Collection.prototype.remove = function(_id) {
  *     });
  */
 DL.Collection.prototype.update = function(_id, data) {
-  return this.client.post(this.segments + '/' + _id, { data: data });
+  return this.client.post(this.segments + '/' + _id, data);
 };
 
 /**
