@@ -8540,8 +8540,8 @@ DL.Client.prototype.getPayload = function(method, data) {
         filename = null;
 
         if (value instanceof HTMLInputElement) {
-          value = value.files[0];
           filename = value.files[0].name;
+          value = value.files[0];
           worth = true;
         } else if (value instanceof HTMLCanvasElement) {
           value = dataURLtoBlob(value.toDataURL());
