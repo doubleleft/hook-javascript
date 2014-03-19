@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 3/18/2014
+ * @build 3/19/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -141,8 +141,8 @@ DL.Client.prototype.put = function(segments, data) {
  * @method delete
  * @param {String} segments
  */
-DL.Client.prototype.remove = function(segments) {
-  return this.request(segments, "DELETE");
+DL.Client.prototype.remove = function(segments, data) {
+  return this.request(segments, "DELETE", data);
 };
 
 /**
@@ -1195,7 +1195,7 @@ DL.Collection.prototype.drop = function() {
 /**
  * Remove a single row by id
  * @method remove
- * @param {String} id
+ * @param {String} id [optional]
  * @return {Promise}
  *
  * @example Deleting a row by id
@@ -1205,7 +1205,11 @@ DL.Collection.prototype.drop = function() {
  *     });
  */
 DL.Collection.prototype.remove = function(_id) {
-  return this.client.remove(this.segments + '/' + _id);
+  var path = this.segments;
+  if (typeof(_id)!=="undefined") {
+    path += '/' + _id;
+  }
+  return this.client.remove(path, this.buildQuery());
 };
 
 /**

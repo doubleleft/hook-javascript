@@ -118,8 +118,8 @@ DL.Client.prototype.put = function(segments, data) {
  * @method delete
  * @param {String} segments
  */
-DL.Client.prototype.remove = function(segments) {
-  return this.request(segments, "DELETE");
+DL.Client.prototype.remove = function(segments, data) {
+  return this.request(segments, "DELETE", data);
 };
 
 /**

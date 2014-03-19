@@ -428,7 +428,7 @@ DL.Collection.prototype.drop = function() {
 /**
  * Remove a single row by id
  * @method remove
- * @param {String} id
+ * @param {String} id [optional]
  * @return {Promise}
  *
  * @example Deleting a row by id
@@ -438,7 +438,11 @@ DL.Collection.prototype.drop = function() {
  *     });
  */
 DL.Collection.prototype.remove = function(_id) {
-  return this.client.remove(this.segments + '/' + _id);
+  var path = this.segments;
+  if (typeof(_id)!=="undefined") {
+    path += '/' + _id;
+  }
+  return this.client.remove(path, this.buildQuery());
 };
 
 /**
