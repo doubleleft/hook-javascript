@@ -118,6 +118,37 @@ DL.Collection.prototype.where = function(objects, _operation, _value) {
   return this;
 };
 
+
+/**
+ * Find first item by _id
+ * @method find
+ * @param {Number} _id
+ * @param {Function} callback [optional]
+ * @return {Promise}
+ *
+ * @example Finding first item by _id, with 'success' callback as param.
+ *
+ *     client.collection('posts').find(50, function(data) {
+ *       console.log("Row:", data);
+ *     });
+ *
+ * @example Catching 'not found' error.
+ *
+ *     client.collection('posts').find(128371923).then(function(data) {
+ *       console.log("Row:", data); // will never execute this
+ *     }).catch(function(e) {
+ *       console.log("Not found.");
+ *     });
+ *
+ */
+DL.Collection.prototype.find = function(_id) {
+  var promise = this.client.get(this.segments + '/' + _id, this.buildQuery());
+  if (arguments.length > 1) {
+    return promise.then.apply(promise, Array.prototype.slice.call(arguments,1));
+  }
+  return promise;
+};
+
 /**
  * Group results by field
  * @method group
