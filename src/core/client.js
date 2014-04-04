@@ -212,7 +212,7 @@ DL.Client.prototype.getPayload = function(method, data) {
 
     if (data instanceof FormData){
       payload = data;
-    } else {
+    } else if (method !== "GET") {
       var field, value, filename,
           formdata = new FormData(),
           worth = false;

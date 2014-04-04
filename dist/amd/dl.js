@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 3/26/2014
+ * @build 4/4/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -235,7 +235,7 @@ DL.Client.prototype.getPayload = function(method, data) {
 
     if (data instanceof FormData){
       payload = data;
-    } else {
+    } else if (method !== "GET") {
       var field, value, filename,
           formdata = new FormData(),
           worth = false;
