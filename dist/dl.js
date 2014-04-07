@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 4/4/2014
+ * @build 4/7/2014
  */
 (function(window) {
   //
@@ -974,26 +974,17 @@ define(function (require) {
 	"use strict";
 
 	return function (url, data, options) {
-
 		data = data || '';
 		options = options || {};
 
 		var complete = options.complete || function(){},
 			success = options.success || function(){},
 			error = options.error || function(){},
-			headers = options.headers || {},
+			headers = options.headers,
 			method = options.method || 'GET',
 			sync = options.sync || false,
 			req = (function() {
-
 				if (typeof 'XMLHttpRequest' !== 'undefined') {
-
-					// CORS (IE8-9)
-					if (url.indexOf('http') === 0 && typeof XDomainRequest !== 'undefined') {
-						return new XDomainRequest();
-					}
-
-					// local, CORS (other browsers)
 					return new XMLHttpRequest();
 
 				} else if (typeof 'ActiveXObject' !== 'undefined') {
@@ -1007,12 +998,19 @@ define(function (require) {
 		}
 
 		// serialize data?
-		if (typeof data !== 'string' && !(data instanceof FormData)) {
+		if (typeof data !== 'string'){
 			var serialized = [];
+			var skip = false;
 			for (var datum in data) {
+				if(typeof(data[datum]) == "function"){
+					skip = true;
+					break;
+				}
 				serialized.push(datum + '=' + data[datum]);
 			}
-			data = serialized.join('&');
+			if(!skip){
+				data = serialized.join('&');
+			}
 		}
 
 		// set timeout
@@ -1022,29 +1020,89 @@ define(function (require) {
 
 		// listen for XHR events
 		req.onload = function () {
-			complete(req.responseText, req.status);
-			success(req.responseText);
+			complete(this.responseText, this.status);
+			success(this.responseText);
 		};
 		req.onerror = function () {
-			complete(req.responseText);
-			error(req.responseText, req.status);
+			complete(this.responseText);
+			error(this.responseText, this.status);
 		};
 
-		// open connection
-		req.open(method, (method === 'GET' && data ? url+'?'+data : url), !sync);
+		try{
+			req.open(method, (method === 'GET' && data ? url+'?'+data : url), !sync);
+			if(headers != null){
+				for (var header in headers) {
+					req.setRequestHeader(header, headers[header]);
+				}
+			}
+			req.send(method !== 'GET' ? data : null);
 
-		// set headers
-		for (var header in headers) {
-			req.setRequestHeader(header, headers[header]);
+		}catch(e){
+			if (typeof XDomainRequest !== 'undefined') {
+				if(sync || headers != null){
+					//XDomainRequest does not suport custom headers
+					//or synchronous method with CORS
+					var a = document.createElement("a"); a.href = url;
+					var iframe = document.createElement("iframe");	
+					document.body.appendChild(iframe);
+					iframe.id = "uxhr-crossdomain";
+					iframe.src = a.protocol + "//" + a.hostname  + "/crossdomain.html";
+					iframe.style.display = "none";
+					var w = iframe.contentWindow;
+					window.addEventListener("message", function(e){
+						var d = e.data.split("|");
+						var key = d[0], val = d[1], json = d[2] == null ? {} : JSON.parse(d[2]);
+						if(key == "uxhr"){
+							if(val == "ready"){
+								var r = {url:url, data:data, options:options};
+								w.postMessage("uxhr|"+JSON.stringify(r), iframe.src);
+							}else if(val == "error"){
+								complete(json.data);
+								error(json.data);
+							}else if(val == "complete"){
+								complete(json.data);
+								success(json.data);
+							}
+						}
+					}, false);
+				}else{
+					var xdr = new XDomainRequest();
+					xdr.onload = req.onload;
+					xdr.onerror = req.onerror;
+					xdr.open(method, method === 'GET' && data ? url+'?'+data : url);
+					xdr.send(method !== 'GET' ? data : null);
+					req = xdr;
+				}
+			}
 		}
 
-		// send it
-		req.send(method !== 'GET' ? data : null);
-
+		// send it	
 		return req;
 	};
-
 }));
+
+window.uxhr_crossdomain = function(){
+	var url = (window.location != window.parent.location) ? document.referrer: document.location;
+	var w = parent;
+	var onMessage = function(e){
+		var d = e.data.split("|");
+		var key = d[0], val = d[1];
+		if(key == "uxhr"){
+			var r = JSON.parse(val);	
+			var options = r.options;
+			options.complete = function(response){
+				w.postMessage("uxhr|complete|"+JSON.stringify({data:response}), url);
+			};
+			options.error = function(response){
+				w.postMessage("uxhr|error|"+JSON.stringify({data:response}), url);
+			};
+			uxhr(r.url, r.data, options);
+		}
+		window.removeEventListener("message", onMessage);
+	};
+	w.postMessage("uxhr|ready", url);
+	window.addEventListener('message', onMessage, false);
+};
 
 /**
  * @license
@@ -8339,6 +8397,9 @@ window.DL = DL;
  *
  * @constructor
  */
+if(typeof(window.FormData)==="undefined"){
+    window.FormData = function(){};
+}
 DL.Client = function(options) {
   this.url = options.url || "http://dl-api.dev/api/public/index.php/";
   this.appId = options.appId;

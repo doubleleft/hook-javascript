@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 4/4/2014
+ * @build 4/7/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -44,6 +44,9 @@ window.DL = DL;
  *
  * @constructor
  */
+if(typeof(window.FormData)==="undefined"){
+    window.FormData = function(){};
+}
 DL.Client = function(options) {
   this.url = options.url || "http://dl-api.dev/api/public/index.php/";
   this.appId = options.appId;

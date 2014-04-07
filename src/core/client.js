@@ -21,6 +21,9 @@
  *
  * @constructor
  */
+if(typeof(window.FormData)==="undefined"){
+    window.FormData = function(){};
+}
 DL.Client = function(options) {
   this.url = options.url || "http://dl-api.dev/api/public/index.php/";
   this.appId = options.appId;
