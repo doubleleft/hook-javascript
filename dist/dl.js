@@ -9667,7 +9667,8 @@ DL.Collection.prototype.buildQuery = function() {
     paginate: 'p',
     first: 'f',
     aggregation: 'aggr',
-    operation: 'op'
+    operation: 'op',
+    data: 'data'
   };
 
   for (f in shortnames) {
