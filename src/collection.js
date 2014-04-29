@@ -538,6 +538,7 @@ DL.Collection.prototype.decrement = function(field, value) {
 
 /**
  * Update all collection's data based on `where` params.
+ * @method updateAll
  * @param {Object} data key-value data to update from matched rows [optional]
  * @return {Promise}
  *

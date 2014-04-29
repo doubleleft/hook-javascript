@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 4/7/2014
+ * @build 4/29/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -173,7 +173,7 @@ DL.Client.prototype.request = function(segments, method, data) {
     request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
   }
 
-  uxhr(this.url + segments, payload, {
+  var xhr = uxhr(this.url + segments, payload, {
     method: method,
     headers: request_headers,
     sync: synchronous,
@@ -263,7 +263,9 @@ DL.Client.prototype.getPayload = function(method, data) {
         //
         // Consider serialization to keep data types here: http://phpjs.org/functions/serialize/
         //
-        formdata.append(field, value, filename || "file");
+        if (!(value instanceof Array)) { // fixme
+          formdata.append(field, value, filename || "file");
+        }
       }
 
       if (worth) {
@@ -1308,6 +1310,7 @@ DL.Collection.prototype.decrement = function(field, value) {
 
 /**
  * Update all collection's data based on `where` params.
+ * @method updateAll
  * @param {Object} data key-value data to update from matched rows [optional]
  * @return {Promise}
  *

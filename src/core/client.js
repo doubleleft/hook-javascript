@@ -150,7 +150,7 @@ DL.Client.prototype.request = function(segments, method, data) {
     request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
   }
 
-  uxhr(this.url + segments, payload, {
+  var xhr = uxhr(this.url + segments, payload, {
     method: method,
     headers: request_headers,
     sync: synchronous,
@@ -240,7 +240,9 @@ DL.Client.prototype.getPayload = function(method, data) {
         //
         // Consider serialization to keep data types here: http://phpjs.org/functions/serialize/
         //
-        formdata.append(field, value, filename || "file");
+        if (!(value instanceof Array)) { // fixme
+          formdata.append(field, value, filename || "file");
+        }
       }
 
       if (worth) {
