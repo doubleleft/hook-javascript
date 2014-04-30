@@ -240,9 +240,10 @@ DL.Client.prototype.getPayload = function(method, data) {
         //
         // Consider serialization to keep data types here: http://phpjs.org/functions/serialize/
         //
-        if (typeof(value)!=="object") { // fixme
+        if (!(value instanceof Array)) { // fixme
           formdata.append(field, value, filename || "file");
         }
+
       }
 
       if (worth) {

@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 4/29/2014
+ * @build 4/30/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -263,9 +263,10 @@ DL.Client.prototype.getPayload = function(method, data) {
         //
         // Consider serialization to keep data types here: http://phpjs.org/functions/serialize/
         //
-        if (typeof(value)!=="object") { // fixme
+        if (!(value instanceof Array)) { // fixme
           formdata.append(field, value, filename || "file");
         }
+
       }
 
       if (worth) {
