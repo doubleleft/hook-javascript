@@ -228,10 +228,15 @@ DL.Client.prototype.getPayload = function(method, data) {
           filename = value.files[0].name;
           value = value.files[0];
           worth = true;
+
+        } else if (value instanceof HTMLInputElement) {
+          value = value.value;
+
         } else if (value instanceof HTMLCanvasElement) {
           value = dataURLtoBlob(value.toDataURL());
           worth = true;
           filename = 'canvas.png';
+
         } else if (value instanceof Blob) {
           worth = true;
           filename = 'blob.' + value.type.match(/\/(.*)/)[1]; // get extension from blob mime/type
