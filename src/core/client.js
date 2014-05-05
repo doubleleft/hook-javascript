@@ -224,7 +224,7 @@ DL.Client.prototype.getPayload = function(method, data) {
         value = data[field];
         filename = null;
 
-        if (value instanceof HTMLInputElement) {
+        if (value instanceof HTMLInputElement && value.files.length > 0) {
           filename = value.files[0].name;
           value = value.files[0];
           worth = true;
