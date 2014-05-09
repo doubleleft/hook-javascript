@@ -6,7 +6,7 @@
         //retrieve data
         var method = Request.HttpMethod;
         var query = Request.Url.Query;
-        var url = System.Configuration.ConfigurationManager.AppSettings.Get("DL-API:endpoint") + query.Replace("?q=", "");
+        var url = Request.Headers["X-Endpoint"] + query.Replace("?q=", "");
 
         var req = WebRequest.Create(url) as HttpWebRequest;
 
