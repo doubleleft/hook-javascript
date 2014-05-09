@@ -21,13 +21,19 @@
  *
  * @constructor
  */
+
+//
+// IE9<: prevent crash when FormData isn't defined.
+//
 if(typeof(window.FormData)==="undefined"){
-    window.FormData = function(){};
+    window.FormData = function(){ this.append=function(){}; };
 }
+
 DL.Client = function(options) {
   this.url = options.url || "http://dl-api.dev/api/public/index.php/";
   this.appId = options.appId;
   this.key = options.key;
+  this.proxy = options.proxy;
 
   /**
    * @property {DL.KeyValues} keys
@@ -150,7 +156,12 @@ DL.Client.prototype.request = function(segments, method, data) {
     request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
   }
 
-  var xhr = uxhr(this.url + segments, payload, {
+  // Forward API endpoint to proxy
+  if (this.proxy) {
+    request_headers["X-Endpoint"] = this.url;
+  }
+
+  var xhr = uxhr((this.proxy || this.url) + segments, payload, {
     method: method,
     headers: request_headers,
     sync: synchronous,
