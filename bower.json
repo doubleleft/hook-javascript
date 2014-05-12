@@ -15,7 +15,7 @@
     "bower_components"
   ],
   "devDependencies": {
-    "uxhr": "endel/uxhr#be99b7fda0f91a178383b9c4497864444bfa426c",
+    "uxhr": "endel/uxhr#b08ca1fc880db2e73c7196bb9762b29e818597db",
     "qunit": "~1.9.0",
     "when": "~2.8.0",
     "lodash": "~2.4.0",
