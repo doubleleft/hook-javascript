@@ -1007,7 +1007,8 @@ define(function (require) {
 		}
 
 		// serialize data?
-		if (typeof data !== 'string' && !(data instanceof FormData)) {
+		var hasFormData = (typeof(window.FormData) !== 'undefined');
+		if (typeof data !== 'string' && (hasFormData && !(data instanceof window.FormData))) {
 			var serialized = [];
 			for (var datum in data) {
 				serialized.push(datum + '=' + data[datum]);
@@ -1030,8 +1031,13 @@ define(function (require) {
 			error(req.responseText, req.status);
 		};
 
+		// use ? or &, accourding to given url
+		if (method === 'GET' && data) {
+			url += (url.indexOf('?') >= 0) ? '&' + data : '?' + data;
+		}
+
 		// open connection
-		req.open(method, (method === 'GET' && data ? url+'?'+data : url), !sync);
+		req.open(method, url, !sync);
 
 		// set headers
 		for (var header in headers) {
@@ -8468,20 +8474,23 @@ DL.Client.prototype.request = function(segments, method, data) {
   // Compute payload
   payload = this.getPayload(method, data);
 
-  // Compute request headers
-  request_headers = this.getHeaders();
-  if(!(payload instanceof FormData)){
-    request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
-  }
-
-  // Forward API endpoint to proxy
   if (this.proxy) {
+    // Compute request headers
+    request_headers = this.getHeaders();
+    if(!(payload instanceof FormData)){
+      request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
+    }
+
+    // Forward API endpoint to proxy
     request_headers["X-Endpoint"] = this.url;
+
+  } else {
+    segments += "?X-App-Id=" + this.appId + "&X-App-Key=" + this.key;
   }
 
   var xhr = uxhr((this.proxy || this.url) + segments, payload, {
     method: method,
-    headers: request_headers,
+    // headers: request_headers,
     sync: synchronous,
     success: function(response) {
       var data = null;

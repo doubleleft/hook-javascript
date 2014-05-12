@@ -15,7 +15,7 @@
     "bower_components"
   ],
   "devDependencies": {
-    "uxhr": "gabriel-laet/uxhr#7aa7bfd05e30382ce851b2a09e2a974c843c4573",
+    "uxhr": "endel/uxhr#be99b7fda0f91a178383b9c4497864444bfa426c",
     "qunit": "~1.9.0",
     "when": "~2.8.0",
     "lodash": "~2.4.0",

@@ -150,20 +150,23 @@ DL.Client.prototype.request = function(segments, method, data) {
   // Compute payload
   payload = this.getPayload(method, data);
 
-  // Compute request headers
-  request_headers = this.getHeaders();
-  if(!(payload instanceof FormData)){
-    request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
-  }
-
-  // Forward API endpoint to proxy
   if (this.proxy) {
+    // Compute request headers
+    request_headers = this.getHeaders();
+    if(!(payload instanceof FormData)){
+      request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
+    }
+
+    // Forward API endpoint to proxy
     request_headers["X-Endpoint"] = this.url;
+
+  } else {
+    segments += "?X-App-Id=" + this.appId + "&X-App-Key=" + this.key;
   }
 
   var xhr = uxhr((this.proxy || this.url) + segments, payload, {
     method: method,
-    headers: request_headers,
+    // headers: request_headers,
     sync: synchronous,
     success: function(response) {
       var data = null;
