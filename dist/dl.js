@@ -8578,7 +8578,7 @@ DL.Client.prototype.getPayload = function(method, data) {
           worth = true;
           filename = 'canvas.png';
 
-        } else if (value instanceof Blob) {
+        } else if (typeof(Blob) !== "undefined" && value instanceof Blob) {
           worth = true;
           filename = 'blob.' + value.type.match(/\/(.*)/)[1]; // get extension from blob mime/type
         }
