@@ -14,14 +14,17 @@
     "node_modules",
     "bower_components"
   ],
-  "devDependencies": {
+  "dependencies" : {
     "uxhr": "endel/uxhr#be99b7fda0f91a178383b9c4497864444bfa426c",
     "qunit": "~1.9.0",
     "when": "~2.8.0",
     "lodash": "~2.4.0",
+
     "blueimp-canvas-to-blob": "~2.1.0",
     "eventsource": "Yaffle/EventSource",
-
+    "wampy": "KSDaemon/wampy.js#05536077d2f39355ea41ff9678a9c9b3e5cde91d"
+  },
+  "devDependencies": {
     "backbone": "~1.1.2",
     "jquery": "~2.1.0"
   }

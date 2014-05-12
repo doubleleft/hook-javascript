@@ -24,7 +24,12 @@ DL.Files.prototype.upload = function(data, fileName, mimeType){
 
 	return deferred.promise;
   }
-  formData.append('file', data, fileName || "dlApiFile");
+
+  try {
+    formData.append('file', data, fileName || "dlApiFile");
+  } catch(e) {
+    formData.append('file', data);
+  }
   return this.client.post('files', formData);
 };
 

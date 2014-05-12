@@ -14,8 +14,11 @@ javascripts:
     - 'bower_components/when/when.js'
     - 'bower_components/uxhr/uxhr.js'
     - 'bower_components/lodash/dist/lodash.js'
+
     - 'bower_components/blueimp-canvas-to-blob/js/canvas-to-blob.min.js'
     - 'bower_components/eventsource/eventsource.js'
+    - 'bower_components/wampy/wampy.js'
+
     - 'src/core/*.js'
     - 'src/*.js'
     - 'src/wrap/end.js'

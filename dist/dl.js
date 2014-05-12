@@ -1007,8 +1007,7 @@ define(function (require) {
 		}
 
 		// serialize data?
-		var hasFormData = (typeof(window.FormData) !== 'undefined');
-		if (typeof data !== 'string' && (hasFormData && !(data instanceof window.FormData))) {
+		if (typeof data !== 'string') {
 			var serialized = [];
 			for (var datum in data) {
 				serialized.push(datum + '=' + data[datum]);
@@ -1031,13 +1030,8 @@ define(function (require) {
 			error(req.responseText, req.status);
 		};
 
-		// use ? or &, accourding to given url
-		if (method === 'GET' && data) {
-			url += (url.indexOf('?') >= 0) ? '&' + data : '?' + data;
-		}
-
 		// open connection
-		req.open(method, url, !sync);
+		req.open(method, (method === 'GET' && data ? url+'?'+data : url), !sync);
 
 		// set headers
 		for (var header in headers) {
@@ -8488,7 +8482,7 @@ DL.Client.prototype.request = function(segments, method, data) {
     segments += "?X-App-Id=" + this.appId + "&X-App-Key=" + this.key;
   }
 
-  var xhr = uxhr((this.proxy || this.url) + segments, payload, {
+  deferred.promise.xhr = uxhr((this.proxy || this.url) + segments, payload, {
     method: method,
     // headers: request_headers,
     sync: synchronous,
@@ -8888,15 +8882,21 @@ DL.Auth.prototype.registerToken = function(data) {
  * @class DL.Channel
  *
  * @param {Client} client
+ * @param {String} namespace
+ * @param {Object} options optional
  * @constructor
  */
 DL.Channel = function(client, collection, options) {
-  this.collection = collection;
-  this.client_id = null;
-  this.callbacks = {};
-  this.options = options || {};
-  this.readyState = null;
+  if (!options.transport) {
+    options.transport = 'SSE';
+  }
+  this.transport = new DL.Channel.Transport[options.transport](client, collection, options);
 };
+
+/**
+ * Channel implementations
+ */
+DL.Channel.Transport = {};
 
 /**
  * Subscribe to channel. Publishes a 'connected' message on the first time.
@@ -8939,48 +8939,7 @@ DL.Channel = function(client, collection, options) {
  *
  */
 DL.Channel.prototype.subscribe = function(event, callback) {
-  if (typeof(callback)==="undefined") {
-    callback = event;
-    event = '_default';
-  }
-  this.callbacks[event] = callback;
-
-  var promise = this.connect();
-
-  if (this.readyState === EventSource.CONNECTING) {
-    var that = this;
-    promise.then(function() {
-      that.event_source.onopen = function(e) {
-        that.readyState = e.readyState;
-        that._trigger.apply(that, ['state:' + e.type, e]);
-      };
-      that.event_source.onerror = function(e) {
-        that.readyState = e.readyState;
-        that._trigger.apply(that, ['state:' + e.type, e]);
-      };
-      that.event_source.onmessage = function(e) {
-        var data = JSON.parse(e.data),
-            event = data.event;
-        delete data.event;
-        that._trigger.apply(that, [event, data]);
-      };
-    });
-  }
-
-  return promise;
-};
-
-/**
- */
-DL.Channel.prototype._trigger = function(event, data) {
-  // always try to dispatch default message handler
-  if (event.indexOf('state:')===-1 && this.callbacks._default) {
-    this.callbacks._default.apply(this, [event, data]);
-  }
-  // try to dispatch message handler for this event
-  if (this.callbacks[event]) {
-    this.callbacks[event].apply(this, [data]);
-  }
+  return this.transport.subscribe(event, callback);
 };
 
 /**
@@ -8989,7 +8948,7 @@ DL.Channel.prototype._trigger = function(event, data) {
  * @return {Boolean}
  */
 DL.Channel.prototype.isConnected = function() {
-  return (this.readyState !== null && this.readyState !== EventSource.CLOSED);
+  return this.transport.isConnected();
 };
 
 /**
@@ -8998,9 +8957,7 @@ DL.Channel.prototype.isConnected = function() {
  * @param {String} event
  */
 DL.Channel.prototype.unsubscribe = function(event) {
-  if (this.callbacks[event]) {
-    this.callbacks[event] = null;
-  }
+  return this.transport.unsubscribe(event);
 };
 
 /**
@@ -9011,62 +8968,14 @@ DL.Channel.prototype.unsubscribe = function(event) {
  * @return {Promise}
  */
 DL.Channel.prototype.publish = function(event, message) {
-  if (typeof(message)==="undefined") { message = {}; }
-  message.client_id = this.client_id;
-  message.event = event;
-  return this.collection.create(message);
+  return this.transport.publish(event, message);
 };
 
 /**
  * @return {Promise}
  */
 DL.Channel.prototype.connect = function() {
-  // Return success if already connected.
-  if (this.readyState !== null) {
-    var deferred = when.defer();
-    deferred.resolver.resolve();
-    return deferred.promise;
-  }
-
-  this.readyState = EventSource.CONNECTING;
-  this._trigger.apply(this, ['state:connecting']);
-
-  var that = this;
-
-  return this.publish('connected').then(function(data) {
-    that.collection.where('updated_at', '>', data.updated_at);
-
-    var query = that.collection.buildQuery();
-
-    query['X-App-Id'] = that.collection.client.appId;
-    query['X-App-Key'] = that.collection.client.key;
-
-    // Forward user authentication token, if it is set
-    var auth_token = window.localStorage.getItem(query['X-App-Id'] + '-' + DL.Auth.AUTH_TOKEN_KEY);
-    if (auth_token) {
-      query['X-Auth-Token'] = auth_token;
-    }
-
-    // time to wait for retry, after connection closes
-    query.stream = {
-      'refresh': that.options.refresh_timeout || 1,
-      'retry': that.options.retry_timeout || 1
-    };
-
-    that.client_id = data.client_id;
-    that.event_source = new EventSource(that.collection.client.url + that.collection.segments + "?" + JSON.stringify(query), {
-      withCredentials: true
-    });
-
-    // bind unload function to force user disconnection
-    window.addEventListener('unload', function(e) {
-      // send synchronous disconnected event
-      that.disconnect(true);
-    });
-  }, function(data) {
-    that.readyState = EventSource.CLOSED;
-    that._trigger.apply(that, ['state:error', data]);
-  });
+  return this.transport.connect();
 };
 
 /**
@@ -9076,13 +8985,7 @@ DL.Channel.prototype.connect = function() {
  * @return {Channel} this
  */
 DL.Channel.prototype.disconnect = function(sync) {
-  if (this.isConnected()) {
-    this.close();
-    this.publish('disconnected', {
-      _sync: ((typeof(sync)!=="undefined") && sync)
-    });
-  }
-  return this;
+  return this.transport.disconnect();
 };
 
 /**
@@ -9091,11 +8994,7 @@ DL.Channel.prototype.disconnect = function(sync) {
  * @return {Channel} this
  */
 DL.Channel.prototype.close = function() {
-  if (this.event_source) {
-    this.event_source.close();
-  }
-  this.readyState = EventSource.CLOSED;
-  return this;
+  return this.transport.close();
 };
 
 /**
@@ -9761,7 +9660,12 @@ DL.Files.prototype.upload = function(data, fileName, mimeType){
 
 	return deferred.promise;
   }
-  formData.append('file', data, fileName || "dlApiFile");
+
+  try {
+    formData.append('file', data, fileName || "dlApiFile");
+  } catch(e) {
+    formData.append('file', data);
+  }
   return this.client.post('files', formData);
 };
 
