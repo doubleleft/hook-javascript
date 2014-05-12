@@ -187,7 +187,7 @@ DL.Client.prototype.request = function(segments, method, data) {
     segments += "?X-App-Id=" + this.appId + "&X-App-Key=" + this.key;
   }
 
-  var xhr = uxhr((this.proxy || this.url) + segments, payload, {
+  deferred.promise.xhr = uxhr((this.proxy || this.url) + segments, payload, {
     method: method,
     // headers: request_headers,
     sync: synchronous,

@@ -1007,8 +1007,7 @@ define(function (require) {
 		}
 
 		// serialize data?
-		var hasFormData = (typeof(window.FormData) !== 'undefined');
-		if (typeof data !== 'string' && (hasFormData && !(data instanceof window.FormData))) {
+		if (typeof data !== 'string') {
 			var serialized = [];
 			for (var datum in data) {
 				serialized.push(datum + '=' + data[datum]);
@@ -1031,13 +1030,8 @@ define(function (require) {
 			error(req.responseText, req.status);
 		};
 
-		// use ? or &, accourding to given url
-		if (method === 'GET' && data) {
-			url += (url.indexOf('?') >= 0) ? '&' + data : '?' + data;
-		}
-
 		// open connection
-		req.open(method, url, !sync);
+		req.open(method, (method === 'GET' && data ? url+'?'+data : url), !sync);
 
 		// set headers
 		for (var header in headers) {
@@ -8488,7 +8482,7 @@ DL.Client.prototype.request = function(segments, method, data) {
     segments += "?X-App-Id=" + this.appId + "&X-App-Key=" + this.key;
   }
 
-  var xhr = uxhr((this.proxy || this.url) + segments, payload, {
+  deferred.promise.xhr = uxhr((this.proxy || this.url) + segments, payload, {
     method: method,
     // headers: request_headers,
     sync: synchronous,
