@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    <div id="main">
+    
+    </div>
+
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="assets/js/dl.min.js"></script>
+
+    <script type="text/javascript">
+        window.dl = new DL.Client({
+            proxy: "Proxy.aspx?q=", // DO NOT CHANGE THIS LINE!!!
+            url: "http://dl-api.ddll.co/", // your dl-api endpoint url
+            appId: 49,    // your app's id
+            key: '708ce13a65f1338f0fc6fa336246c32a'  // your app's public key
+        });
+
+
+        $(function () {
+
+            //#### STORE DATA
+            //dl.collection('posts').create({
+            //    title: "Post name"
+            //});
+
+            //#### FETCH DATA
+            var c = dl.collection('posts');
+            //c.where('author', 'Vicente'); // equal operator may be omitted
+            //c.where('stars', '>', 10);     // support '<' and '>' operators
+            c.then(function (result) {
+                var $main = $("#main");
+                $main.text(JSON.stringify(result));
+                console.log(result);
+            });
+
+            //#### UPDATE DATA
+            //dl.collection('posts').update(1529, { title: "Changing post title" }).then(function (data) {
+            //    console.log("Success:", data.success);
+            //});
+
+            //!!!! WORK IN PROGRESS !!!
+            //#### REMOVE DATA - 
+            //dl.collection('posts').remove(1529).then(function (data) {
+            //    console.log("Success:", data.success);
+            //});
+        });
+    </script>
+</body>
+</html>
