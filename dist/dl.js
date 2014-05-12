@@ -1007,7 +1007,8 @@ define(function (require) {
 		}
 
 		// serialize data?
-		if (typeof data !== 'string') {
+		var hasFormData = (typeof(window.FormData) !== 'undefined');
+		if (typeof data !== 'string' && (hasFormData && !(data instanceof window.FormData))) {
 			var serialized = [];
 			for (var datum in data) {
 				serialized.push(datum + '=' + data[datum]);
@@ -1030,8 +1031,13 @@ define(function (require) {
 			error(req.responseText, req.status);
 		};
 
+		// use ? or &, accourding to given url
+		if (method === 'GET' && data) {
+			url += (url.indexOf('?') >= 0) ? '&' + data : '?' + data;
+		}
+
 		// open connection
-		req.open(method, (method === 'GET' && data ? url+'?'+data : url), !sync);
+		req.open(method, url, !sync);
 
 		// set headers
 		for (var header in headers) {
