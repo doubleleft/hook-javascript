@@ -1054,7 +1054,7 @@ define(function (require) {
 		}
 
 		// send it
-    if (req instanceof XDomainRequest) {
+    if (typeof(window.XDomainRequest)!=="undefined" && req instanceof XDomainRequest) {
       setTimeout(function() {
         req.send(method !== 'GET' ? data : null);
       }, 0);
