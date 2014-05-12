@@ -235,7 +235,10 @@ DL.Client.prototype.getPayload = function(method, data) {
         value = data[field];
         filename = null;
 
-        if (value instanceof HTMLInputElement && value.files.length > 0) {
+        if (typeof(value)==='undefined' || value === null) {
+          continue;
+
+        } if (value instanceof HTMLInputElement && value.files.length > 0) {
           filename = value.files[0].name;
           value = value.files[0];
           worth = true;
@@ -257,7 +260,11 @@ DL.Client.prototype.getPayload = function(method, data) {
         // Consider serialization to keep data types here: http://phpjs.org/functions/serialize/
         //
         if (!(value instanceof Array)) { // fixme
-          formdata.append(field, value, filename || "file");
+          try {
+            formdata.append(field, value, filename || "file");
+          } catch (e) {
+            formdata.append(field, value);
+          }
         }
 
       }
