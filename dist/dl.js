@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 5/12/2014
+ * @build 5/13/2014
  */
 (function(window) {
   //
@@ -10666,8 +10666,9 @@ DL.Channel.Transport.WEBSOCKETS.prototype.unsubscribe = function(event) {
   this.ws.subscribe(this.collection.name + '.' + event);
 };
 
-DL.Channel.Transport.WEBSOCKETS.prototype.publish = function(event, message, exclude, eligible) {
-  this.ws.publish(this.collection.name + '.' + event, message, exclude, eligible);
+DL.Channel.Transport.WEBSOCKETS.prototype.publish = function(event, message) { // , exclude, eligible
+  arguments[0] = this.collection.name + '.' + event;
+  this.ws.publish.apply(this.ws, arguments);
 };
 
 // DL.Channel.Transport.WEBSOCKETS.prototype.connect = function() {
