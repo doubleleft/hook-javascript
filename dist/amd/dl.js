@@ -110,11 +110,11 @@ DL.Client.prototype.collection = function(collectionName) {
  * @param {Object} options (optional)
  * @return {DL.Channel}
  *
- * @example Retrieve a SSE channel (default transport).
+ * @example Create a channel using Servet-Sent Events transport.
  *
  *     var channel = client.channel('messages');
  *
- * @example Retrieve a websockets channel.
+ * @example Create a channel using WebSockets transport.
  *
  *     var channel = client.channel('messages', { transport: "websockets" });
  *
@@ -129,7 +129,7 @@ DL.Client.prototype.channel = function(name, options) {
   if (!options.transport) { options.transport = 'sse'; }
   options.transport = options.transport.toUpperCase();
 
-  this.transport = new DL.Channel[options.transport](client, collection, options);
+  return new DL.Channel[options.transport](client, collection, options);
 };
 
 /**
@@ -1242,21 +1242,14 @@ DL.Collection.prototype.buildQuery = function() {
 
 
 /**
- * @module DL
- * @class DL.CollectionItem
+ * module DL
+ * class DL.CollectionItem
  *
- * @param {DL.Collection} collection
- * @param {Number|String} _id
- * @constructor
+ * param {DL.Collection} collection
+ * param {Number|String} _id
+ * constructor
  */
-DL.CollectionItem = function(collection, _id) {
-  this.collection = collection;
-
-  this.name = this._validateName(name);
-  this.reset();
-
-  this.segments = 'collection/' + this.name;
-};
+DL.CollectionItem = function(collection, _id) {};
 
 
 /**
@@ -1792,7 +1785,6 @@ DL.Channel.WEBSOCKETS.prototype.publish = function(event, message) { // , exclud
 /**
  * Disconnect from channel, publishing a 'disconnected' message.
  * @method disconnect
- * @param {Boolean} synchronous default = false
  * @return {DL.Channel} this
  */
 DL.Channel.WEBSOCKETS.prototype.disconnect = function() {
