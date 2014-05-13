@@ -10,6 +10,8 @@
 DL.Channel = function(client, collection, options) {
   if (!options.transport) {
     options.transport = 'SSE';
+  } else {
+    options.transport = options.transport.toUpperCase();
   }
   this.transport = new DL.Channel.Transport[options.transport](client, collection, options);
 };
@@ -59,8 +61,8 @@ DL.Channel.Transport = {};
  *
  *
  */
-DL.Channel.prototype.subscribe = function(event, callback) {
-  return this.transport.subscribe(event, callback);
+DL.Channel.prototype.subscribe = function() {
+  return this.transport.subscribe.apply(this.transport, arguments);
 };
 
 /**
@@ -69,7 +71,7 @@ DL.Channel.prototype.subscribe = function(event, callback) {
  * @return {Boolean}
  */
 DL.Channel.prototype.isConnected = function() {
-  return this.transport.isConnected();
+  return this.transport.isConnected.apply(this.transport, arguments);
 };
 
 /**
@@ -77,8 +79,8 @@ DL.Channel.prototype.isConnected = function() {
  * @method unsubscribe
  * @param {String} event
  */
-DL.Channel.prototype.unsubscribe = function(event) {
-  return this.transport.unsubscribe(event);
+DL.Channel.prototype.unsubscribe = function() {
+  return this.transport.unsubscribe.apply(this.transport, arguments);
 };
 
 /**
@@ -88,15 +90,15 @@ DL.Channel.prototype.unsubscribe = function(event) {
  * @param {Object} message
  * @return {Promise}
  */
-DL.Channel.prototype.publish = function(event, message) {
-  return this.transport.publish(event, message);
+DL.Channel.prototype.publish = function() {
+  return this.transport.publish.apply(this.transport, arguments);
 };
 
 /**
  * @return {Promise}
  */
 DL.Channel.prototype.connect = function() {
-  return this.transport.connect();
+  return this.transport.connect.apply(this.transport, arguments);
 };
 
 /**
@@ -105,8 +107,8 @@ DL.Channel.prototype.connect = function() {
  * @param {Boolean} synchronous default = false
  * @return {Channel} this
  */
-DL.Channel.prototype.disconnect = function(sync) {
-  return this.transport.disconnect();
+DL.Channel.prototype.disconnect = function() {
+  return this.transport.disconnect.apply(this.transport, arguments);
 };
 
 /**
@@ -115,5 +117,5 @@ DL.Channel.prototype.disconnect = function(sync) {
  * @return {Channel} this
  */
 DL.Channel.prototype.close = function() {
-  return this.transport.close();
+  return this.transport.close.apply(arguments);
 };

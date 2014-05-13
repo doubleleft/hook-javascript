@@ -35,6 +35,11 @@ DL.Client = function(options) {
   this.key = options.key;
   this.proxy = options.proxy;
 
+  // append last slash if doesn't have it
+  if (this.url.lastIndexOf('/') != this.url.length - 1) {
+    this.url += "/";
+  }
+
   /**
    * @property {DL.KeyValues} keys
    */
@@ -88,6 +93,10 @@ DL.Client.prototype.collection = function(collectionName) {
  *
  */
 DL.Client.prototype.channel = function(name, options) {
+  if (typeof(options)==="undefined") {
+    options = {};
+  }
+
   var collection = this.collection(name);
   collection.segments = collection.segments.replace('collection/', 'channels/');
   return new DL.Channel(this, collection, options);

@@ -17,10 +17,11 @@ javascripts:
 
     - 'bower_components/blueimp-canvas-to-blob/js/canvas-to-blob.min.js'
     - 'bower_components/eventsource/eventsource.js'
-    - 'bower_components/wampy/wampy.js'
+    - 'bower_components/wampy/src/wampy.js'
 
     - 'src/core/*.js'
     - 'src/*.js'
+    - 'src/channel/*.js'
     - 'src/wrap/end.js'
   dest: 'dist/dl.js'
 
@@ -29,6 +30,7 @@ amd:
     - 'src/wrap/amd-begin.js'
     - 'src/core/*.js'
     - 'src/*.js'
+    - 'src/channel/*.js'
     - 'src/wrap/amd-end.js'
   dest: 'dist/amd/dl.js'
 

@@ -58,6 +58,11 @@ DL.Client = function(options) {
   this.key = options.key;
   this.proxy = options.proxy;
 
+  // append last slash if doesn't have it
+  if (this.url.lastIndexOf('/') != this.url.length - 1) {
+    this.url += "/";
+  }
+
   /**
    * @property {DL.KeyValues} keys
    */
@@ -111,6 +116,10 @@ DL.Client.prototype.collection = function(collectionName) {
  *
  */
 DL.Client.prototype.channel = function(name, options) {
+  if (typeof(options)==="undefined") {
+    options = {};
+  }
+
   var collection = this.collection(name);
   collection.segments = collection.segments.replace('collection/', 'channels/');
   return new DL.Channel(this, collection, options);
@@ -594,6 +603,8 @@ DL.Auth.prototype.registerToken = function(data) {
 DL.Channel = function(client, collection, options) {
   if (!options.transport) {
     options.transport = 'SSE';
+  } else {
+    options.transport = options.transport.toUpperCase();
   }
   this.transport = new DL.Channel.Transport[options.transport](client, collection, options);
 };
@@ -643,8 +654,8 @@ DL.Channel.Transport = {};
  *
  *
  */
-DL.Channel.prototype.subscribe = function(event, callback) {
-  return this.transport.subscribe(event, callback);
+DL.Channel.prototype.subscribe = function() {
+  return this.transport.subscribe.apply(this.transport, arguments);
 };
 
 /**
@@ -653,7 +664,7 @@ DL.Channel.prototype.subscribe = function(event, callback) {
  * @return {Boolean}
  */
 DL.Channel.prototype.isConnected = function() {
-  return this.transport.isConnected();
+  return this.transport.isConnected.apply(this.transport, arguments);
 };
 
 /**
@@ -661,8 +672,8 @@ DL.Channel.prototype.isConnected = function() {
  * @method unsubscribe
  * @param {String} event
  */
-DL.Channel.prototype.unsubscribe = function(event) {
-  return this.transport.unsubscribe(event);
+DL.Channel.prototype.unsubscribe = function() {
+  return this.transport.unsubscribe.apply(this.transport, arguments);
 };
 
 /**
@@ -672,15 +683,15 @@ DL.Channel.prototype.unsubscribe = function(event) {
  * @param {Object} message
  * @return {Promise}
  */
-DL.Channel.prototype.publish = function(event, message) {
-  return this.transport.publish(event, message);
+DL.Channel.prototype.publish = function() {
+  return this.transport.publish.apply(this.transport, arguments);
 };
 
 /**
  * @return {Promise}
  */
 DL.Channel.prototype.connect = function() {
-  return this.transport.connect();
+  return this.transport.connect.apply(this.transport, arguments);
 };
 
 /**
@@ -689,8 +700,8 @@ DL.Channel.prototype.connect = function() {
  * @param {Boolean} synchronous default = false
  * @return {Channel} this
  */
-DL.Channel.prototype.disconnect = function(sync) {
-  return this.transport.disconnect();
+DL.Channel.prototype.disconnect = function() {
+  return this.transport.disconnect.apply(this.transport, arguments);
 };
 
 /**
@@ -699,7 +710,7 @@ DL.Channel.prototype.disconnect = function(sync) {
  * @return {Channel} this
  */
 DL.Channel.prototype.close = function() {
-  return this.transport.close();
+  return this.transport.close.apply(arguments);
 };
 
 /**
@@ -1546,6 +1557,221 @@ DL.System.prototype.time = function() {
     promise.then.apply(promise, arguments);
   }
   return promise;
+};
+
+DL.Channel.Transport.Example = function(client, collection, options) {
+};
+
+DL.Channel.Transport.Example.prototype.subscribe = function(event, callback) {
+};
+
+DL.Channel.Transport.Example.prototype.isConnected = function() {
+};
+
+DL.Channel.Transport.Example.prototype.unsubscribe = function(event) {
+};
+
+DL.Channel.Transport.Example.prototype.publish = function(event, message) {
+};
+
+DL.Channel.Transport.Example.prototype.connect = function() {
+};
+
+DL.Channel.Transport.Example.prototype.disconnect = function(sync) {
+};
+
+DL.Channel.Transport.Example.prototype.close = function() {
+};
+
+
+DL.Channel.Transport.SSE = function(client, collection, options) {
+  this.collection = collection;
+  this.client_id = null;
+  this.callbacks = {};
+  this.options = options || {};
+  this.readyState = null;
+};
+
+DL.Channel.Transport.SSE.prototype.subscribe = function(event, callback) {
+  if (typeof(callback)==="undefined") {
+    callback = event;
+    event = '_default';
+  }
+  this.callbacks[event] = callback;
+
+  var promise = this.connect();
+
+  if (this.readyState === EventSource.CONNECTING) {
+    var that = this;
+    promise.then(function() {
+      that.event_source.onopen = function(e) {
+        that.readyState = e.readyState;
+        that._trigger.apply(that, ['state:' + e.type, e]);
+      };
+      that.event_source.onerror = function(e) {
+        that.readyState = e.readyState;
+        that._trigger.apply(that, ['state:' + e.type, e]);
+      };
+      that.event_source.onmessage = function(e) {
+        var data = JSON.parse(e.data),
+            event = data.event;
+        delete data.event;
+        that._trigger.apply(that, [event, data]);
+      };
+    });
+  }
+
+  return promise;
+};
+
+/**
+ */
+DL.Channel.Transport.SSE.prototype._trigger = function(event, data) {
+  // always try to dispatch default message handler
+  if (event.indexOf('state:')===-1 && this.callbacks._default) {
+    this.callbacks._default.apply(this, [event, data]);
+  }
+  // try to dispatch message handler for this event
+  if (this.callbacks[event]) {
+    this.callbacks[event].apply(this, [data]);
+  }
+};
+
+/**
+ * Is EventSource listenning to messages?
+ * @method isConnected
+ * @return {Boolean}
+ */
+DL.Channel.Transport.SSE.prototype.isConnected = function() {
+  return (this.readyState !== null && this.readyState !== EventSource.CLOSED);
+};
+
+DL.Channel.Transport.SSE.prototype.unsubscribe = function(event) {
+  if (this.callbacks[event]) {
+    this.callbacks[event] = null;
+  }
+};
+
+DL.Channel.Transport.SSE.prototype.publish = function(event, message) {
+  if (typeof(message)==="undefined") { message = {}; }
+  message.client_id = this.client_id;
+  message.event = event;
+  return this.collection.create(message);
+};
+
+DL.Channel.Transport.SSE.prototype.connect = function() {
+  // Return success if already connected.
+  if (this.readyState !== null) {
+    var deferred = when.defer();
+    deferred.resolver.resolve();
+    return deferred.promise;
+  }
+
+  this.readyState = EventSource.CONNECTING;
+  this._trigger.apply(this, ['state:connecting']);
+
+  var that = this;
+
+  return this.publish('connected').then(function(data) {
+    that.collection.where('updated_at', '>', data.updated_at);
+
+    var query = that.collection.buildQuery();
+
+    query['X-App-Id'] = that.collection.client.appId;
+    query['X-App-Key'] = that.collection.client.key;
+
+    // Forward user authentication token, if it is set
+    var auth_token = window.localStorage.getItem(query['X-App-Id'] + '-' + DL.Auth.AUTH_TOKEN_KEY);
+    if (auth_token) {
+      query['X-Auth-Token'] = auth_token;
+    }
+
+    // time to wait for retry, after connection closes
+    query.stream = {
+      'refresh': that.options.refresh_timeout || 1,
+      'retry': that.options.retry_timeout || 1
+    };
+
+    that.client_id = data.client_id;
+    that.event_source = new EventSource(that.collection.client.url + that.collection.segments + "?" + JSON.stringify(query), {
+      withCredentials: true
+    });
+
+    // bind unload function to force user disconnection
+    window.addEventListener('unload', function(e) {
+      // send synchronous disconnected event
+      that.disconnect(true);
+    });
+  }, function(data) {
+    that.readyState = EventSource.CLOSED;
+    that._trigger.apply(that, ['state:error', data]);
+  });
+};
+
+DL.Channel.Transport.SSE.prototype.disconnect = function(sync) {
+  if (this.isConnected()) {
+    this.close();
+    this.publish('disconnected', {
+      _sync: ((typeof(sync)!=="undefined") && sync)
+    });
+  }
+  return this;
+};
+
+DL.Channel.Transport.SSE.prototype.close = function() {
+  if (this.event_source) {
+    this.event_source.close();
+  }
+  this.readyState = EventSource.CLOSED;
+  return this;
+};
+
+
+DL.Channel.Transport.WEBSOCKETS = function(client, collection, options) {
+  this.client = client;
+  this.collection = collection;
+
+  if (!options.url) {
+    var scheme = window.location.protocol === 'https:' ? 'wss://' : 'ws://',
+        url = client.url.replace(/https?:\/\//, scheme);
+
+    if (url.match(/index\.php/)) {
+      url = url.replace("index.php", "ws");
+    } else {
+      url += "ws";
+    }
+
+    options.url = url;
+  }
+
+  this.ws = new Wampy(options.url);
+};
+
+DL.Channel.Transport.WEBSOCKETS.prototype.subscribe = function(event, callback) {
+  this.ws.subscribe(this.collection.name + '.' + event, callback);
+};
+
+DL.Channel.Transport.WEBSOCKETS.prototype.isConnected = function() {
+  return this.ws._isInitialized && this.ws._ws.readyState === 1;
+};
+
+DL.Channel.Transport.WEBSOCKETS.prototype.unsubscribe = function(event) {
+  this.ws.subscribe(this.collection.name + '.' + event);
+};
+
+DL.Channel.Transport.WEBSOCKETS.prototype.publish = function(event, message, exclude, eligible) {
+  this.ws.publish(this.collection.name + '.' + event, message, exclude, eligible);
+};
+
+// DL.Channel.Transport.WEBSOCKETS.prototype.connect = function() {
+// };
+
+DL.Channel.Transport.WEBSOCKETS.prototype.disconnect = function() {
+  this.ws.disconnect();
+};
+
+DL.Channel.Transport.WEBSOCKETS.prototype.close = function() {
+  this.disconnect();
 };
 
 return DL;
