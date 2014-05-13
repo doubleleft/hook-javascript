@@ -1720,9 +1720,9 @@ DL.Channel.WEBSOCKETS = function(client, collection, options) {
         url = client.url.replace(/https?:\/\//, scheme);
 
     if (url.match(/index\.php/)) {
-      url = url.replace("index.php", "ws");
+      url = url.replace("index.php", "ws/");
     } else {
-      url += "ws";
+      url += "ws/";
     }
 
     options.url = url;
