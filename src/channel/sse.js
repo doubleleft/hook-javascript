@@ -1,12 +1,64 @@
-DL.Channel.Transport.SSE = function(client, collection, options) {
+/**
+ * @module DL
+ * @class DL.Channel.SSE
+ *
+ * @param {Client} client
+ * @param {String} namespace
+ * @param {Object} options optional
+ * @constructor
+ *
+ */
+DL.Channel.SSE = function(client, collection, options) {
   this.collection = collection;
   this.client_id = null;
   this.callbacks = {};
   this.options = options || {};
   this.readyState = null;
 };
+DL.Channel.SSE.prototype = new DL.Channel();
+DL.Channel.SSE.prototype.constructor = DL.Channel.SSE;
 
-DL.Channel.Transport.SSE.prototype.subscribe = function(event, callback) {
+/**
+ * Subscribe to channel. Publishes a 'connected' message on the first time.
+ * @method subscribe
+ * @param {String} event (optional)
+ * @param {Function} callback
+ * @return {Promise}
+ *
+ * @example Registering for all messages
+ *
+ *     channel.subscribe(function(event, data) {
+ *       console.log("Message: ", event, data);
+ *     })
+ *
+ * @example Registering for a single custom event
+ *
+ *     channel.subscribe('some-event', function(data) {
+ *       console.log("Custom event triggered: ", data);
+ *     })
+ *
+ * @example Registering for client connected/disconnected events
+ *
+ *     channel.subscribe('connected', function(data) {
+ *       console.log("New client connected: ", data.client_id);
+ *     });
+ *     channel.subscribe('disconnected', function(data) {
+ *       console.log("Client disconnected: ", data.client_id);
+ *     });
+ *
+ *
+ * @example Registering error event
+ *
+ *     channel.subscribe('state:open', function(e) {
+ *       console.log("Error: ", e);
+ *     });
+ *     channel.subscribe('state:error', function(e) {
+ *       console.log("Error: ", e);
+ *     });
+ *
+ *
+ */
+DL.Channel.SSE.prototype.subscribe = function(event, callback) {
   if (typeof(callback)==="undefined") {
     callback = event;
     event = '_default';
@@ -40,7 +92,7 @@ DL.Channel.Transport.SSE.prototype.subscribe = function(event, callback) {
 
 /**
  */
-DL.Channel.Transport.SSE.prototype._trigger = function(event, data) {
+DL.Channel.SSE.prototype._trigger = function(event, data) {
   // always try to dispatch default message handler
   if (event.indexOf('state:')===-1 && this.callbacks._default) {
     this.callbacks._default.apply(this, [event, data]);
@@ -56,24 +108,36 @@ DL.Channel.Transport.SSE.prototype._trigger = function(event, data) {
  * @method isConnected
  * @return {Boolean}
  */
-DL.Channel.Transport.SSE.prototype.isConnected = function() {
+DL.Channel.SSE.prototype.isConnected = function() {
   return (this.readyState !== null && this.readyState !== EventSource.CLOSED);
 };
 
-DL.Channel.Transport.SSE.prototype.unsubscribe = function(event) {
+/**
+ * Unsubscribe to a event listener
+ * @method unsubscribe
+ * @param {String} event
+ */
+DL.Channel.SSE.prototype.unsubscribe = function(event) {
   if (this.callbacks[event]) {
     this.callbacks[event] = null;
   }
 };
 
-DL.Channel.Transport.SSE.prototype.publish = function(event, message) {
+/**
+ * Publish event message
+ * @method publish
+ * @param {String} event
+ * @param {Object} message
+ * @return {Promise}
+ */
+DL.Channel.SSE.prototype.publish = function(event, message) {
   if (typeof(message)==="undefined") { message = {}; }
   message.client_id = this.client_id;
   message.event = event;
   return this.collection.create(message);
 };
 
-DL.Channel.Transport.SSE.prototype.connect = function() {
+DL.Channel.SSE.prototype.connect = function() {
   // Return success if already connected.
   if (this.readyState !== null) {
     var deferred = when.defer();
@@ -122,7 +186,13 @@ DL.Channel.Transport.SSE.prototype.connect = function() {
   });
 };
 
-DL.Channel.Transport.SSE.prototype.disconnect = function(sync) {
+/**
+ * Disconnect from channel, publishing a 'disconnected' message.
+ * @method disconnect
+ * @param {Boolean} synchronous default = false
+ * @return {DL.Channel} this
+ */
+DL.Channel.SSE.prototype.disconnect = function(sync) {
   if (this.isConnected()) {
     this.close();
     this.publish('disconnected', {
@@ -132,7 +202,12 @@ DL.Channel.Transport.SSE.prototype.disconnect = function(sync) {
   return this;
 };
 
-DL.Channel.Transport.SSE.prototype.close = function() {
+/**
+ * Close event source connection.
+ * @method close
+ * @return {Channel} this
+ */
+DL.Channel.SSE.prototype.close = function() {
   if (this.event_source) {
     this.event_source.close();
   }

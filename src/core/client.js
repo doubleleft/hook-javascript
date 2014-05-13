@@ -87,19 +87,26 @@ DL.Client.prototype.collection = function(collectionName) {
  * @param {Object} options (optional)
  * @return {DL.Channel}
  *
- * @example Retrieve a channel reference.
+ * @example Create a channel using Servet-Sent Events transport.
  *
- *     var messages = client.channel('messages');
+ *     var channel = client.channel('messages');
+ *
+ * @example Create a channel using WebSockets transport.
+ *
+ *     var channel = client.channel('messages', { transport: "websockets" });
  *
  */
 DL.Client.prototype.channel = function(name, options) {
-  if (typeof(options)==="undefined") {
-    options = {};
-  }
+  if (typeof(options)==="undefined") { options = {}; }
 
   var collection = this.collection(name);
   collection.segments = collection.segments.replace('collection/', 'channels/');
-  return new DL.Channel(this, collection, options);
+
+  // Use 'SSE' as default transport layer
+  if (!options.transport) { options.transport = 'sse'; }
+  options.transport = options.transport.toUpperCase();
+
+  this.transport = new DL.Channel[options.transport](client, collection, options);
 };
 
 /**
