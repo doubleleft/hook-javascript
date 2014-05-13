@@ -35,6 +35,8 @@ DL.Channel.WEBSOCKETS = function(client, collection, options) {
     options.url = url;
   }
 
+  console.log(this.client.key);
+  options.url += this.collection.name + "?X-App-Id=" + this.client.appId + "&X-App-Key=" + this.client.key;
   this.ws = new Wampy(options.url);
 };
 DL.Channel.WEBSOCKETS.prototype = new DL.Channel();
@@ -111,6 +113,15 @@ DL.Channel.WEBSOCKETS.prototype.disconnect = function() {
   return this;
 };
 
+/**
+ * @method call
+ * @param {String} procedure
+ * @return {Promise}
+ */
+DL.Channel.WEBSOCKETS.prototype.call = function(procedure, callbacks) {
+  this.ws.call(procedure, callbacks);
+  return this;
+};
 DL.Channel.WEBSOCKETS.prototype.connect = function() {
   this.ws.connect();
   return this;

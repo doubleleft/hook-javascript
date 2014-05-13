@@ -106,7 +106,7 @@ DL.Client.prototype.channel = function(name, options) {
   if (!options.transport) { options.transport = 'sse'; }
   options.transport = options.transport.toUpperCase();
 
-  return new DL.Channel[options.transport](client, collection, options);
+  return new DL.Channel[options.transport](this, collection, options);
 };
 
 /**

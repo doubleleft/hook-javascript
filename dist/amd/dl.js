@@ -129,7 +129,7 @@ DL.Client.prototype.channel = function(name, options) {
   if (!options.transport) { options.transport = 'sse'; }
   options.transport = options.transport.toUpperCase();
 
-  return new DL.Channel[options.transport](client, collection, options);
+  return new DL.Channel[options.transport](this, collection, options);
 };
 
 /**
@@ -345,67 +345,79 @@ DL.Iterable = function() { };
 DL.Iterable.prototype = {
   /**
    * @method each
-   * @param {Function} callback
+   * @param {Function} func
+   * @return {Promise}
    */
-  each : function(callback) { return this._iterate('each', callback); },
+  each : function(func) { return this._iterate('each', func); },
 
   /**
    * @method find
-   * @param {Function} callback
+   * @param {Function} func
+   * @return {Promise}
    */
-  find : function(callback) { return this._iterate('find', callback); },
+  find : function(func) { return this._iterate('find', func); },
 
   /**
    * @method filter
-   * @param {Function} callback
+   * @param {Function} func
+   * @return {Promise}
    */
-  filter : function(callback) { return this._iterate('filter', callback); },
+  filter : function(func) { return this._iterate('filter', func); },
 
   /**
    * @method max
-   * @param {Function} callback
+   * @param {Function} func
+   * @return {Promise}
    */
-  max : function(callback) { return this._iterate('max', callback); },
+  max : function(func) { return this._iterate('max', func); },
 
   /**
    * @method min
-   * @param {Function} callback
+   * @param {Function} func
+   * @return {Promise}
    */
-  min : function(callback) { return this._iterate('min', callback); },
+  min : function(func) { return this._iterate('min', func); },
 
   /**
    * @method every
-   * @param {Function} callback
+   * @param {Function} func
+   * @return {Promise}
    */
-  every : function(callback, accumulator) { return this._iterate('every', callback); },
+  every : function(func, accumulator) { return this._iterate('every', func); },
 
   /**
    * @method reject
-   * @param {Function} callback
+   * @param {Function} func
+   * @return {Promise}
    */
-  reject : function(callback, accumulator) { return this._iterate('reject', callback, accumulator); },
+  reject : function(func, accumulator) { return this._iterate('reject', func, accumulator); },
 
   /**
    * @method groupBy
-   * @param {Function} callback
+   * @param {Function} func
+   * @return {Promise}
    */
-  groupBy : function(callback, accumulator) { return this._iterate('groupBy', callback, accumulator); },
+  groupBy : function(func, accumulator) { return this._iterate('groupBy', func, accumulator); },
 
   /**
    * Iterate using lodash function
    * @method _iterate
    * @param {String} method
-   * @param {Function} callback
+   * @param {Function} func
    * @param {Object} argument
+   * @return {Promise}
    */
-  _iterate : function(method, callback, arg3) {
-    var that = this;
+  _iterate : function(method, func, arg3) {
+    var that = this, deferred = when.defer();
 
     this.then(function(data) {
-      _[method].call(that, data, callback, arg3);
+      var result = _[method].call(_, data, func, arg3);
+      deferred.resolver.resolve(result);
+    }).catch(function(err) {
+      deferred.resolver.reject(err);
     });
 
-    return this;
+    return deferred.promise;
   }
 };
 
@@ -1716,6 +1728,8 @@ DL.Channel.WEBSOCKETS = function(client, collection, options) {
     options.url = url;
   }
 
+  console.log(this.client.key);
+  options.url += this.collection.name + "?X-App-Id=" + this.client.appId + "&X-App-Key=" + this.client.key;
   this.ws = new Wampy(options.url);
 };
 DL.Channel.WEBSOCKETS.prototype = new DL.Channel();
@@ -1792,6 +1806,15 @@ DL.Channel.WEBSOCKETS.prototype.disconnect = function() {
   return this;
 };
 
+/**
+ * @method call
+ * @param {String} procedure
+ * @return {Promise}
+ */
+DL.Channel.WEBSOCKETS.prototype.call = function(procedure, callbacks) {
+  this.ws.call(procedure, callbacks);
+  return this;
+};
 DL.Channel.WEBSOCKETS.prototype.connect = function() {
   this.ws.connect();
   return this;
