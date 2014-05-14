@@ -35,8 +35,12 @@ DL.Channel.WEBSOCKETS = function(client, collection, options) {
     options.url = url;
   }
 
-  console.log(this.client.key);
   options.url += this.collection.name + "?X-App-Id=" + this.client.appId + "&X-App-Key=" + this.client.key;
+  var auth_token = this.client.auth.getToken();
+  if (auth_token) {
+    options.url += '&X-Auth-Token=' + auth_token;
+  }
+
   this.ws = new Wampy(options.url);
 };
 DL.Channel.WEBSOCKETS.prototype = new DL.Channel();

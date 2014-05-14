@@ -225,7 +225,7 @@ DL.Client.prototype.getHeaders = function() {
   }, auth_token;
 
   // Forward user authentication token, if it is set
-  var auth_token = window.localStorage.getItem(this.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
+  var auth_token = this.auth.getToken();
   if (auth_token) {
     request_headers['X-Auth-Token'] = auth_token;
   }

@@ -78,7 +78,7 @@ DL.Auth.prototype.authenticate = function(provider, data) {
   if (typeof(data)==="undefined") { data = {}; }
   promise = this.client.post('auth/' + provider, data);
   promise.then(function(data) {
-    that.registerToken(data);
+    that._registerToken(data);
   });
   return promise;
 };
@@ -103,7 +103,7 @@ DL.Auth.prototype.verify = function(provider, data) {
   if (typeof(data)==="undefined") { data = {}; }
   promise = this.client.post('auth/' + provider + '/verify', data);
   promise.then(function(data) {
-    that.registerToken(data);
+    that._registerToken(data);
   });
   return promise;
 };
@@ -175,7 +175,15 @@ DL.Auth.prototype.logout = function() {
   return this.setCurrentUser(null);
 };
 
-DL.Auth.prototype.registerToken = function(data) {
+/**
+ * @method getToken
+ * @return {String|null}
+ */
+DL.Auth.prototype.getToken = function() {
+  return window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
+};
+
+DL.Auth.prototype._registerToken = function(data) {
   if (data.token) {
     // register authentication token on localStorage
     window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY, data.token.token);

@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 5/13/2014
+ * @build 5/14/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -248,7 +248,7 @@ DL.Client.prototype.getHeaders = function() {
   }, auth_token;
 
   // Forward user authentication token, if it is set
-  var auth_token = window.localStorage.getItem(this.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
+  var auth_token = this.auth.getToken();
   if (auth_token) {
     request_headers['X-Auth-Token'] = auth_token;
   }
@@ -501,7 +501,7 @@ DL.Auth.prototype.authenticate = function(provider, data) {
   if (typeof(data)==="undefined") { data = {}; }
   promise = this.client.post('auth/' + provider, data);
   promise.then(function(data) {
-    that.registerToken(data);
+    that._registerToken(data);
   });
   return promise;
 };
@@ -526,7 +526,7 @@ DL.Auth.prototype.verify = function(provider, data) {
   if (typeof(data)==="undefined") { data = {}; }
   promise = this.client.post('auth/' + provider + '/verify', data);
   promise.then(function(data) {
-    that.registerToken(data);
+    that._registerToken(data);
   });
   return promise;
 };
@@ -598,7 +598,15 @@ DL.Auth.prototype.logout = function() {
   return this.setCurrentUser(null);
 };
 
-DL.Auth.prototype.registerToken = function(data) {
+/**
+ * @method getToken
+ * @return {String|null}
+ */
+DL.Auth.prototype.getToken = function() {
+  return window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
+};
+
+DL.Auth.prototype._registerToken = function(data) {
   if (data.token) {
     // register authentication token on localStorage
     window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY, data.token.token);
@@ -1728,8 +1736,12 @@ DL.Channel.WEBSOCKETS = function(client, collection, options) {
     options.url = url;
   }
 
-  console.log(this.client.key);
   options.url += this.collection.name + "?X-App-Id=" + this.client.appId + "&X-App-Key=" + this.client.key;
+  var auth_token = this.client.auth.getToken();
+  if (auth_token) {
+    options.url += '&X-Auth-Token=' + auth_token;
+  }
+
   this.ws = new Wampy(options.url);
 };
 DL.Channel.WEBSOCKETS.prototype = new DL.Channel();
