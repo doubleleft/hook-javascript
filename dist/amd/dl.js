@@ -200,7 +200,12 @@ DL.Client.prototype.request = function(segments, method, data) {
     request_headers["X-Endpoint"] = this.url;
 
   } else {
+    // XMLHttpRequest#setRequestHeader isn't implemented on Internet Explorer's XDomainRequest
     segments += "?X-App-Id=" + this.appId + "&X-App-Key=" + this.key;
+    var auth_token = this.auth.getToken();
+    if (auth_token) {
+      segments += '&X-Auth-Token=' + auth_token;
+    }
   }
 
   deferred.promise.xhr = uxhr((this.proxy || this.url) + segments, payload, {
