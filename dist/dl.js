@@ -9096,28 +9096,26 @@ DL.Client.prototype.request = function(segments, method, data) {
   // Compute payload
   payload = this.getPayload(method, data);
 
-  if (this.proxy) {
-    // Compute request headers
-    request_headers = this.getHeaders();
-    if(!(payload instanceof FormData)){
-      request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
-    }
+  // Compute request headers
+  request_headers = this.getHeaders();
+  if(!(payload instanceof FormData)){
+    request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
+  }
 
+  if (this.proxy) {
     // Forward API endpoint to proxy
     request_headers["X-Endpoint"] = this.url;
 
-  } else {
+  } else if (typeof(XDomainRequest) !== "undefined") {
     // XMLHttpRequest#setRequestHeader isn't implemented on Internet Explorer's XDomainRequest
     segments += "?X-App-Id=" + this.appId + "&X-App-Key=" + this.key;
     var auth_token = this.auth.getToken();
-    if (auth_token) {
-      segments += '&X-Auth-Token=' + auth_token;
-    }
+    if (auth_token) { segments += '&X-Auth-Token=' + auth_token; }
   }
 
   deferred.promise.xhr = uxhr((this.proxy || this.url) + segments, payload, {
     method: method,
-    // headers: request_headers,
+    headers: request_headers,
     sync: synchronous,
     success: function(response) {
       var data = null;
