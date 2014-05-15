@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 5/14/2014
+ * @build 5/15/2014
  */
 (function(window) {
   //
@@ -9125,7 +9125,7 @@ DL.Client.prototype.request = function(segments, method, data) {
         //something wrong with JSON. IE throws exception on JSON.parse
       }
 
-      if (!data || data.error) {
+      if (data === false || data === null || data.error) {
         deferred.resolver.reject(data);
       } else {
         deferred.resolver.resolve(data);

@@ -195,7 +195,7 @@ DL.Client.prototype.request = function(segments, method, data) {
         //something wrong with JSON. IE throws exception on JSON.parse
       }
 
-      if (!data || data.error) {
+      if (data === false || data === null || data.error) {
         deferred.resolver.reject(data);
       } else {
         deferred.resolver.resolve(data);
