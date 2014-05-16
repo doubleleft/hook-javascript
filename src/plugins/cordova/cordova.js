@@ -1,0 +1,1 @@
+DL.Client.prototype.cordova = {};

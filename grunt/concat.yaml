@@ -25,6 +25,11 @@ javascripts:
     - 'src/wrap/end.js'
   dest: 'dist/dl.js'
 
+cordova:
+  src:
+    - 'src/plugins/cordova/*'
+  dest: 'dist/plugins/cordova.js'
+
 amd:
   src:
     - 'src/wrap/amd-begin.js'
