@@ -60,6 +60,11 @@ DL.Client = function(options) {
   /**
    * @property {DL.System} system
    */
+  this.events = new DL.System(this);
+
+  /**
+   * @property {DL.System} system
+   */
   this.system = new DL.System(this);
 };
 
@@ -1267,6 +1272,30 @@ DL.CollectionItem = function(collection, _id) {
   this.segments = 'collection/' + this.name;
 };
 
+
+/**
+ * @class DL.Events
+ */
+DL.Events = function(client) {
+  this.client = client;
+  this.events = {};
+};
+
+DL.Events.prototype.on = function(event, callback, context) {
+  if (!this.events[event]) { this.events[event] = []; }
+  this.events[event].push({callback: callback, context: context});
+};
+
+DL.Events.prototype.trigger = function(event, data) {
+  var c, args = arguments.slice(1);
+  if (this.events[event]) {
+    for (var i=0,length=this.events[event].length;i<length;i++)  {
+      c = this.events[event][i];
+      c.callback.apply(c.context || this.client, args);
+    }
+  }
+
+};
 
 /**
  */
