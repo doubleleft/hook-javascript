@@ -1,6 +1,7 @@
 /**
  * Deals with user registration/authentication
  * @class DL.Auth
+ * @extends DL.Events
  * @param {DL.Client} client
  * @constructor
  */
@@ -16,6 +17,10 @@ DL.Auth = function(client) {
     this.currentUser = JSON.parse(this.currentUser); // localStorage only supports recording strings, so we need to parse it
   }
 };
+
+// Inherits from Events
+DL.Auth.prototype = new DL.Events();
+DL.Auth.prototype.constructor = DL.Auth;
 
 // Constants
 DL.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';

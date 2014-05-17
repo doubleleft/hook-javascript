@@ -1,21 +1,20 @@
 /**
  * @class DL.Events
  */
-DL.Events = function(client) {
-  this.client = client;
-  this.events = {};
+DL.Events = function() {
+  this._events = {};
 };
 
 DL.Events.prototype.on = function(event, callback, context) {
-  if (!this.events[event]) { this.events[event] = []; }
-  this.events[event].push({callback: callback, context: context});
+  if (!this._events[event]) { this._events[event] = []; }
+  this._events[event].push({callback: callback, context: context || this});
 };
 
 DL.Events.prototype.trigger = function(event, data) {
   var c, args = arguments.slice(1);
-  if (this.events[event]) {
-    for (var i=0,length=this.events[event].length;i<length;i++)  {
-      c = this.events[event][i];
+  if (this._events[event]) {
+    for (var i=0,length=this._events[event].length;i<length;i++)  {
+      c = this._events[event][i];
       c.callback.apply(c.context || this.client, args);
     }
   }

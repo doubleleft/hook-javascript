@@ -35,11 +35,6 @@ DL.Client = function(options) {
   this.auth = new DL.Auth(this);
 
   /**
-   * @property {DL.Events} events
-   */
-  this.events = new DL.Events(this);
-
-  /**
    * @property {DL.System} system
    */
   this.system = new DL.System(this);
