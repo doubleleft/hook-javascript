@@ -96,6 +96,7 @@ DL.Auth.prototype.register = function(provider, data) {
  * @see register
  */
 DL.Auth.prototype.authenticate = function() {
+  console.log("auth.authenticate method is deprecated. Please use auth.register.");
   return this.register.apply(this, arguments);
 };
 
@@ -108,7 +109,7 @@ DL.Auth.prototype.authenticate = function() {
  *
  * @example
  *
- *     client.auth.verify('email', {email: "edreyer@doubleleft.com", password: "123"}).then(function(data){
+ *     client.auth.login('email', {email: "edreyer@doubleleft.com", password: "123"}).then(function(data){
  *       console.log("User found: ", data);
  *     }, function(data){
  *       console.log("User not found or password invalid.", data);
@@ -131,6 +132,7 @@ DL.Auth.prototype.login = function(provider, data) {
  * @see login
  */
 DL.Auth.prototype.verify = function() {
+  console.log("auth.verify method is deprecated. Please use auth.login.");
   return this.login.apply(this, arguments)
 };
 
