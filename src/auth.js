@@ -2,7 +2,7 @@
  * Deals with user registration/authentication
  * @module DL
  * @class DL.Auth
- *
+ * @extends DL.Events
  * @param {DL.Client} client
  * @constructor
  */
@@ -25,6 +25,10 @@ DL.Auth = function(client) {
   }
 };
 
+// Inherits from Events
+DL.Auth.prototype = new DL.Events();
+DL.Auth.prototype.constructor = DL.Auth;
+
 // Constants
 DL.Auth.AUTH_DATA_KEY = 'dl-api-auth-data';
 DL.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
@@ -40,22 +44,27 @@ DL.Auth.prototype.setCurrentUser = function(data) {
   if (!data) {
     window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
     window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
+
+    // trigger logout event
+    this.trigger('logout');
   } else {
     window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY, JSON.stringify(data));
+
+    // trigger login event
+    this.trigger('logged');
   }
   return this;
 };
 
 /**
  * Register user using current authentication provider.
- *
  * @param {String} provider
  * @param {Object} data
- * @method authenticate
+ * @method register
  *
- * @example Authenticating with email address
+ * @example Register with email address
  *
- *     client.auth.authenticate('email', {
+ *     client.auth.register('email', {
  *       email: "daliberti@doubleleft.com",
  *       name: "Danilo Aliberti",
  *       password: "123"
@@ -63,17 +72,16 @@ DL.Auth.prototype.setCurrentUser = function(data) {
  *       console.log("Registered user: ", user);
  *     });
  *
- * @example Authenticating with Facebook
+ * @example Register with Facebook
  *
  *     FB.login(function(response) {
- *       client.auth.authenticate('facebook', response.authResponse).then(function(user) {
+ *       client.auth.register('facebook', response.authResponse).then(function(user) {
  *         console.log("Registered user: ", user);
  *       });
  *     }, {scope: 'email'});
  *
- *
  */
-DL.Auth.prototype.authenticate = function(provider, data) {
+DL.Auth.prototype.register = function(provider, data) {
   var promise, that = this;
   if (typeof(data)==="undefined") { data = {}; }
   promise = this.client.post('auth/' + provider, data);
@@ -84,8 +92,16 @@ DL.Auth.prototype.authenticate = function(provider, data) {
 };
 
 /**
+ * @method authenticate
+ * @see register
+ */
+DL.Auth.prototype.authenticate = function() {
+  return this.register.apply(this, arguments);
+};
+
+/**
  * Verify if user is already registered, and log-in if succeed.
- * @method verify
+ * @method login
  * @param {String} provider
  * @param {Object} data
  * @return {Promise}
@@ -97,8 +113,10 @@ DL.Auth.prototype.authenticate = function(provider, data) {
  *     }, function(data){
  *       console.log("User not found or password invalid.", data);
  *     });
+ *
+ * Verify if user is already registered, and log-in if succeed.
  */
-DL.Auth.prototype.verify = function(provider, data) {
+DL.Auth.prototype.login = function(provider, data) {
   var promise, that = this;
   if (typeof(data)==="undefined") { data = {}; }
   promise = this.client.post('auth/' + provider + '/verify', data);
@@ -106,6 +124,14 @@ DL.Auth.prototype.verify = function(provider, data) {
     that._registerToken(data);
   });
   return promise;
+};
+
+/**
+ * @method verify
+ * @see login
+ */
+DL.Auth.prototype.verify = function() {
+  return this.login.apply(this, arguments)
 };
 
 /**

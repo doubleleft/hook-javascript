@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 5/16/2014
+ * @build 5/17/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -340,6 +340,28 @@ DL.Client.prototype.serialize = function(obj, prefix) {
 };
 
 /**
+ * @class DL.Events
+ */
+DL.Events = function() {
+  this._events = {};
+};
+
+DL.Events.prototype.on = function(event, callback, context) {
+  if (!this._events[event]) { this._events[event] = []; }
+  this._events[event].push({callback: callback, context: context || this});
+};
+
+DL.Events.prototype.trigger = function(event, data) {
+  var c, args = arguments.slice(1);
+  if (this._events[event]) {
+    for (var i=0,length=this._events[event].length;i<length;i++)  {
+      c = this._events[event][i];
+      c.callback.apply(c.context || this.client, args);
+    }
+  }
+};
+
+/**
  * Iterable is for internal use only.
  * @module DL
  * @class DL.Iterable
@@ -428,7 +450,7 @@ DL.Iterable.prototype = {
  * Deals with user registration/authentication
  * @module DL
  * @class DL.Auth
- *
+ * @extends DL.Events
  * @param {DL.Client} client
  * @constructor
  */
@@ -451,6 +473,10 @@ DL.Auth = function(client) {
   }
 };
 
+// Inherits from Events
+DL.Auth.prototype = new DL.Events();
+DL.Auth.prototype.constructor = DL.Auth;
+
 // Constants
 DL.Auth.AUTH_DATA_KEY = 'dl-api-auth-data';
 DL.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
@@ -466,8 +492,10 @@ DL.Auth.prototype.setCurrentUser = function(data) {
   if (!data) {
     window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
     window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
+    this.trigger('logout');
   } else {
     window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY, JSON.stringify(data));
+    this.trigger('login');
   }
   return this;
 };
