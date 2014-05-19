@@ -25,11 +25,6 @@ javascripts:
     - 'src/wrap/end.js'
   dest: 'dist/dl.js'
 
-cordova:
-  src:
-    - 'src/plugins/cordova/*'
-  dest: 'dist/plugins/cordova.js'
-
 amd:
   src:
     - 'src/wrap/amd-begin.js'
@@ -43,3 +38,8 @@ plugin_backbone:
   src:
     - 'src/plugins/backbone.js'
   dest: 'dist/plugins/backbone.js'
+
+plugin_cordova:
+  src:
+    - 'src/plugins/cordova/*'
+  dest: 'dist/plugins/cordova.js'

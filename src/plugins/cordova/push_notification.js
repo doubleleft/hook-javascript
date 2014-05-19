@@ -1,8 +1,19 @@
 /**
- * @class Push
+ * @class DL.Client.Cordova.PushNotification
+ * @extends DL.Events
  */
 DL.Client.Cordova = {};
 DL.Client.Cordova.PushNotification = function() {};
+
+// Inherits from Events
+DL.Client.Cordova.PushNotification.prototype = new DL.Events();
+DL.Client.Cordova.PushNotification.constructor = DL.Client.Cordova.PushNotification;
+
+// References:
+// http://androidexample.com/Android_Push_Notifications_using_Google_Cloud_Messaging_GCM/index.php?view=article_discription&aid=119&aaid=139
+// http://www.androidhive.info/2012/10/android-push-notifications-using-google-cloud-messaging-gcm-php-and-mysql/
+// http://devgirl.org/2012/10/25/tutorial-android-push-notifications-with-phonegap/
+// http://devgirl.org/2012/10/19/tutorial-apple-push-notifications-with-phonegap-part-1/
 
 /**
  * -------------
@@ -15,6 +26,19 @@ DL.Client.Cordova.PushNotification = function() {};
 
 /**
  * @method register
+ * @return DL.Client.Cordova.PushNotification
+ *
+ * @example Registering for push notifications on Android
+ *
+ *     dl.cordova.push.register({senderID: "xxxx"}).on('notification', function(e) {
+ *       console.log("Notification: ", e);
+ *     });
+ *
+ * @example Registering for push notifications on iOS
+ *
+ *     dl.cordova.push.register().on('notification', function(e) {
+ *       console.log("Notification: ", e);
+ *     });
  */
 DL.Client.Cordova.PushNotification.prototype.register = function(options) {
   var self = this,
@@ -44,6 +68,26 @@ DL.Client.Cordova.PushNotification.prototype.register = function(options) {
     }
   }
 
+  // Check 'regid' for Android registrations
+  this.on('registered', function(e) {
+    if ( e.regid.length > 0 ) {
+      self._registerDevice(e.regid);
+    }
+  });
+
+  function successHandler(result) {
+    console.log("successHandler: ", result);
+    // on iOS devices, result is the token
+    if (device.platform.match(/ios/i)) {
+      self._registerDevice(result);
+    }
+  }
+
+  function errorHandler(error) {
+    console.log("Error: ", error);
+  }
+
+
   // handle GCM notifications for Android
   function onNotification(e) {
     if (device.platform.match(/ios/i)) {
@@ -64,13 +108,15 @@ DL.Client.Cordova.PushNotification.prototype.register = function(options) {
       return;
     }
 
-    $("#app-status-ul").append('<li>EVENT -> RECEIVED:' + e.event + '</li>');
+    // trigger generic notification
+    this.trigger('notification', e);
 
-    if (e.event == "registered") {
-      if ( e.regid.length > 0 ) {
-        self._sendRegistration(e.regid);
-      }
-    } else if (e.event == "message") {
+    // trigger event
+    if (e.event) {
+      this.trigger(event, e);
+    }
+
+    if (e.event == "message") {
       // if this flag is set, this notification happened while we were in the foreground.
       // you might want to play a sound to get the user's attention, throw up a dialog, etc.
       if (e.foreground) {
@@ -83,6 +129,7 @@ DL.Client.Cordova.PushNotification.prototype.register = function(options) {
         my_media.play();
 
       } else {
+
         // otherwise we were launched because the user touched a notification in the notification tray.
         if (e.coldstart) {
           // COLDSTART NOTIFICATION
@@ -98,25 +145,8 @@ DL.Client.Cordova.PushNotification.prototype.register = function(options) {
 
       // (amazon-fireos only)
       // e.payload.timeStamp
-
-    } else if (e.event === "error") {
-      console.log(e.msg);
-
-    } else {
-      console.log("triggered a unknown event");
     }
-  }
 
-  function successHandler(result) {
-    console.log("successHandler: ", result);
-    // on iOS devices, result is the token
-    if (device.platform.match(/ios/i)) {
-      self._sendRegistration(result);
-    }
-  }
-
-  function errorHandler(error) {
-    console.log("Error: ", error);
   }
 
   // Android options
@@ -132,24 +162,15 @@ DL.Client.Cordova.PushNotification.prototype.register = function(options) {
 };
 
 /**
- * @method onNotification
- * @param {Function} callback
- * @return {DL.Client.Cordova.PushNotification} this
- */
-DL.Client.Cordova.PushNotification.prototype.onNotification = function(callback) {
-  this._onNotification = callback;
-};
-
-/**
  * @method unregister
  */
 DL.Client.Cordova.PushNotification.prototype.unregister = function(options) {
 };
 
 /**
- * method _sendRegistration
+ * method _registerDevice
  */
-DL.Client.Cordova.PushNotification.prototype._sendRegistration = function(id) {
+DL.Client.Cordova.PushNotification.prototype._registerDevice = function(id) {
   console.log("registration id = " + id);
 };
 
