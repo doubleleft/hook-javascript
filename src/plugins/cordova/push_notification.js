@@ -83,8 +83,11 @@ DL.Client.Cordova.PushNotification.prototype.register = function(options) {
     }
   }
 
-  // ignore iOS-only options when it doens't apply
-  if (device.platform.match(/ios/i) === null) {
+  // ignore senderID for iOS devices
+  if (device.platform.match(/ios/i)) {
+    delete registerOptions['senderID'];
+  } else {
+    // ignore iOS-only options when it doens't apply
     delete registerOptions['badge'];
     delete registerOptions['sound'];
     delete registerOptions['alert'];
@@ -118,7 +121,7 @@ DL.Client.Cordova.PushNotification.prototype.register = function(options) {
   // handle notification
   function onNotification(e) {
     // trigger generic notification
-    this.trigger('notification', e);
+    self.trigger('notification', e);
 
     if (device.platform.match(/ios/i)) {
       if (e.alert) {
@@ -139,7 +142,7 @@ DL.Client.Cordova.PushNotification.prototype.register = function(options) {
 
     // trigger event
     if (e.event) {
-      this.trigger(event, e);
+      self.trigger(event, e);
     }
 
     if (e.event == "message") {
