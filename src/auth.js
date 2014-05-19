@@ -133,7 +133,7 @@ DL.Auth.prototype.login = function(provider, data) {
  */
 DL.Auth.prototype.verify = function() {
   console.log("auth.verify method is deprecated. Please use auth.login.");
-  return this.login.apply(this, arguments)
+  return this.login.apply(this, arguments);
 };
 
 /**

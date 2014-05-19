@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 5/17/2014
+ * @build 5/19/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -492,24 +492,27 @@ DL.Auth.prototype.setCurrentUser = function(data) {
   if (!data) {
     window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
     window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
+
+    // trigger logout event
     this.trigger('logout');
   } else {
     window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY, JSON.stringify(data));
-    this.trigger('login');
+
+    // trigger login event
+    this.trigger('logged');
   }
   return this;
 };
 
 /**
  * Register user using current authentication provider.
- *
  * @param {String} provider
  * @param {Object} data
- * @method authenticate
+ * @method register
  *
- * @example Authenticating with email address
+ * @example Register with email address
  *
- *     client.auth.authenticate('email', {
+ *     client.auth.register('email', {
  *       email: "daliberti@doubleleft.com",
  *       name: "Danilo Aliberti",
  *       password: "123"
@@ -517,17 +520,16 @@ DL.Auth.prototype.setCurrentUser = function(data) {
  *       console.log("Registered user: ", user);
  *     });
  *
- * @example Authenticating with Facebook
+ * @example Register with Facebook
  *
  *     FB.login(function(response) {
- *       client.auth.authenticate('facebook', response.authResponse).then(function(user) {
+ *       client.auth.register('facebook', response.authResponse).then(function(user) {
  *         console.log("Registered user: ", user);
  *       });
  *     }, {scope: 'email'});
  *
- *
  */
-DL.Auth.prototype.authenticate = function(provider, data) {
+DL.Auth.prototype.register = function(provider, data) {
   var promise, that = this;
   if (typeof(data)==="undefined") { data = {}; }
   promise = this.client.post('auth/' + provider, data);
@@ -538,21 +540,32 @@ DL.Auth.prototype.authenticate = function(provider, data) {
 };
 
 /**
+ * @method authenticate
+ * @see register
+ */
+DL.Auth.prototype.authenticate = function() {
+  console.log("auth.authenticate method is deprecated. Please use auth.register.");
+  return this.register.apply(this, arguments);
+};
+
+/**
  * Verify if user is already registered, and log-in if succeed.
- * @method verify
+ * @method login
  * @param {String} provider
  * @param {Object} data
  * @return {Promise}
  *
  * @example
  *
- *     client.auth.verify('email', {email: "edreyer@doubleleft.com", password: "123"}).then(function(data){
+ *     client.auth.login('email', {email: "edreyer@doubleleft.com", password: "123"}).then(function(data){
  *       console.log("User found: ", data);
  *     }, function(data){
  *       console.log("User not found or password invalid.", data);
  *     });
+ *
+ * Verify if user is already registered, and log-in if succeed.
  */
-DL.Auth.prototype.verify = function(provider, data) {
+DL.Auth.prototype.login = function(provider, data) {
   var promise, that = this;
   if (typeof(data)==="undefined") { data = {}; }
   promise = this.client.post('auth/' + provider + '/verify', data);
@@ -560,6 +573,15 @@ DL.Auth.prototype.verify = function(provider, data) {
     that._registerToken(data);
   });
   return promise;
+};
+
+/**
+ * @method verify
+ * @see login
+ */
+DL.Auth.prototype.verify = function() {
+  console.log("auth.verify method is deprecated. Please use auth.login.");
+  return this.login.apply(this, arguments);
 };
 
 /**

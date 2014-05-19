@@ -35,6 +35,9 @@ DL.Client = function(options) {
   this.key = options.key;
   this.proxy = options.proxy;
 
+  // expose last static instance
+  DL.Client.instance = this;
+
   // append last slash if doesn't have it
   if (this.url.lastIndexOf('/') != this.url.length - 1) {
     this.url += "/";

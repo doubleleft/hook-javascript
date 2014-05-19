@@ -3,7 +3,15 @@
  * @extends DL.Events
  */
 DL.Client.Cordova = {};
-DL.Client.Cordova.PushNotification = function() {};
+DL.Client.Cordova.PushNotification = function() {
+  var self = this;
+  this.appVersion = "";
+
+  // store appName from device
+  navigator.appInfo.getVersion(function(version) {
+    self.appVersion = version;
+  });
+};
 
 // Inherits from Events
 DL.Client.Cordova.PushNotification.prototype = new DL.Events();
@@ -48,22 +56,38 @@ DL.Client.Cordova.PushNotification.constructor = DL.Client.Cordova.PushNotificat
 DL.Client.Cordova.PushNotification.prototype.register = function(options) {
   var self = this,
       name  = null,
-      registerOptions = {ecb: 'onNotification'},
+      registerOptions = {
+        ecb: 'onNotification',
+        badge: "true", sound: "true", alert: "true" // iOS options
+      },
       notificationPlugin = window.plugins && window.plugins.pushNotification;
 
+  console.log("Registering for push notifications...");
+
   if (!notificationPlugin) {
+    console.log("Please install PushPlugin: https://github.com/phonegap-build/PushPlugin");
     throw new Error("Please install PushPlugin: https://github.com/phonegap-build/PushPlugin");
   }
 
   if (typeof(device)==="undefined") {
+    console.log("Please install device: https://github.com/apache/cordova-plugin-device");
     throw new Error("Please install device: https://github.com/apache/cordova-plugin-device");
   }
+
+  console.log("Platform: " + device.platform);
 
   if (device.platform.match(/android/i) || device.platform.match(/fireos/)) {
     // senderID is required for Android/FireOS
     if (!options.senderID) {
       throw new Error("senderID is required for Android apps. Create one at: https://developers.google.com/console");
     }
+  }
+
+  // ignore iOS-only options when it doens't apply
+  if (device.platform.match(/ios/i) === null) {
+    delete registerOptions['badge'];
+    delete registerOptions['sound'];
+    delete registerOptions['alert'];
   }
 
   // merge options and registerOptions
@@ -81,7 +105,6 @@ DL.Client.Cordova.PushNotification.prototype.register = function(options) {
   });
 
   function successHandler(result) {
-    console.log("successHandler: ", result);
     // on iOS devices, result is the token
     if (device.platform.match(/ios/i)) {
       self._registerDevice(result);
@@ -92,12 +115,13 @@ DL.Client.Cordova.PushNotification.prototype.register = function(options) {
     console.log("Error: ", error);
   }
 
-
-  // handle GCM notifications for Android
+  // handle notification
   function onNotification(e) {
+    // trigger generic notification
+    this.trigger('notification', e);
+
     if (device.platform.match(/ios/i)) {
       if (e.alert) {
-        $("#app-status-ul").append('<li>push-notification: ' + e.alert + '</li>');
         navigator.notification.alert(e.alert);
       }
 
@@ -112,9 +136,6 @@ DL.Client.Cordova.PushNotification.prototype.register = function(options) {
 
       return;
     }
-
-    // trigger generic notification
-    this.trigger('notification', e);
 
     // trigger event
     if (e.event) {
@@ -160,8 +181,12 @@ DL.Client.Cordova.PushNotification.prototype.register = function(options) {
   // iOS options
   // {"badge":"true","sound":"true","alert":"true","ecb":"onNotificationAPN"}
 
+  console.log("will register for notifications...");
+  console.log("options: " + JSON.stringify(registerOptions));
+
   // required
   notificationPlugin.register(successHandler, errorHandler, registerOptions);
+  console.log("registered.");
 
   return this;
 };
@@ -177,7 +202,13 @@ DL.Client.Cordova.PushNotification.prototype.unregister = function(options) {
  * method _registerDevice
  */
 DL.Client.Cordova.PushNotification.prototype._registerDevice = function(id) {
-  console.log("registration id = " + id);
+  console.log("_registerDevice: " + id);
+
+  DL.Client.instance.post('push/register', {
+    device_id: id,
+    app_version: this.appVersion,
+    platform: device.platform.toLowerCase()
+  });
 };
 
 /**
