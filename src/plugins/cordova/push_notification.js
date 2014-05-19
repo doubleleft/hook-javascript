@@ -25,11 +25,16 @@ DL.Client.Cordova.PushNotification.constructor = DL.Client.Cordova.PushNotificat
  */
 
 /**
+ * Register device for Push Notifications
  * @method register
  * @return DL.Client.Cordova.PushNotification
  *
  * @example Registering for push notifications on Android
  *
+ *     //
+ *     // Get a senderID on your app's Google Console
+ *     // - https://developers.google.com/console
+ *     //
  *     dl.cordova.push.register({senderID: "xxxx"}).on('notification', function(e) {
  *       console.log("Notification: ", e);
  *     });
@@ -162,6 +167,7 @@ DL.Client.Cordova.PushNotification.prototype.register = function(options) {
 };
 
 /**
+ * Unregister device for Push Notifications
  * @method unregister
  */
 DL.Client.Cordova.PushNotification.prototype.unregister = function(options) {
@@ -176,5 +182,6 @@ DL.Client.Cordova.PushNotification.prototype._registerDevice = function(id) {
 
 /**
  * @property push
+ * @type DL.Client.Cordova.PushNotification
  */
 DL.Client.prototype.cordova.push = new DL.Client.Cordova.PushNotification();
