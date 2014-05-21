@@ -136,7 +136,7 @@ DL.Collection.prototype.where = function(objects, _operation, _value) {
  *
  *     client.collection('posts').find(128371923).then(function(data) {
  *       console.log("Row:", data); // will never execute this
- *     }).catch(function(e) {
+ *     }).otherwise(function(e) {
  *       console.log("Not found.");
  *     });
  *
