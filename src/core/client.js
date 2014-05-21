@@ -35,9 +35,6 @@ DL.Client = function(options) {
   this.key = options.key;
   this.proxy = options.proxy;
 
-  // expose last static instance
-  DL.Client.instance = this;
-
   // append last slash if doesn't have it
   if (this.url.lastIndexOf('/') != this.url.length - 1) {
     this.url += "/";
@@ -62,6 +59,9 @@ DL.Client = function(options) {
    * @property {DL.System} system
    */
   this.system = new DL.System(this);
+
+  // Setup all registered plugins.
+  DL.Plugin.Manager.setup(this);
 };
 
 /**

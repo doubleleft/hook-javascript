@@ -1,21 +1,36 @@
 /**
- * @class DL.Client.Cordova.PushNotification
+ * -------------
+ * Dependency plugins:
+ * -------------
+ * - https://github.com/phonegap-build/PushPlugin
+ * - https://github.com/apache/cordova-plugin-device
+ * - https://github.com/danmichaelo/cordova-plugin-appinfo
+ */
+
+/**
+ * @class DL.Plugin.Cordova.PushNotification
  * @extends DL.Events
  */
-DL.Client.Cordova = {};
-DL.Client.Cordova.PushNotification = function() {
+DL.Plugin.Cordova.PushNotification = function(client) {
   var self = this;
+
+  this.client = client;
   this.appVersion = "";
+
+  if (!navigator.appInfo) {
+    throw new Error("Please install AppInfo plugin: https://github.com/danmichaelo/cordova-plugin-appinfo");
+  }
 
   // store appName from device
   navigator.appInfo.getVersion(function(version) {
+    console.log("app version: " + version);
     self.appVersion = version;
   });
 };
 
 // Inherits from Events
-DL.Client.Cordova.PushNotification.prototype = new DL.Events();
-DL.Client.Cordova.PushNotification.constructor = DL.Client.Cordova.PushNotification;
+DL.Plugin.Cordova.PushNotification.prototype = new DL.Events();
+DL.Plugin.Cordova.PushNotification.constructor = DL.Plugin.Cordova.PushNotification;
 
 // References:
 // http://androidexample.com/Android_Push_Notifications_using_Google_Cloud_Messaging_GCM/index.php?view=article_discription&aid=119&aaid=139
@@ -24,18 +39,9 @@ DL.Client.Cordova.PushNotification.constructor = DL.Client.Cordova.PushNotificat
 // http://devgirl.org/2012/10/19/tutorial-apple-push-notifications-with-phonegap-part-1/
 
 /**
- * -------------
- * Dependencies:
- * -------------
- * - https://github.com/phonegap-build/PushPlugin
- * - https://github.com/apache/cordova-plugin-device
- * - https://github.com/danmichaelo/cordova-plugin-appinfo
- */
-
-/**
  * Register device for Push Notifications
  * @method register
- * @return DL.Client.Cordova.PushNotification
+ * @return DL.Plugin.Cordova.PushNotification
  *
  * @example Registering for push notifications on Android
  *
@@ -53,7 +59,7 @@ DL.Client.Cordova.PushNotification.constructor = DL.Client.Cordova.PushNotificat
  *       console.log("Notification: ", e);
  *     });
  */
-DL.Client.Cordova.PushNotification.prototype.register = function(options) {
+DL.Plugin.Cordova.PushNotification.prototype.register = function(options) {
   var self = this,
       name  = null,
       registerOptions = {
@@ -83,7 +89,14 @@ DL.Client.Cordova.PushNotification.prototype.register = function(options) {
     }
   }
 
-  // ignore senderID for iOS devices
+  // Merge options and registerOptions
+  for (name in options) {
+    if (options.hasOwnProperty(name)) {
+      registerOptions[name] = options[name];
+    }
+  }
+
+  // Ignore senderID for iOS devices
   if (device.platform.match(/ios/i)) {
     delete registerOptions['senderID'];
   } else {
@@ -91,13 +104,6 @@ DL.Client.Cordova.PushNotification.prototype.register = function(options) {
     delete registerOptions['badge'];
     delete registerOptions['sound'];
     delete registerOptions['alert'];
-  }
-
-  // merge options and registerOptions
-  for (name in options) {
-    if (options.hasOwnProperty(name)) {
-      registerOptions[name] = options[name];
-    }
   }
 
   // Check 'regid' for Android registrations
@@ -108,6 +114,7 @@ DL.Client.Cordova.PushNotification.prototype.register = function(options) {
   });
 
   function successHandler(result) {
+    console.log("successHandler");
     // on iOS devices, result is the token
     if (device.platform.match(/ios/i)) {
       self._registerDevice(result);
@@ -115,10 +122,11 @@ DL.Client.Cordova.PushNotification.prototype.register = function(options) {
   }
 
   function errorHandler(error) {
-    console.log("Error: ", error);
+    console.log("errorHandler");
+    console.log("Error: " + error);
   }
 
-  // handle notification
+  // Handle notification
   function onNotification(e) {
     // trigger generic notification
     self.trigger('notification', e);
@@ -198,24 +206,19 @@ DL.Client.Cordova.PushNotification.prototype.register = function(options) {
  * Unregister device for Push Notifications
  * @method unregister
  */
-DL.Client.Cordova.PushNotification.prototype.unregister = function(options) {
+DL.Plugin.Cordova.PushNotification.prototype.unregister = function(options) {
 };
 
 /**
  * method _registerDevice
  */
-DL.Client.Cordova.PushNotification.prototype._registerDevice = function(id) {
+DL.Plugin.Cordova.PushNotification.prototype._registerDevice = function(id) {
   console.log("_registerDevice: " + id);
 
-  DL.Client.instance.post('push/register', {
+  this.client.post('push/registration', {
     device_id: id,
+    app_name: this.appVersion,
     app_version: this.appVersion,
     platform: device.platform.toLowerCase()
   });
 };
-
-/**
- * @property push
- * @type DL.Client.Cordova.PushNotification
- */
-DL.Client.prototype.cordova.push = new DL.Client.Cordova.PushNotification();

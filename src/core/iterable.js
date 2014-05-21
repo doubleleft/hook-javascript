@@ -75,7 +75,7 @@ DL.Iterable.prototype = {
     this.then(function(data) {
       var result = _[method].call(_, data, func, arg3);
       deferred.resolver.resolve(result);
-    }).catch(function(err) {
+    }, function(err) {
       deferred.resolver.reject(err);
     });
 

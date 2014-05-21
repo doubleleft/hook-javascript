@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 5/19/2014
+ * @build 5/20/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -58,9 +58,6 @@ DL.Client = function(options) {
   this.key = options.key;
   this.proxy = options.proxy;
 
-  // expose last static instance
-  DL.Client.instance = this;
-
   // append last slash if doesn't have it
   if (this.url.lastIndexOf('/') != this.url.length - 1) {
     this.url += "/";
@@ -85,6 +82,9 @@ DL.Client = function(options) {
    * @property {DL.System} system
    */
   this.system = new DL.System(this);
+
+  // Setup all registered plugins.
+  DL.Plugin.Manager.setup(this);
 };
 
 /**
@@ -441,11 +441,42 @@ DL.Iterable.prototype = {
     this.then(function(data) {
       var result = _[method].call(_, data, func, arg3);
       deferred.resolver.resolve(result);
-    }).catch(function(err) {
+    }, function(err) {
       deferred.resolver.reject(err);
     });
 
     return deferred.promise;
+  }
+};
+
+/**
+ * @module DL
+ * @class DL.PluginManager
+ * @constructor
+ * @static
+ */
+DL.Plugin = {};
+DL.Plugin.Manager = { plugins: [] };
+
+/**
+ * Register plugin to be instantiated on DL.Client
+ * @method register
+ * @param {Object} class
+ * @static
+ */
+DL.Plugin.Manager.register = function(path, klass) {
+  this.plugins.push({ path: path, klass: klass });
+};
+
+/**
+ * Register all plugins on target DL.Client
+ * @method setup
+ * @param {DL.Client} client
+ * @static
+ */
+DL.Plugin.Manager.setup = function(client) {
+  for (var i=0, l = this.plugins.length; i < l; i++) {
+    client[ this.plugins[i].path ] = new this.plugins[i].klass(client);
   }
 };
 
