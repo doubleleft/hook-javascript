@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 5/20/2014
+ * @build 5/21/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -867,7 +867,7 @@ DL.Collection.prototype.where = function(objects, _operation, _value) {
  *
  *     client.collection('posts').find(128371923).then(function(data) {
  *       console.log("Row:", data); // will never execute this
- *     }).catch(function(e) {
+ *     }).otherwise(function(e) {
  *       console.log("Not found.");
  *     });
  *
