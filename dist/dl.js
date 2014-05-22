@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 5/21/2014
+ * @build 5/22/2014
  */
 (function(window) {
   //
@@ -9262,7 +9262,7 @@ DL.Events.prototype.on = function(event, callback, context) {
 };
 
 DL.Events.prototype.trigger = function(event, data) {
-  var c, args = arguments.slice(1);
+  var c, args = Array.prototype.slice.call(arguments,1);
   if (this._events[event]) {
     for (var i=0,length=this._events[event].length;i<length;i++)  {
       c = this._events[event][i];
@@ -9348,7 +9348,7 @@ DL.Iterable.prototype = {
     this.then(function(data) {
       var result = _[method].call(_, data, func, arg3);
       deferred.resolver.resolve(result);
-    }, function(err) {
+    }).otherwise(function(err) {
       deferred.resolver.reject(err);
     });
 
@@ -10630,25 +10630,24 @@ DL.Channel.SSE.prototype.connect = function() {
   return this.publish('connected').then(function(data) {
     that.collection.where('updated_at', '>', data.updated_at);
 
-    var query = that.collection.buildQuery();
-
-    query['X-App-Id'] = that.collection.client.appId;
-    query['X-App-Key'] = that.collection.client.key;
+    var queryString = 'X-App-Id=' + that.collection.client.appId +
+      '&X-App-Key=' + that.collection.client.key;
 
     // Forward user authentication token, if it is set
-    var auth_token = window.localStorage.getItem(query['X-App-Id'] + '-' + DL.Auth.AUTH_TOKEN_KEY);
+    var auth_token = that.collection.client.auth.getToken();
     if (auth_token) {
-      query['X-Auth-Token'] = auth_token;
+      queryString += '&X-Auth-Token=' + auth_token;
     }
 
     // time to wait for retry, after connection closes
+    var query = that.collection.buildQuery();
     query.stream = {
       'refresh': that.options.refresh_timeout || 1,
       'retry': that.options.retry_timeout || 1
     };
 
     that.client_id = data.client_id;
-    that.event_source = new EventSource(that.collection.client.url + that.collection.segments + "?" + JSON.stringify(query), {
+    that.event_source = new EventSource(that.collection.client.url + that.collection.segments + "?" + queryString + "&" + JSON.stringify(query), {
       withCredentials: true
     });
 
