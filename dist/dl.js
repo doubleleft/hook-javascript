@@ -9440,7 +9440,7 @@ DL.Auth.prototype.setCurrentUser = function(data) {
     window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY, JSON.stringify(data));
 
     // trigger login event
-    this.trigger('logged_in');
+    this.trigger('logged_in', data);
   }
   return this;
 };
