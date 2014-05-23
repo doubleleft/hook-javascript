@@ -40,19 +40,20 @@ DL.Auth.AUTH_TOKEN_EXPIRATION = 'dl-api-auth-token-expiration';
  * @return {DL.Auth} this
  */
 DL.Auth.prototype.setCurrentUser = function(data) {
-  this.currentUser = data;
   if (!data) {
+    // trigger logout event
+    this.trigger('logged_out', this.currentUser);
+
     window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
     window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
-
-    // trigger logout event
-    this.trigger('logged_out');
   } else {
     window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY, JSON.stringify(data));
 
     // trigger login event
     this.trigger('logged_in', data);
   }
+  this.currentUser = data;
+
   return this;
 };
 
