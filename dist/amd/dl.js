@@ -1585,8 +1585,6 @@ DL.Channel.SSE = function(client, collection, options) {
   this.options = options || {};
   this.readyState = null;
 };
-DL.Channel.SSE.prototype = new DL.Channel();
-DL.Channel.SSE.prototype.constructor = DL.Channel.SSE;
 
 /**
  * Subscribe to channel. Publishes a 'connected' message on the first time.
@@ -1838,8 +1836,6 @@ DL.Channel.WEBSOCKETS = function(client, collection, options) {
     }
   });
 };
-DL.Channel.WEBSOCKETS.prototype = new DL.Channel();
-DL.Channel.WEBSOCKETS.prototype.constructor = DL.Channel.WEBSOCKETS;
 
 /**
  * Subscribe to channel. Publishes a 'connected' message on the first time.
@@ -1894,11 +1890,25 @@ DL.Channel.WEBSOCKETS.prototype.unsubscribe = function(event) {
  * @method publish
  * @param {String} event
  * @param {Object} message
+ * @param {Object} options 'exclude' and 'elegible' are optional options.
  * @return {DL.Channel}
  */
-DL.Channel.WEBSOCKETS.prototype.publish = function(event, message) { // , exclude, eligible
-  arguments[0] = this.collection.name + '.' + event;
-  this.ws.publish.apply(this.ws, arguments);
+DL.Channel.WEBSOCKETS.prototype.publish = function(event, message, options) {
+  var exclude = [], eligible = [];
+
+  if (typeof(options)==="undefined") {
+    options = {};
+  }
+
+  if (options.exclude && options.exclude instanceof Array) {
+    exclude = options.exclude;
+  }
+
+  if (options.eligible && options.eligible instanceof Array) {
+    eligible = options.eligible;
+  }
+
+  this.ws.publish(this.collection.name + '.' + event, message, exclude, eligible);
   return this;
 };
 

@@ -105,11 +105,25 @@ DL.Channel.WEBSOCKETS.prototype.unsubscribe = function(event) {
  * @method publish
  * @param {String} event
  * @param {Object} message
+ * @param {Object} options 'exclude' and 'elegible' are optional options.
  * @return {DL.Channel}
  */
-DL.Channel.WEBSOCKETS.prototype.publish = function(event, message) { // , exclude, eligible
-  arguments[0] = this.collection.name + '.' + event;
-  this.ws.publish.apply(this.ws, arguments);
+DL.Channel.WEBSOCKETS.prototype.publish = function(event, message, options) {
+  var exclude = [], eligible = [];
+
+  if (typeof(options)==="undefined") {
+    options = {};
+  }
+
+  if (options.exclude && options.exclude instanceof Array) {
+    exclude = options.exclude;
+  }
+
+  if (options.eligible && options.eligible instanceof Array) {
+    eligible = options.eligible;
+  }
+
+  this.ws.publish(this.collection.name + '.' + event, message, exclude, eligible);
   return this;
 };
 
