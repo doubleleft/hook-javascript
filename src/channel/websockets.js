@@ -51,8 +51,6 @@ DL.Channel.WEBSOCKETS = function(client, collection, options) {
     }
   });
 };
-DL.Channel.WEBSOCKETS.prototype = new DL.Channel();
-DL.Channel.WEBSOCKETS.prototype.constructor = DL.Channel.WEBSOCKETS;
 
 /**
  * Subscribe to channel. Publishes a 'connected' message on the first time.

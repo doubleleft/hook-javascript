@@ -15,8 +15,6 @@ DL.Channel.SSE = function(client, collection, options) {
   this.options = options || {};
   this.readyState = null;
 };
-DL.Channel.SSE.prototype = new DL.Channel();
-DL.Channel.SSE.prototype.constructor = DL.Channel.SSE;
 
 /**
  * Subscribe to channel. Publishes a 'connected' message on the first time.
