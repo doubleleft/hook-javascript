@@ -1019,6 +1019,14 @@ define(function (require) {
 			data = serialized.join('&');
 		}
 
+		// use ? or &, accourding to given url
+		if (method === 'GET' && data) {
+			url += (url.indexOf('?') >= 0) ? '&' + data : '?' + data;
+		}
+
+		// open connection
+		req.open(method, url, !sync);
+
 		// set timeout
 		if ('ontimeout' in req) {
 			req.timeout = timeout;
@@ -1040,27 +1048,15 @@ define(function (require) {
 			error(req.responseText, req.status);
 		};
 
-		// use ? or &, accourding to given url
-		if (method === 'GET' && data) {
-			url += (url.indexOf('?') >= 0) ? '&' + data : '?' + data;
-		}
-
-		// open connection
-		req.open(method, url, !sync);
-
-		// set headers
-		for (var header in headers) {
-			req.setRequestHeader(header, headers[header]);
-		}
+    if (typeof(req.setRequestHeader)!=="undefined") {
+		  // set headers
+		  for (var header in headers) {
+		  	req.setRequestHeader(header, headers[header]);
+		  }
+    }
 
 		// send it
-    if (typeof(window.XDomainRequest)!=="undefined" && req instanceof XDomainRequest) {
-      setTimeout(function() {
-        req.send(method !== 'GET' ? data : null);
-      }, 0);
-    } else {
-      req.send(method !== 'GET' ? data : null);
-    }
+    req.send(method !== 'GET' ? data : null);
 		return req;
 	};
 
