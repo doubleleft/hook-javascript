@@ -1,8 +1,7 @@
 /**
  * Channel implementations
  */
-DL.Channel = function() {
-};
+DL.Channel = {};
 
 // DL.Channel.Example = function(client, collection, options) {
 // };

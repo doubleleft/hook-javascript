@@ -709,8 +709,7 @@ DL.Auth.prototype._registerToken = function(data) {
 /**
  * Channel implementations
  */
-DL.Channel = function() {
-};
+DL.Channel = {};
 
 // DL.Channel.Example = function(client, collection, options) {
 // };
@@ -1807,12 +1806,15 @@ DL.Channel.SSE.prototype.close = function() {
  *     });
  */
 DL.Channel.WEBSOCKETS = function(client, collection, options) {
+  var that = this;
+
   this.client = client;
   this.collection = collection;
+  this.client_id = null;
 
   if (!options.url) {
     var scheme = window.location.protocol === 'https:' ? 'wss://' : 'ws://',
-        url = client.url.replace(/https?:\/\//, scheme);
+        url = client.url.replace(/(?:https?:)?\/\//, scheme)
 
     if (url.match(/index\.php/)) {
       url = url.replace("index.php", "ws/");
@@ -1829,7 +1831,12 @@ DL.Channel.WEBSOCKETS = function(client, collection, options) {
     options.url += '&X-Auth-Token=' + auth_token;
   }
 
-  this.ws = new Wampy(options.url);
+  var ws = this.ws = new Wampy(options.url, {
+    onConnect: function(data) {
+      // Fill client_id
+      that.client_id = ws._cache.sessionId;
+    }
+  });
 };
 DL.Channel.WEBSOCKETS.prototype = new DL.Channel();
 DL.Channel.WEBSOCKETS.prototype.constructor = DL.Channel.WEBSOCKETS;
