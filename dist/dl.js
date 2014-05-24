@@ -9189,7 +9189,12 @@ DL.Client.prototype.getPayload = function(method, data) {
         if (typeof(value)==='undefined' || value === null) {
           continue;
 
-        } if (value instanceof HTMLInputElement && value.files.length > 0) {
+        } else if (typeof(value)==="string") {
+          //
+          // Do nothing...
+          //
+          // IE8 can't compare instanceof String with HTMLInputElement. LOL
+        } else if (value instanceof HTMLInputElement && value.files && value.files.length > 0) {
           filename = value.files[0].name;
           value = value.files[0];
           worth = true;
