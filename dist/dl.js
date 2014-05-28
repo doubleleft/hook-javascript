@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 5/23/2014
+ * @build 5/28/2014
  */
 (function(window) {
   //
@@ -9433,6 +9433,7 @@ DL.Auth.prototype.setCurrentUser = function(data) {
   if (!data) {
     // trigger logout event
     this.trigger('logged_out', this.currentUser);
+    this.currentUser = data;
 
     window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
     window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
@@ -9440,9 +9441,9 @@ DL.Auth.prototype.setCurrentUser = function(data) {
     window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY, JSON.stringify(data));
 
     // trigger login event
+    this.currentUser = data;
     this.trigger('logged_in', data);
   }
-  this.currentUser = data;
 
   return this;
 };
@@ -10789,7 +10790,7 @@ DL.Channel.WEBSOCKETS.prototype.isConnected = function() {
  * @return {DL.Channel}
  */
 DL.Channel.WEBSOCKETS.prototype.unsubscribe = function(event) {
-  this.ws.subscribe(this.collection.name + '.' + event);
+  this.ws.unsubscribe(this.collection.name + '.' + event);
   return this;
 };
 
