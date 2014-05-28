@@ -65,7 +65,7 @@ DL.Collection.prototype.get = function() {
  * Add `where` param
  * @method where
  * @param {Object | String} where params or field name
- * @param {String} operation '<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between'
+ * @param {String} operation '<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between', 'like'
  * @param {String} value value
  * @return {DL.Collection} this
  *
@@ -90,6 +90,12 @@ DL.Collection.prototype.get = function() {
  * @example Filtering 'in' value list.
  *
  *     client.collection('posts').where('author_id', 'in', [500, 501]).then(function(result) {
+ *       console.log(result);
+ *     })
+ *
+ * @example Partial String matching
+ *
+ *     client.collection('posts').where('author', 'like', '%Silva%').then(function(result) {
  *       console.log(result);
  *     })
  *
