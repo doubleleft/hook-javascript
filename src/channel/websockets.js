@@ -44,13 +44,21 @@ DL.Channel.WEBSOCKETS = function(client, collection, options) {
     options.url += '&X-Auth-Token=' + auth_token;
   }
 
-  var ws = this.ws = new Wampy(options.url, {
-    onConnect: function(data) {
-      // Fill client_id
-      that.client_id = ws._cache.sessionId;
-    }
+  if (options.debug) {
+    ab.debug(true, true);
+  }
+
+  ab.connect(options.url, function(session) {
+    that.ws = session;
+    that.client_id = session.sessionid();
+    that.trigger('connected');
   });
 };
+
+// Inherits from Events
+
+DL.Channel.WEBSOCKETS.prototype = new DL.Events();
+DL.Channel.WEBSOCKETS.prototype.constructor = DL.Channel.WEBSOCKETS;
 
 /**
  * Subscribe to channel. Publishes a 'connected' message on the first time.
@@ -76,7 +84,9 @@ DL.Channel.WEBSOCKETS = function(client, collection, options) {
  *
  */
 DL.Channel.WEBSOCKETS.prototype.subscribe = function(event, callback) {
-  this.ws.subscribe(this.collection.name + '.' + event, callback);
+  this.ws.subscribe(this.collection.name + '.' + event, function(topic, data) {
+    callback(data);
+  });
   return this;
 };
 
@@ -86,7 +96,7 @@ DL.Channel.WEBSOCKETS.prototype.subscribe = function(event, callback) {
  * @return {Boolean}
  */
 DL.Channel.WEBSOCKETS.prototype.isConnected = function() {
-  return this.ws._isInitialized && this.ws._ws.readyState === 1;
+  return this.ws && this.ws._websocket_connected;
 };
 
 /**

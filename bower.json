@@ -22,7 +22,7 @@
 
     "blueimp-canvas-to-blob": "~2.1.0",
     "eventsource": "Yaffle/EventSource",
-    "wampy": "KSDaemon/wampy.js#05536077d2f39355ea41ff9678a9c9b3e5cde91d"
+    "AutobahnJS": "tavendo/AutobahnJS#v0.8.2"
   },
   "devDependencies": {
     "backbone": "~1.1.2",
