@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 5/29/2014
+ * @build 5/30/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -1841,6 +1841,10 @@ DL.Channel.WEBSOCKETS = function(client, collection, options) {
     options.url += '&X-Auth-Token=' + auth_token;
   }
 
+  if (options.debug) {
+    ab.debug(true, true);
+  }
+
   ab.connect(options.url, function(session) {
     that.ws = session;
     that.client_id = session.sessionid();
@@ -1936,7 +1940,9 @@ DL.Channel.WEBSOCKETS.prototype.publish = function(event, message, options) {
  * @return {DL.Channel} this
  */
 DL.Channel.WEBSOCKETS.prototype.disconnect = function() {
-  this.ws.disconnect();
+  if(this.ws != null){
+    this.ws.disconnect();
+  }
   return this;
 };
 

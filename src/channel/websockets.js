@@ -143,7 +143,9 @@ DL.Channel.WEBSOCKETS.prototype.publish = function(event, message, options) {
  * @return {DL.Channel} this
  */
 DL.Channel.WEBSOCKETS.prototype.disconnect = function() {
-  this.ws.disconnect();
+  if(this.ws != null){
+    this.ws.disconnect();
+  }
   return this;
 };
 
