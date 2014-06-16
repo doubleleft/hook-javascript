@@ -44,9 +44,8 @@ DL.Channel.WEBSOCKETS = function(client, collection, options) {
     options.url += '&X-Auth-Token=' + auth_token;
   }
 
-  if (options.debug) {
-    ab.debug(true, true);
-  }
+  // WAMP message debugging
+  ab.debug(options.debug === true, options.verbose === true);
 
   ab.connect(options.url, function(session) {
     that.ws = session;
