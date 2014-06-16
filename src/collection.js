@@ -108,6 +108,7 @@ DL.Collection.prototype.where = function(objects, _operation, _value) {
   if (typeof(objects)==="object") {
     for (field in objects) {
       if (objects.hasOwnProperty(field)) {
+        operation = '=';
         if (objects[field] instanceof Array) {
           operation = objects[field][0];
           value = objects[field][1];
@@ -471,6 +472,12 @@ DL.Collection.prototype.drop = function() {
  * @example Deleting a row by id
  *
  *     client.collection('posts').remove(1).then(function(data) {
+ *       console.log("Success:", data.success);
+ *     });
+ *
+ * @example Deleting multiple rows
+ *
+ *     client.collection('ranking').where('score', 0).remove().then(function(data) {
  *       console.log("Success:", data.success);
  *     });
  */
