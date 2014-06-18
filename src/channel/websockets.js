@@ -105,7 +105,9 @@ DL.Channel.WEBSOCKETS.prototype.isConnected = function() {
  * @return {DL.Channel}
  */
 DL.Channel.WEBSOCKETS.prototype.unsubscribe = function(event) {
-  this.ws.unsubscribe(this.collection.name + '.' + event);
+  if (this.ws._subscriptions[this.collection.name + '.' + event]) {
+    this.ws.unsubscribe(this.collection.name + '.' + event);
+  }
   return this;
 };
 
