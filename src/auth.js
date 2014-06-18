@@ -42,7 +42,7 @@ DL.Auth.AUTH_TOKEN_EXPIRATION = 'dl-api-auth-token-expiration';
 DL.Auth.prototype.setCurrentUser = function(data) {
   if (!data) {
     // trigger logout event
-    this.trigger('logged_out', this.currentUser);
+    this.trigger('logout', this.currentUser);
     this.currentUser = data;
 
     window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
@@ -52,7 +52,7 @@ DL.Auth.prototype.setCurrentUser = function(data) {
 
     // trigger login event
     this.currentUser = data;
-    this.trigger('logged_in', data);
+    this.trigger('login', data);
   }
 
   return this;
