@@ -45,12 +45,15 @@ DL.Channel.WEBSOCKETS = function(client, collection, options) {
   }
 
   // WAMP message debugging
-  ab.debug(options.debug === true, options.verbose === true);
+  ab.debug(options.debug === true, options.verbose === true, options.debug === true);
 
   ab.connect(options.url, function(session) {
     that.ws = session;
     that.client_id = session.sessionid();
     that.trigger('connected');
+  }, null, {
+    retryDelay: 1000,
+    maxRetries: 10
   });
 };
 
@@ -105,7 +108,7 @@ DL.Channel.WEBSOCKETS.prototype.isConnected = function() {
  * @return {DL.Channel}
  */
 DL.Channel.WEBSOCKETS.prototype.unsubscribe = function(event) {
-  if (this.ws._subscriptions[this.collection.name + '.' + event]) {
+  if (this.ws && this.ws._subscriptions[this.collection.name + '.' + event]) {
     this.ws.unsubscribe(this.collection.name + '.' + event);
   }
   return this;

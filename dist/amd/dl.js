@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 5/30/2014
+ * @build 6/23/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -529,7 +529,7 @@ DL.Auth.AUTH_TOKEN_EXPIRATION = 'dl-api-auth-token-expiration';
 DL.Auth.prototype.setCurrentUser = function(data) {
   if (!data) {
     // trigger logout event
-    this.trigger('logged_out', this.currentUser);
+    this.trigger('logout', this.currentUser);
     this.currentUser = data;
 
     window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
@@ -539,7 +539,7 @@ DL.Auth.prototype.setCurrentUser = function(data) {
 
     // trigger login event
     this.currentUser = data;
-    this.trigger('logged_in', data);
+    this.trigger('login', data);
   }
 
   return this;
@@ -845,6 +845,7 @@ DL.Collection.prototype.where = function(objects, _operation, _value) {
   if (typeof(objects)==="object") {
     for (field in objects) {
       if (objects.hasOwnProperty(field)) {
+        operation = '=';
         if (objects[field] instanceof Array) {
           operation = objects[field][0];
           value = objects[field][1];
@@ -1208,6 +1209,12 @@ DL.Collection.prototype.drop = function() {
  * @example Deleting a row by id
  *
  *     client.collection('posts').remove(1).then(function(data) {
+ *       console.log("Success:", data.success);
+ *     });
+ *
+ * @example Deleting multiple rows
+ *
+ *     client.collection('ranking').where('score', 0).remove().then(function(data) {
  *       console.log("Success:", data.success);
  *     });
  */
@@ -1841,14 +1848,16 @@ DL.Channel.WEBSOCKETS = function(client, collection, options) {
     options.url += '&X-Auth-Token=' + auth_token;
   }
 
-  if (options.debug) {
-    ab.debug(true, true);
-  }
+  // WAMP message debugging
+  ab.debug(options.debug === true, options.verbose === true, options.debug === true);
 
   ab.connect(options.url, function(session) {
     that.ws = session;
     that.client_id = session.sessionid();
     that.trigger('connected');
+  }, null, {
+    retryDelay: 1000,
+    maxRetries: 10
   });
 };
 
@@ -1903,7 +1912,9 @@ DL.Channel.WEBSOCKETS.prototype.isConnected = function() {
  * @return {DL.Channel}
  */
 DL.Channel.WEBSOCKETS.prototype.unsubscribe = function(event) {
-  this.ws.unsubscribe(this.collection.name + '.' + event);
+  if (this.ws && this.ws._subscriptions[this.collection.name + '.' + event]) {
+    this.ws.unsubscribe(this.collection.name + '.' + event);
+  }
   return this;
 };
 
