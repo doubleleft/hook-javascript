@@ -293,7 +293,10 @@ DL.Client.prototype.getPayload = function(method, data) {
           try {
             formdata.append(field, value, filename || "file");
           } catch (e) {
-            formdata.append(field, value);
+            try {
+              // on cli-console (nodejs), here throwns error when using Collection.updateAll
+              formdata.append(field, value);
+            } catch (e2) {}
           }
         }
 

@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 6/23/2014
+ * @build 6/24/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -316,7 +316,10 @@ DL.Client.prototype.getPayload = function(method, data) {
           try {
             formdata.append(field, value, filename || "file");
           } catch (e) {
-            formdata.append(field, value);
+            try {
+              // on cli-console (nodejs), here throwns error when using Collection.updateAll
+              formdata.append(field, value);
+            } catch (e2) {}
           }
         }
 
