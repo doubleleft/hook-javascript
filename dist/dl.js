@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 6/26/2014
+ * @build 7/1/2014
  */
 (function(window) {
   //
@@ -10129,15 +10129,6 @@ DL.Auth.prototype.register = function(provider, data) {
 };
 
 /**
- * @method authenticate
- * @see register
- */
-DL.Auth.prototype.authenticate = function() {
-  console.log("auth.authenticate method is deprecated. Please use auth.register.");
-  return this.register.apply(this, arguments);
-};
-
-/**
  * Verify if user is already registered, and log-in if succeed.
  * @method login
  * @param {String} provider
@@ -10157,20 +10148,11 @@ DL.Auth.prototype.authenticate = function() {
 DL.Auth.prototype.login = function(provider, data) {
   var promise, that = this;
   if (typeof(data)==="undefined") { data = {}; }
-  promise = this.client.post('auth/' + provider + '/verify', data);
+  promise = this.client.post('auth/' + provider + '/login', data);
   promise.then(function(data) {
     that._registerToken(data);
   });
   return promise;
-};
-
-/**
- * @method verify
- * @see login
- */
-DL.Auth.prototype.verify = function() {
-  console.log("auth.verify method is deprecated. Please use auth.login.");
-  return this.login.apply(this, arguments);
 };
 
 /**
@@ -11228,6 +11210,7 @@ DL.Channel.SSE.prototype.subscribe = function(event, callback) {
 /**
  */
 DL.Channel.SSE.prototype._trigger = function(event, data) {
+  console.log("Trigger: ", event, data);
   // always try to dispatch default message handler
   if (event.indexOf('state:')===-1 && this.callbacks._default) {
     this.callbacks._default.apply(this, [event, data]);

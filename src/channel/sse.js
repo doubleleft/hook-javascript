@@ -91,6 +91,7 @@ DL.Channel.SSE.prototype.subscribe = function(event, callback) {
 /**
  */
 DL.Channel.SSE.prototype._trigger = function(event, data) {
+  console.log("Trigger: ", event, data);
   // always try to dispatch default message handler
   if (event.indexOf('state:')===-1 && this.callbacks._default) {
     this.callbacks._default.apply(this, [event, data]);
