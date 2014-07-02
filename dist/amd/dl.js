@@ -847,7 +847,6 @@ DL.Collection.prototype.where = function(objects, _operation, _value) {
   return this;
 };
 
-
 /**
  * Find first item by _id
  * @method find
@@ -877,6 +876,39 @@ DL.Collection.prototype.find = function(_id) {
   }
   return promise;
 };
+
+/**
+ * Set the relationships that should be eager loaded.
+ * @method with
+ * @param {String} ...
+ * @return {DL.Collection}
+ *
+ * @example Simple relationship
+ *
+ *     client.collection('books').with('author').each(function(book) {
+ *       console.log("Author: ", book.author.name);
+ *     });
+ *
+ * @example Multiple relationships
+ *
+ *     client.collection('books').with('author', 'publisher').each(function(book) {
+ *       console.log("Author: ", book.author.name);
+ *       console.log("Publisher: ", book.publisher.name);
+ *     });
+ *
+ * @example Nested relationships
+ *
+ *     client.collection('books').with('author.contacts').each(function(book) {
+ *       console.log("Author: ", book.author.name);
+ *       console.log("Contacts: ", book.author.contacts);
+ *     });
+ *
+ */
+DL.Collection.prototype.with = function() {
+  this.options.with = arguments;
+  return this;
+};
+
 
 /**
  * Group results by field
@@ -1065,6 +1097,7 @@ DL.Collection.prototype.reset = function() {
   this._group = [];
   this._limit = null;
   this._offset = null;
+  this._remember = null;
   return this;
 };
 
@@ -1128,6 +1161,25 @@ DL.Collection.prototype.limit = function(int) {
  */
 DL.Collection.prototype.offset = function(int) {
   this._offset = int;
+  return this;
+};
+
+/**
+ * Indicate that the query results should be cached.
+ *
+ * @method remember
+ * @param {Number} minutes
+ * @return {DL.Collection} this
+ *
+ * @example Caching a query
+ *
+ *     client.collection('posts').sort('updated_at', -1).limit(5).remember(10).then(function(data) {
+ *       // ...
+ *     });
+ *
+ */
+DL.Collection.prototype.remember = function(minutes) {
+  this._remember = minutes;
   return this;
 };
 
@@ -1312,9 +1364,10 @@ DL.Collection.prototype._validateName = function(name) {
 DL.Collection.prototype.buildQuery = function() {
   var query = {};
 
-  // apply limit / offset
+  // apply limit / offset and remember
   if (this._limit !== null) { query.limit = this._limit; }
   if (this._offset !== null) { query.offset = this._offset; }
+  if (this._remember !== null) { query.remember = this._remember; }
 
   // apply wheres
   if (this.wheres.length > 0) {
@@ -1336,7 +1389,8 @@ DL.Collection.prototype.buildQuery = function() {
     first: 'f',
     aggregation: 'aggr',
     operation: 'op',
-    data: 'data'
+    data: 'data',
+    with: 'with'
   };
 
   for (f in shortnames) {
@@ -1350,7 +1404,6 @@ DL.Collection.prototype.buildQuery = function() {
 
   return query;
 };
-
 
 /**
  * module DL
@@ -1547,6 +1600,7 @@ DL.Pagination.prototype.isFetching = function() {
 
 DL.Pagination.prototype.then = function() {
 };
+
 
 /**
  * @module DL
