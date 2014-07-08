@@ -1,7 +1,7 @@
-window.client = new DL.Client({
-  url: "http://dl-api.dev/index.php/",
+window.client = new Hook.Client({
+  url: "http://hook.dev/index.php/",
   appId: '1',
-  key: "4c5f2f5ed5cebe26955829ab948128fc"
+  key: "006f04b4f723c9920e259a746f9318be"
 });
 
 window.ascii_rand = function(length) {
@@ -14,7 +14,7 @@ window.ascii_rand = function(length) {
 }
 
 test("API", function() {
-  ok( client.url == "http://dl-api.dev/index.php/", "url OK");
+  ok( client.url == "http://hook.dev/index.php/", "url OK");
   ok( client.appId == "1", "'appId' OK");
-  ok( client.key == "4c5f2f5ed5cebe26955829ab948128fc", "'secret' OK");
+  ok( client.key == "006f04b4f723c9920e259a746f9318be", "'secret' OK");
 });

@@ -24,7 +24,7 @@ javascripts:
     - 'src/*.js'
     - 'src/channel/*.js'
     - 'src/wrap/end.js'
-  dest: 'dist/dl.js'
+  dest: 'dist/hook.js'
 
 amd:
   src:
@@ -33,7 +33,7 @@ amd:
     - 'src/*.js'
     - 'src/channel/*.js'
     - 'src/wrap/amd-end.js'
-  dest: 'dist/amd/dl.js'
+  dest: 'dist/amd/hook.js'
 
 plugin_backbone:
   src:

@@ -1,18 +1,18 @@
 /**
- * DL.Client is the entry-point for using dl-api.
+ * Hook.Client is the entry-point for using dl-api.
  *
  * You should instantiate a global javascript client for consuming dl-api.
  *
  * ```javascript
- * window.dl = new DL.Client({
+ * window.dl = new Hook.Client({
  *   url: "http://local-or-remote-dl-api-address.com/api/public/index.php/",
  *   appId: 1,    // your app's id
  *   key: 'test'  // your app's public key
  * });
  * ```
  *
- * @module DL
- * @class DL.Client
+ * @module Hook
+ * @class Hook.Client
  *
  * @param {Object} options
  *   @param {String} options.appId
@@ -29,7 +29,7 @@ if(typeof(window.FormData)==="undefined"){
     window.FormData = function(){ this.append=function(){}; };
 }
 
-DL.Client = function(options) {
+Hook.Client = function(options) {
   this.url = options.url || "http://dl-api.dev/api/public/index.php/";
   this.appId = options.appId;
   this.key = options.key;
@@ -41,34 +41,34 @@ DL.Client = function(options) {
   }
 
   /**
-   * @property {DL.KeyValues} keys
+   * @property {Hook.KeyValues} keys
    */
-  this.keys = new DL.KeyValues(this);
+  this.keys = new Hook.KeyValues(this);
 
   /**
-   * @property {DL.Auth} auth
+   * @property {Hook.Auth} auth
    */
-  this.auth = new DL.Auth(this);
+  this.auth = new Hook.Auth(this);
 
   /**
-   * @property {DL.Fiels} files
+   * @property {Hook.Fiels} files
    */
-  this.files = new DL.Files(this);
+  this.files = new Hook.Files(this);
 
   /**
-   * @property {DL.System} system
+   * @property {Hook.System} system
    */
-  this.system = new DL.System(this);
+  this.system = new Hook.System(this);
 
   // Setup all registered plugins.
-  DL.Plugin.Manager.setup(this);
+  Hook.Plugin.Manager.setup(this);
 };
 
 /**
  * Get collection instance.
  * @method collection
  * @param {String} collectionName
- * @return {DL.Collection}
+ * @return {Hook.Collection}
  *
  * @example Retrieve a collection reference. Your collection tables are created on demand.
  *
@@ -79,8 +79,8 @@ DL.Client = function(options) {
  *     var highscores = client.collection('highscores');
  *
  */
-DL.Client.prototype.collection = function(collectionName) {
-  return new DL.Collection(this, collectionName);
+Hook.Client.prototype.collection = function(collectionName) {
+  return new Hook.Collection(this, collectionName);
 };
 
 /**
@@ -88,7 +88,7 @@ DL.Client.prototype.collection = function(collectionName) {
  * @method channel
  * @param {String} name
  * @param {Object} options (optional)
- * @return {DL.Channel}
+ * @return {Hook.Channel}
  *
  * @example Create a channel using Servet-Sent Events transport.
  *
@@ -99,7 +99,7 @@ DL.Client.prototype.collection = function(collectionName) {
  *     var channel = client.channel('messages', { transport: "websockets" });
  *
  */
-DL.Client.prototype.channel = function(name, options) {
+Hook.Client.prototype.channel = function(name, options) {
   if (typeof(options)==="undefined") { options = {}; }
 
   var collection = this.collection(name);
@@ -109,7 +109,7 @@ DL.Client.prototype.channel = function(name, options) {
   if (!options.transport) { options.transport = 'sse'; }
   options.transport = options.transport.toUpperCase();
 
-  return new DL.Channel[options.transport](this, collection, options);
+  return new Hook.Channel[options.transport](this, collection, options);
 };
 
 /**
@@ -117,7 +117,7 @@ DL.Client.prototype.channel = function(name, options) {
  * @param {String} segments
  * @param {Object} data
  */
-DL.Client.prototype.post = function(segments, data) {
+Hook.Client.prototype.post = function(segments, data) {
   if (typeof(data)==="undefined") {
     data = {};
   }
@@ -129,7 +129,7 @@ DL.Client.prototype.post = function(segments, data) {
  * @param {String} segments
  * @param {Object} data
  */
-DL.Client.prototype.get = function(segments, data) {
+Hook.Client.prototype.get = function(segments, data) {
   return this.request(segments, "GET", data);
 };
 
@@ -138,7 +138,7 @@ DL.Client.prototype.get = function(segments, data) {
  * @param {String} segments
  * @param {Object} data
  */
-DL.Client.prototype.put = function(segments, data) {
+Hook.Client.prototype.put = function(segments, data) {
   return this.request(segments, "PUT", data);
 };
 
@@ -146,7 +146,7 @@ DL.Client.prototype.put = function(segments, data) {
  * @method delete
  * @param {String} segments
  */
-DL.Client.prototype.remove = function(segments, data) {
+Hook.Client.prototype.remove = function(segments, data) {
   return this.request(segments, "DELETE", data);
 };
 
@@ -156,7 +156,7 @@ DL.Client.prototype.remove = function(segments, data) {
  * @param {String} method
  * @param {Object} data
  */
-DL.Client.prototype.request = function(segments, method, data) {
+Hook.Client.prototype.request = function(segments, method, data) {
   var payload, request_headers, deferred = when.defer(),
       synchronous = false;
 
@@ -223,7 +223,7 @@ DL.Client.prototype.request = function(segments, method, data) {
  * @method getHeaders
  * @return {Object}
  */
-DL.Client.prototype.getHeaders = function() {
+Hook.Client.prototype.getHeaders = function() {
   // App authentication request headers
   var request_headers = {
     'X-App-Id': this.appId,
@@ -245,7 +245,7 @@ DL.Client.prototype.getHeaders = function() {
  * @param {Object} data
  * @return {String|FormData}
  */
-DL.Client.prototype.getPayload = function(method, data) {
+Hook.Client.prototype.getPayload = function(method, data) {
   var payload = null;
   if (data) {
 
@@ -315,7 +315,7 @@ DL.Client.prototype.getPayload = function(method, data) {
   return payload;
 }
 
-DL.Client.prototype.serialize = function(obj, prefix) {
+Hook.Client.prototype.serialize = function(obj, prefix) {
   var str = [];
   for (var p in obj) {
     if (obj.hasOwnProperty(p)) {

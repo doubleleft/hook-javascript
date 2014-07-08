@@ -1,10 +1,10 @@
-asyncTest("Plugin: Backbone.DLCollection", function() {
+asyncTest("Plugin: Backbone.HookCollection", function() {
   expect(1);
 
-  Backbone.dlapi = client;
+  Backbone.hook = client;
 
-  var Post = Backbone.DLModel.extend({name: 'posts'});
-  var PostCollection = Backbone.DLCollection.extend({
+  var Post = Backbone.HookModel.extend({name: 'posts'});
+  var PostCollection = Backbone.HookCollection.extend({
     model: Post,
     getLast: function() {
       this.remote.sort('created_at', -1).limit(5);

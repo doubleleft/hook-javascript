@@ -1,16 +1,16 @@
 /**
- * @module DL.Plugin
+ * @module Hook.Plugin
  * @class Cordova
  */
-DL.Plugin.Cordova = function(client) {
+Hook.Plugin.Cordova = function(client) {
   this.client = client;
 
   /**
    * @property push
-   * @type DL.Plugin.Cordova.PushNotification
+   * @type Hook.Plugin.Cordova.PushNotification
    */
-  this.push = new DL.Plugin.Cordova.PushNotification(client);
+  this.push = new Hook.Plugin.Cordova.PushNotification(client);
 };
 
 // Register plugin
-DL.Plugin.Manager.register('cordova', DL.Plugin.Cordova);
+Hook.Plugin.Manager.register('cordova', Hook.Plugin.Cordova);

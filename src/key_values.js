@@ -1,11 +1,11 @@
 /**
- * @module DL
- * @class DL.KeyValues
+ * @module Hook
+ * @class Hook.KeyValues
  *
- * @param {DL.Client} client
+ * @param {Hook.Client} client
  * @constructor
  */
-DL.KeyValues = function(client) {
+Hook.KeyValues = function(client) {
   this.client = client;
 };
 
@@ -21,7 +21,7 @@ DL.KeyValues = function(client) {
  *       console.log(key.value);
  *     });
  */
-DL.KeyValues.prototype.get = function(key, callback) {
+Hook.KeyValues.prototype.get = function(key, callback) {
   var promise = this.client.get('key/' + key);
   if (callback) {
     promise.then.apply(promise, [callback]);
@@ -41,6 +41,6 @@ DL.KeyValues.prototype.get = function(key, callback) {
  *       console.log(key);
  *     });
  */
-DL.KeyValues.prototype.set = function(key, value) {
+Hook.KeyValues.prototype.set = function(key, value) {
   return this.client.post('key/' + key, { value: value });
 };

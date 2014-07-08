@@ -1,17 +1,23 @@
-asyncTest("Key-value Store", function() {
-  expect(2);
-
-  client.keys.get('something').then(function(data) {
-    ok(true, "GET");
-  });
+asyncTest("Key-value: set", function() {
+  expect(1);
 
   client.keys.set('something', 'data').then(function(data) {
     ok(data.value == "data", "SET");
+  }).done(function() {
     start();
   });
 
-  setTimeout(function() {
-  }, 200);
+});
+
+asyncTest("Key-value: get", function() {
+  expect(1);
+
+  client.keys.get('something').then(function(data) {
+    ok(true, "GET");
+  }).done(function() {
+    start();
+  });
+
 
 });
 

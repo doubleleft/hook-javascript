@@ -1,4 +1,4 @@
-test("Collection internals", function() {
+test("Collection: Internal behaviour", function() {
   var posts = client.collection('posts');
 
   //

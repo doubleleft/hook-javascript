@@ -1,10 +1,10 @@
 /**
  * Iterable is for internal use only.
- * @module DL
- * @class DL.Iterable
+ * @module Hook
+ * @class Hook.Iterable
  */
-DL.Iterable = function() { };
-DL.Iterable.prototype = {
+Hook.Iterable = function() { };
+Hook.Iterable.prototype = {
   /**
    * @method each
    * @param {Function} func

@@ -8,10 +8,10 @@
  */
 
 /**
- * @class DL.Plugin.Cordova.PushNotification
- * @extends DL.Events
+ * @class Hook.Plugin.Cordova.PushNotification
+ * @extends Hook.Events
  */
-DL.Plugin.Cordova.PushNotification = function(client) {
+Hook.Plugin.Cordova.PushNotification = function(client) {
   var self = this;
 
   this.client = client;
@@ -29,8 +29,8 @@ DL.Plugin.Cordova.PushNotification = function(client) {
 };
 
 // Inherits from Events
-DL.Plugin.Cordova.PushNotification.prototype = new DL.Events();
-DL.Plugin.Cordova.PushNotification.constructor = DL.Plugin.Cordova.PushNotification;
+Hook.Plugin.Cordova.PushNotification.prototype = new Hook.Events();
+Hook.Plugin.Cordova.PushNotification.constructor = Hook.Plugin.Cordova.PushNotification;
 
 // References:
 // http://androidexample.com/Android_Push_Notifications_using_Google_Cloud_Messaging_GCM/index.php?view=article_discription&aid=119&aaid=139
@@ -41,7 +41,7 @@ DL.Plugin.Cordova.PushNotification.constructor = DL.Plugin.Cordova.PushNotificat
 /**
  * Register device for Push Notifications
  * @method register
- * @return DL.Plugin.Cordova.PushNotification
+ * @return Hook.Plugin.Cordova.PushNotification
  *
  * @example Registering for push notifications on Android
  *
@@ -59,7 +59,7 @@ DL.Plugin.Cordova.PushNotification.constructor = DL.Plugin.Cordova.PushNotificat
  *       console.log("Notification: ", e);
  *     });
  */
-DL.Plugin.Cordova.PushNotification.prototype.register = function(options) {
+Hook.Plugin.Cordova.PushNotification.prototype.register = function(options) {
   var self = this,
       name  = null,
       registerOptions = {
@@ -206,13 +206,13 @@ DL.Plugin.Cordova.PushNotification.prototype.register = function(options) {
  * Unregister device for Push Notifications
  * @method unregister
  */
-DL.Plugin.Cordova.PushNotification.prototype.unregister = function(options) {
+Hook.Plugin.Cordova.PushNotification.prototype.unregister = function(options) {
 };
 
 /**
  * method _registerDevice
  */
-DL.Plugin.Cordova.PushNotification.prototype._registerDevice = function(id) {
+Hook.Plugin.Cordova.PushNotification.prototype._registerDevice = function(id) {
   console.log("_registerDevice: " + id);
 
   this.client.post('push/registration', {

@@ -1,8 +1,8 @@
 /**
- * @module DL
- * @class DL.Files
+ * @module Hook
+ * @class Hook.Files
  */
-DL.Files = function(client) {
+Hook.Files = function(client) {
   this.client = client;
 };
 
@@ -13,7 +13,7 @@ DL.Files = function(client) {
  * @param {String} mimeType [optional]
  * @return {Promise}
  */
-DL.Files.prototype.upload = function(data, fileName, mimeType){
+Hook.Files.prototype.upload = function(data, fileName, mimeType){
   var formData = new FormData();
   if(data instanceof HTMLCanvasElement && data.toBlob){
 	var deferred = when.defer();
@@ -39,7 +39,7 @@ DL.Files.prototype.upload = function(data, fileName, mimeType){
  * @param {Number|String} _id
  * @return {Promise}
  */
-DL.Files.prototype.get = function(_id) {
+Hook.Files.prototype.get = function(_id) {
   return this.client.get('files/' + _id);
 };
 
@@ -49,6 +49,6 @@ DL.Files.prototype.get = function(_id) {
  * @param {Number|String} _id
  * @return {Promise}
  */
-DL.Files.prototype.remove = function(_id) {
+Hook.Files.prototype.remove = function(_id) {
   return this.client.remove('files/' + _id);
 };

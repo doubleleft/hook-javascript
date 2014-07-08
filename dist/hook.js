@@ -1,9 +1,9 @@
 /*
- * dl-api-javascript v0.1.0
- * https://github.com/doubleleft/dl-api-javascript
+ * hook-javascript v0.1.0
+ * https://github.com/doubleleft/hook-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 7/1/2014
+ * @build 7/8/2014
  */
 (function(window) {
   //
@@ -9555,32 +9555,32 @@ var global = this;
 }));
 
 /**
- * @module DL
+ * @module Hook
  */
-var DL = {
+var Hook = {
   VERSION: "0.1.0",
   defaults: {
     perPage: 50
   }
 };
 
-window.DL = DL;
+window.Hook = Hook;
 
 /**
- * DL.Client is the entry-point for using dl-api.
+ * Hook.Client is the entry-point for using dl-api.
  *
  * You should instantiate a global javascript client for consuming dl-api.
  *
  * ```javascript
- * window.dl = new DL.Client({
+ * window.dl = new Hook.Client({
  *   url: "http://local-or-remote-dl-api-address.com/api/public/index.php/",
  *   appId: 1,    // your app's id
  *   key: 'test'  // your app's public key
  * });
  * ```
  *
- * @module DL
- * @class DL.Client
+ * @module Hook
+ * @class Hook.Client
  *
  * @param {Object} options
  *   @param {String} options.appId
@@ -9597,7 +9597,7 @@ if(typeof(window.FormData)==="undefined"){
     window.FormData = function(){ this.append=function(){}; };
 }
 
-DL.Client = function(options) {
+Hook.Client = function(options) {
   this.url = options.url || "http://dl-api.dev/api/public/index.php/";
   this.appId = options.appId;
   this.key = options.key;
@@ -9609,34 +9609,34 @@ DL.Client = function(options) {
   }
 
   /**
-   * @property {DL.KeyValues} keys
+   * @property {Hook.KeyValues} keys
    */
-  this.keys = new DL.KeyValues(this);
+  this.keys = new Hook.KeyValues(this);
 
   /**
-   * @property {DL.Auth} auth
+   * @property {Hook.Auth} auth
    */
-  this.auth = new DL.Auth(this);
+  this.auth = new Hook.Auth(this);
 
   /**
-   * @property {DL.Fiels} files
+   * @property {Hook.Fiels} files
    */
-  this.files = new DL.Files(this);
+  this.files = new Hook.Files(this);
 
   /**
-   * @property {DL.System} system
+   * @property {Hook.System} system
    */
-  this.system = new DL.System(this);
+  this.system = new Hook.System(this);
 
   // Setup all registered plugins.
-  DL.Plugin.Manager.setup(this);
+  Hook.Plugin.Manager.setup(this);
 };
 
 /**
  * Get collection instance.
  * @method collection
  * @param {String} collectionName
- * @return {DL.Collection}
+ * @return {Hook.Collection}
  *
  * @example Retrieve a collection reference. Your collection tables are created on demand.
  *
@@ -9647,8 +9647,8 @@ DL.Client = function(options) {
  *     var highscores = client.collection('highscores');
  *
  */
-DL.Client.prototype.collection = function(collectionName) {
-  return new DL.Collection(this, collectionName);
+Hook.Client.prototype.collection = function(collectionName) {
+  return new Hook.Collection(this, collectionName);
 };
 
 /**
@@ -9656,7 +9656,7 @@ DL.Client.prototype.collection = function(collectionName) {
  * @method channel
  * @param {String} name
  * @param {Object} options (optional)
- * @return {DL.Channel}
+ * @return {Hook.Channel}
  *
  * @example Create a channel using Servet-Sent Events transport.
  *
@@ -9667,7 +9667,7 @@ DL.Client.prototype.collection = function(collectionName) {
  *     var channel = client.channel('messages', { transport: "websockets" });
  *
  */
-DL.Client.prototype.channel = function(name, options) {
+Hook.Client.prototype.channel = function(name, options) {
   if (typeof(options)==="undefined") { options = {}; }
 
   var collection = this.collection(name);
@@ -9677,7 +9677,7 @@ DL.Client.prototype.channel = function(name, options) {
   if (!options.transport) { options.transport = 'sse'; }
   options.transport = options.transport.toUpperCase();
 
-  return new DL.Channel[options.transport](this, collection, options);
+  return new Hook.Channel[options.transport](this, collection, options);
 };
 
 /**
@@ -9685,7 +9685,7 @@ DL.Client.prototype.channel = function(name, options) {
  * @param {String} segments
  * @param {Object} data
  */
-DL.Client.prototype.post = function(segments, data) {
+Hook.Client.prototype.post = function(segments, data) {
   if (typeof(data)==="undefined") {
     data = {};
   }
@@ -9697,7 +9697,7 @@ DL.Client.prototype.post = function(segments, data) {
  * @param {String} segments
  * @param {Object} data
  */
-DL.Client.prototype.get = function(segments, data) {
+Hook.Client.prototype.get = function(segments, data) {
   return this.request(segments, "GET", data);
 };
 
@@ -9706,7 +9706,7 @@ DL.Client.prototype.get = function(segments, data) {
  * @param {String} segments
  * @param {Object} data
  */
-DL.Client.prototype.put = function(segments, data) {
+Hook.Client.prototype.put = function(segments, data) {
   return this.request(segments, "PUT", data);
 };
 
@@ -9714,7 +9714,7 @@ DL.Client.prototype.put = function(segments, data) {
  * @method delete
  * @param {String} segments
  */
-DL.Client.prototype.remove = function(segments, data) {
+Hook.Client.prototype.remove = function(segments, data) {
   return this.request(segments, "DELETE", data);
 };
 
@@ -9724,7 +9724,7 @@ DL.Client.prototype.remove = function(segments, data) {
  * @param {String} method
  * @param {Object} data
  */
-DL.Client.prototype.request = function(segments, method, data) {
+Hook.Client.prototype.request = function(segments, method, data) {
   var payload, request_headers, deferred = when.defer(),
       synchronous = false;
 
@@ -9791,7 +9791,7 @@ DL.Client.prototype.request = function(segments, method, data) {
  * @method getHeaders
  * @return {Object}
  */
-DL.Client.prototype.getHeaders = function() {
+Hook.Client.prototype.getHeaders = function() {
   // App authentication request headers
   var request_headers = {
     'X-App-Id': this.appId,
@@ -9813,7 +9813,7 @@ DL.Client.prototype.getHeaders = function() {
  * @param {Object} data
  * @return {String|FormData}
  */
-DL.Client.prototype.getPayload = function(method, data) {
+Hook.Client.prototype.getPayload = function(method, data) {
   var payload = null;
   if (data) {
 
@@ -9883,7 +9883,7 @@ DL.Client.prototype.getPayload = function(method, data) {
   return payload;
 }
 
-DL.Client.prototype.serialize = function(obj, prefix) {
+Hook.Client.prototype.serialize = function(obj, prefix) {
   var str = [];
   for (var p in obj) {
     if (obj.hasOwnProperty(p)) {
@@ -9896,18 +9896,18 @@ DL.Client.prototype.serialize = function(obj, prefix) {
 };
 
 /**
- * @class DL.Events
+ * @class Hook.Events
  */
-DL.Events = function() {
+Hook.Events = function() {
   this._events = {};
 };
 
-DL.Events.prototype.on = function(event, callback, context) {
+Hook.Events.prototype.on = function(event, callback, context) {
   if (!this._events[event]) { this._events[event] = []; }
   this._events[event].push({callback: callback, context: context || this});
 };
 
-DL.Events.prototype.trigger = function(event, data) {
+Hook.Events.prototype.trigger = function(event, data) {
   var c, args = Array.prototype.slice.call(arguments,1);
   if (this._events[event]) {
     for (var i=0,length=this._events[event].length;i<length;i++)  {
@@ -9919,11 +9919,11 @@ DL.Events.prototype.trigger = function(event, data) {
 
 /**
  * Iterable is for internal use only.
- * @module DL
- * @class DL.Iterable
+ * @module Hook
+ * @class Hook.Iterable
  */
-DL.Iterable = function() { };
-DL.Iterable.prototype = {
+Hook.Iterable = function() { };
+Hook.Iterable.prototype = {
   /**
    * @method each
    * @param {Function} func
@@ -10003,31 +10003,31 @@ DL.Iterable.prototype = {
 };
 
 /**
- * @module DL
- * @class DL.PluginManager
+ * @module Hook
+ * @class Hook.PluginManager
  * @constructor
  * @static
  */
-DL.Plugin = {};
-DL.Plugin.Manager = { plugins: [] };
+Hook.Plugin = {};
+Hook.Plugin.Manager = { plugins: [] };
 
 /**
- * Register plugin to be instantiated on DL.Client
+ * Register plugin to be instantiated on Hook.Client
  * @method register
  * @param {Object} class
  * @static
  */
-DL.Plugin.Manager.register = function(path, klass) {
+Hook.Plugin.Manager.register = function(path, klass) {
   this.plugins.push({ path: path, klass: klass });
 };
 
 /**
- * Register all plugins on target DL.Client
+ * Register all plugins on target Hook.Client
  * @method setup
- * @param {DL.Client} client
+ * @param {Hook.Client} client
  * @static
  */
-DL.Plugin.Manager.setup = function(client) {
+Hook.Plugin.Manager.setup = function(client) {
   for (var i=0, l = this.plugins.length; i < l; i++) {
     client[ this.plugins[i].path ] = new this.plugins[i].klass(client);
   }
@@ -10035,13 +10035,13 @@ DL.Plugin.Manager.setup = function(client) {
 
 /**
  * Deals with user registration/authentication
- * @module DL
- * @class DL.Auth
- * @extends DL.Events
- * @param {DL.Client} client
+ * @module Hook
+ * @class Hook.Auth
+ * @extends Hook.Events
+ * @param {Hook.Client} client
  * @constructor
  */
-DL.Auth = function(client) {
+Hook.Auth = function(client) {
   this.client = client;
 
   /**
@@ -10051,8 +10051,8 @@ DL.Auth = function(client) {
   this.currentUser = null;
 
   var now = new Date(),
-      tokenExpiration = new Date(parseInt((window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_EXPIRATION)) || 0, 10) * 1000),
-      currentUser = window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
+      tokenExpiration = new Date(parseInt((window.localStorage.getItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_EXPIRATION)) || 0, 10) * 1000),
+      currentUser = window.localStorage.getItem(this.client.appId + '-' + Hook.Auth.AUTH_DATA_KEY);
 
   // Fill current user only when it isn't expired yet.
   if (currentUser && now.getTime() < tokenExpiration.getTime()) {
@@ -10061,29 +10061,29 @@ DL.Auth = function(client) {
 };
 
 // Inherits from Events
-DL.Auth.prototype = new DL.Events();
-DL.Auth.prototype.constructor = DL.Auth;
+Hook.Auth.prototype = new Hook.Events();
+Hook.Auth.prototype.constructor = Hook.Auth;
 
 // Constants
-DL.Auth.AUTH_DATA_KEY = 'dl-api-auth-data';
-DL.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
-DL.Auth.AUTH_TOKEN_EXPIRATION = 'dl-api-auth-token-expiration';
+Hook.Auth.AUTH_DATA_KEY = 'dl-api-auth-data';
+Hook.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
+Hook.Auth.AUTH_TOKEN_EXPIRATION = 'dl-api-auth-token-expiration';
 
 /**
  * @method setUserData
  * @param {Object} data
- * @return {DL.Auth} this
+ * @return {Hook.Auth} this
  */
-DL.Auth.prototype.setCurrentUser = function(data) {
+Hook.Auth.prototype.setCurrentUser = function(data) {
   if (!data) {
     // trigger logout event
     this.trigger('logout', this.currentUser);
     this.currentUser = data;
 
-    window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
-    window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
+    window.localStorage.removeItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_KEY);
+    window.localStorage.removeItem(this.client.appId + '-' + Hook.Auth.AUTH_DATA_KEY);
   } else {
-    window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY, JSON.stringify(data));
+    window.localStorage.setItem(this.client.appId + '-' + Hook.Auth.AUTH_DATA_KEY, JSON.stringify(data));
 
     // trigger login event
     this.currentUser = data;
@@ -10118,7 +10118,7 @@ DL.Auth.prototype.setCurrentUser = function(data) {
  *     }, {scope: 'email'});
  *
  */
-DL.Auth.prototype.register = function(provider, data) {
+Hook.Auth.prototype.register = function(provider, data) {
   var promise, that = this;
   if (typeof(data)==="undefined") { data = {}; }
   promise = this.client.post('auth/' + provider, data);
@@ -10145,7 +10145,7 @@ DL.Auth.prototype.register = function(provider, data) {
  *
  * Verify if user is already registered, and log-in if succeed.
  */
-DL.Auth.prototype.login = function(provider, data) {
+Hook.Auth.prototype.login = function(provider, data) {
   var promise, that = this;
   if (typeof(data)==="undefined") { data = {}; }
   promise = this.client.post('auth/' + provider + '/login', data);
@@ -10173,7 +10173,7 @@ DL.Auth.prototype.login = function(provider, data) {
  *       console.log("User not found: ", data);
  *     });
  */
-DL.Auth.prototype.forgotPassword = function(data) {
+Hook.Auth.prototype.forgotPassword = function(data) {
   if (typeof(data)==="undefined") { data = {}; }
   return this.client.post('auth/email/forgotPassword', data);
 };
@@ -10203,7 +10203,7 @@ DL.Auth.prototype.forgotPassword = function(data) {
  *     });
  *
  */
-DL.Auth.prototype.resetPassword = function(data) {
+Hook.Auth.prototype.resetPassword = function(data) {
   if (typeof(data)==="string") { data = { password: data }; }
   if (typeof(data.token)==="undefined") {
     data.token = window.location.href.match(/[\?|&]token=([a-z0-9]+)/);
@@ -10216,9 +10216,9 @@ DL.Auth.prototype.resetPassword = function(data) {
 
 /**
  * @method logout
- * @return {DL.Auth} this
+ * @return {Hook.Auth} this
  */
-DL.Auth.prototype.logout = function() {
+Hook.Auth.prototype.logout = function() {
   return this.setCurrentUser(null);
 };
 
@@ -10226,15 +10226,15 @@ DL.Auth.prototype.logout = function() {
  * @method getToken
  * @return {String|null}
  */
-DL.Auth.prototype.getToken = function() {
-  return window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
+Hook.Auth.prototype.getToken = function() {
+  return window.localStorage.getItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_KEY);
 };
 
-DL.Auth.prototype._registerToken = function(data) {
+Hook.Auth.prototype._registerToken = function(data) {
   if (data.token) {
     // register authentication token on localStorage
-    window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY, data.token.token);
-    window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_EXPIRATION, data.token.expire_at);
+    window.localStorage.setItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_KEY, data.token.token);
+    window.localStorage.setItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_EXPIRATION, data.token.expire_at);
     delete data.token;
 
     // Store curent user
@@ -10245,35 +10245,35 @@ DL.Auth.prototype._registerToken = function(data) {
 /**
  * Channel implementations
  */
-DL.Channel = {};
+Hook.Channel = {};
 
-// DL.Channel.Example = function(client, collection, options) {
+// Hook.Channel.Example = function(client, collection, options) {
 // };
 
-// DL.Channel.Example.prototype.subscribe = function(event, callback) {
+// Hook.Channel.Example.prototype.subscribe = function(event, callback) {
 // };
 
-// DL.Channel.Example.prototype.isConnected = function() {
+// Hook.Channel.Example.prototype.isConnected = function() {
 // };
 
-// DL.Channel.Example.prototype.unsubscribe = function(event) {
+// Hook.Channel.Example.prototype.unsubscribe = function(event) {
 // };
 
-// DL.Channel.Example.prototype.publish = function(event, message) {
+// Hook.Channel.Example.prototype.publish = function(event, message) {
 // };
 
-// DL.Channel.Example.prototype.disconnect = function(sync) {
+// Hook.Channel.Example.prototype.disconnect = function(sync) {
 // };
 
 /**
- * @module DL
- * @class DL.Collection
+ * @module Hook
+ * @class Hook.Collection
  *
- * @param {DL.Client} client
+ * @param {Hook.Client} client
  * @param {String} name
  * @constructor
  */
-DL.Collection = function(client, name) {
+Hook.Collection = function(client, name) {
   this.client = client;
 
   this.name = this._validateName(name);
@@ -10282,15 +10282,15 @@ DL.Collection = function(client, name) {
   this.segments = 'collection/' + this.name;
 };
 
-// Inherits from DL.Iterable
-DL.Collection.prototype = new DL.Iterable();
-DL.Collection.prototype.constructor = DL.Collection;
+// Inherits from Hook.Iterable
+Hook.Collection.prototype = new Hook.Iterable();
+Hook.Collection.prototype.constructor = Hook.Collection;
 
 /**
  * Create a new resource
  * @method create
  * @param {Object} data
- * @return {DL.Collection} this
+ * @return {Hook.Collection} this
  *
  * @example Creating an entry
  *
@@ -10315,16 +10315,16 @@ DL.Collection.prototype.constructor = DL.Collection;
  *     });
  *
  */
-DL.Collection.prototype.create = function(data) {
+Hook.Collection.prototype.create = function(data) {
   return this.client.post(this.segments, data);
 };
 
 /**
  * Get collection data, based on `where` params.
  * @method get
- * @return {DL.Collection} this
+ * @return {Hook.Collection} this
  */
-DL.Collection.prototype.get = function() {
+Hook.Collection.prototype.get = function() {
   return this.client.get(this.segments, this.buildQuery());
 };
 
@@ -10334,7 +10334,7 @@ DL.Collection.prototype.get = function() {
  * @param {Object | String} where params or field name
  * @param {String} operation '<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between', 'like'
  * @param {String} value value
- * @return {DL.Collection} this
+ * @return {Hook.Collection} this
  *
  * @example Multiple 'where' calls
  *
@@ -10367,7 +10367,7 @@ DL.Collection.prototype.get = function() {
  *     })
  *
  */
-DL.Collection.prototype.where = function(objects, _operation, _value) {
+Hook.Collection.prototype.where = function(objects, _operation, _value) {
   var field,
       operation = (typeof(_value)==="undefined") ? '=' : _operation,
       value = (typeof(_value)==="undefined") ? _operation : _value;
@@ -10414,7 +10414,7 @@ DL.Collection.prototype.where = function(objects, _operation, _value) {
  *     });
  *
  */
-DL.Collection.prototype.find = function(_id) {
+Hook.Collection.prototype.find = function(_id) {
   var promise = this.client.get(this.segments + '/' + _id, this.buildQuery());
   if (arguments.length > 1) {
     return promise.then.apply(promise, Array.prototype.slice.call(arguments,1));
@@ -10426,7 +10426,7 @@ DL.Collection.prototype.find = function(_id) {
  * Set the relationships that should be eager loaded.
  * @method with
  * @param {String} ...
- * @return {DL.Collection}
+ * @return {Hook.Collection}
  *
  * @example Simple relationship
  *
@@ -10449,7 +10449,7 @@ DL.Collection.prototype.find = function(_id) {
  *     });
  *
  */
-DL.Collection.prototype.with = function() {
+Hook.Collection.prototype.with = function() {
   this.options.with = arguments;
   return this;
 };
@@ -10460,9 +10460,9 @@ DL.Collection.prototype.with = function() {
  * @method group
  * @param {String} field
  * @param {String} ... more fields
- * @return {DL.Collection} this
+ * @return {Hook.Collection} this
  */
-DL.Collection.prototype.group = function() {
+Hook.Collection.prototype.group = function() {
   this._group = arguments;
   return this;
 };
@@ -10479,7 +10479,7 @@ DL.Collection.prototype.group = function() {
  *       console.log("Total:", total);
  *     });
  */
-DL.Collection.prototype.count = function() {
+Hook.Collection.prototype.count = function() {
   this.options.aggregation = {method: 'count', field: null};
   var promise = this.get();
   if (arguments.length > 0) {
@@ -10501,7 +10501,7 @@ DL.Collection.prototype.count = function() {
  *       console.log("max: ", data);
  *     });
  */
-DL.Collection.prototype.max = function(field) {
+Hook.Collection.prototype.max = function(field) {
   this.options.aggregation = {method: 'max', field: field};
   var promise = this.get();
   if (arguments.length > 1) {
@@ -10523,7 +10523,7 @@ DL.Collection.prototype.max = function(field) {
  *       console.log("min: ", data);
  *     });
  */
-DL.Collection.prototype.min = function(field) {
+Hook.Collection.prototype.min = function(field) {
   this.options.aggregation = {method: 'min', field: field};
   var promise = this.get();
   if (arguments.length > 1) {
@@ -10545,7 +10545,7 @@ DL.Collection.prototype.min = function(field) {
  *       console.log("avg: ", data);
  *     });
  */
-DL.Collection.prototype.avg = function(field) {
+Hook.Collection.prototype.avg = function(field) {
   this.options.aggregation = {method: 'avg', field: field};
   var promise = this.get();
   if (arguments.length > 1) {
@@ -10567,7 +10567,7 @@ DL.Collection.prototype.avg = function(field) {
  *       console.log("sum: ", data);
  *     });
  */
-DL.Collection.prototype.sum = function(field) {
+Hook.Collection.prototype.sum = function(field) {
   this.options.aggregation = {method: 'sum', field: field};
   var promise = this.get();
   if (arguments.length > 1) {
@@ -10588,7 +10588,7 @@ DL.Collection.prototype.sum = function(field) {
  *       console.log("Last created user:", data);
  *     });
  */
-DL.Collection.prototype.first = function() {
+Hook.Collection.prototype.first = function() {
   this.options.first = 1;
   var promise = this.get();
   promise.then.apply(promise, arguments);
@@ -10608,7 +10608,7 @@ DL.Collection.prototype.first = function() {
  *       console.log("Unique row: ", data);
  *     });
  */
-DL.Collection.prototype.firstOrCreate = function(data) {
+Hook.Collection.prototype.firstOrCreate = function(data) {
   throw new Error("Not implemented");
   // var promise;
   // this.options.first = 1;
@@ -10624,7 +10624,7 @@ DL.Collection.prototype.firstOrCreate = function(data) {
  * @method then
  * @return {Promise}
  */
-DL.Collection.prototype.then = function() {
+Hook.Collection.prototype.then = function() {
   var promise = this.get();
   promise.then.apply(promise, arguments);
   return promise;
@@ -10633,9 +10633,9 @@ DL.Collection.prototype.then = function() {
 /**
  * Clear collection filtering state
  * @method reset
- * @return {DL.Collection} this
+ * @return {Hook.Collection} this
  */
-DL.Collection.prototype.reset = function() {
+Hook.Collection.prototype.reset = function() {
   this.options = {};
   this.wheres = [];
   this.ordering = [];
@@ -10650,7 +10650,7 @@ DL.Collection.prototype.reset = function() {
  * @method sort
  * @param {String} field
  * @param {Number|String} direction
- * @return {DL.Collection} this
+ * @return {Hook.Collection} this
  *
  * @example Return just the first element for current query
  *
@@ -10665,7 +10665,7 @@ DL.Collection.prototype.reset = function() {
  *     client.collection('users').sort('created_at', -1).then(function(data) {  });
  *     client.collection('users').sort('created_at', 'desc').then(function(data) {  });
  */
-DL.Collection.prototype.sort = function(field, direction) {
+Hook.Collection.prototype.sort = function(field, direction) {
   if (!direction) {
     direction = "asc";
   } else if (typeof(direction)==="number") {
@@ -10678,7 +10678,7 @@ DL.Collection.prototype.sort = function(field, direction) {
 /**
  * @method limit
  * @param {Number} int
- * @return {DL.Collection} this
+ * @return {Hook.Collection} this
  *
  * @example Limit the number of rows to retrieve
  *
@@ -10692,7 +10692,7 @@ DL.Collection.prototype.sort = function(field, direction) {
  *       console.log("last 5 rows updated, after 5 lastest: ", data);
  *     });
  */
-DL.Collection.prototype.limit = function(int) {
+Hook.Collection.prototype.limit = function(int) {
   this._limit = int;
   return this;
 };
@@ -10702,9 +10702,9 @@ DL.Collection.prototype.limit = function(int) {
  * @see limit
  *
  * @param {Number} int
- * @return {DL.Collection} this
+ * @return {Hook.Collection} this
  */
-DL.Collection.prototype.offset = function(int) {
+Hook.Collection.prototype.offset = function(int) {
   this._offset = int;
   return this;
 };
@@ -10714,7 +10714,7 @@ DL.Collection.prototype.offset = function(int) {
  *
  * @method remember
  * @param {Number} minutes
- * @return {DL.Collection} this
+ * @return {Hook.Collection} this
  *
  * @example Caching a query
  *
@@ -10723,7 +10723,7 @@ DL.Collection.prototype.offset = function(int) {
  *     });
  *
  */
-DL.Collection.prototype.remember = function(minutes) {
+Hook.Collection.prototype.remember = function(minutes) {
   this._remember = minutes;
   return this;
 };
@@ -10732,7 +10732,7 @@ DL.Collection.prototype.remember = function(minutes) {
  * Get channel for this collection.
  * @method channel
  * @param {Object} options (optional)
- * @return {DL.Channel}
+ * @return {Hook.Channel}
  *
  * @example Streaming collection data
  *
@@ -10744,25 +10744,25 @@ DL.Collection.prototype.remember = function(minutes) {
  *     client.collection('messages').create({type: 'new-game', text: "yey, streaming will catch me!"});
  *
  */
-DL.Collection.prototype.channel = function(options) {
+Hook.Collection.prototype.channel = function(options) {
   throw new Error("Not implemented.");
-  // return new DL.Channel(this.client, this, options);
+  // return new Hook.Channel(this.client, this, options);
 };
 
 /**
  * @method paginate
- * @return {DL.Pagination}
+ * @return {Hook.Pagination}
  *
  * @param {Mixed} perpage_or_callback
  * @param {Function} onComplete
  * @param {Function} onError (optional)
  */
-DL.Collection.prototype.paginate = function(perPage, onComplete, onError) {
-  var pagination = new DL.Pagination(this);
+Hook.Collection.prototype.paginate = function(perPage, onComplete, onError) {
+  var pagination = new Hook.Pagination(this);
 
   if (!onComplete) {
     onComplete = perPage;
-    perPage = DL.defaults.perPage;
+    perPage = Hook.defaults.perPage;
   }
 
   this.options.paginate = perPage;
@@ -10778,7 +10778,7 @@ DL.Collection.prototype.paginate = function(perPage, onComplete, onError) {
  * Drop entire collection. This operation is irreversible.
  * @return {Promise}
  */
-DL.Collection.prototype.drop = function() {
+Hook.Collection.prototype.drop = function() {
   return this.client.remove(this.segments);
 };
 
@@ -10800,7 +10800,7 @@ DL.Collection.prototype.drop = function() {
  *       console.log("Success:", data.success);
  *     });
  */
-DL.Collection.prototype.remove = function(_id) {
+Hook.Collection.prototype.remove = function(_id) {
   var path = this.segments;
   if (typeof(_id)!=="undefined") {
     path += '/' + _id;
@@ -10820,7 +10820,7 @@ DL.Collection.prototype.remove = function(_id) {
  *       console.log("Success:", data.success);
  *     });
  */
-DL.Collection.prototype.update = function(_id, data) {
+Hook.Collection.prototype.update = function(_id, data) {
   return this.client.post(this.segments + '/' + _id, data);
 };
 
@@ -10837,7 +10837,7 @@ DL.Collection.prototype.update = function(_id, data) {
  *       console.log(numRows, " users has been updated");
  *     });
  */
-DL.Collection.prototype.increment = function(field, value) {
+Hook.Collection.prototype.increment = function(field, value) {
   this.options.operation = { method: 'increment', field: field, value: value };
   var promise = this.client.put(this.segments, this.buildQuery());
   if (arguments.length > 0) {
@@ -10859,7 +10859,7 @@ DL.Collection.prototype.increment = function(field, value) {
  *       console.log(numRows, " users has been updated");
  *     });
  */
-DL.Collection.prototype.decrement = function(field, value) {
+Hook.Collection.prototype.decrement = function(field, value) {
   this.options.operation = { method: 'decrement', field: field, value: value };
   var promise = this.client.put(this.segments, this.buildQuery());
   if (arguments.length > 0) {
@@ -10886,17 +10886,17 @@ DL.Collection.prototype.decrement = function(field, value) {
  *       console.log(numRows, " users has been updated");
  *     });
  */
-DL.Collection.prototype.updateAll = function(data) {
+Hook.Collection.prototype.updateAll = function(data) {
   this.options.data = data;
   return this.client.put(this.segments, this.buildQuery());
 };
 
-DL.Collection.prototype.addWhere = function(field, operation, value) {
+Hook.Collection.prototype.addWhere = function(field, operation, value) {
   this.wheres.push([field, operation.toLowerCase(), value]);
   return this;
 };
 
-DL.Collection.prototype._validateName = function(name) {
+Hook.Collection.prototype._validateName = function(name) {
   var regexp = /^[a-z_\/0-9]+$/;
 
   if (!regexp.test(name)) {
@@ -10906,7 +10906,7 @@ DL.Collection.prototype._validateName = function(name) {
   return name;
 };
 
-DL.Collection.prototype.buildQuery = function() {
+Hook.Collection.prototype.buildQuery = function() {
   var query = {};
 
   // apply limit / offset and remember
@@ -10951,21 +10951,20 @@ DL.Collection.prototype.buildQuery = function() {
 };
 
 /**
- * module DL
- * class DL.CollectionItem
+ * module Hook
+ * class Hook.CollectionItem
  *
- * param {DL.Collection} collection
+ * param {Hook.Collection} collection
  * param {Number|String} _id
  * constructor
  */
-DL.CollectionItem = function(collection, _id) {};
-
+Hook.CollectionItem = function(collection, _id) {};
 
 /**
- * @module DL
- * @class DL.Files
+ * @module Hook
+ * @class Hook.Files
  */
-DL.Files = function(client) {
+Hook.Files = function(client) {
   this.client = client;
 };
 
@@ -10976,7 +10975,7 @@ DL.Files = function(client) {
  * @param {String} mimeType [optional]
  * @return {Promise}
  */
-DL.Files.prototype.upload = function(data, fileName, mimeType){
+Hook.Files.prototype.upload = function(data, fileName, mimeType){
   var formData = new FormData();
   if(data instanceof HTMLCanvasElement && data.toBlob){
 	var deferred = when.defer();
@@ -11002,7 +11001,7 @@ DL.Files.prototype.upload = function(data, fileName, mimeType){
  * @param {Number|String} _id
  * @return {Promise}
  */
-DL.Files.prototype.get = function(_id) {
+Hook.Files.prototype.get = function(_id) {
   return this.client.get('files/' + _id);
 };
 
@@ -11012,18 +11011,18 @@ DL.Files.prototype.get = function(_id) {
  * @param {Number|String} _id
  * @return {Promise}
  */
-DL.Files.prototype.remove = function(_id) {
+Hook.Files.prototype.remove = function(_id) {
   return this.client.remove('files/' + _id);
 };
 
 /**
- * @module DL
- * @class DL.KeyValues
+ * @module Hook
+ * @class Hook.KeyValues
  *
- * @param {DL.Client} client
+ * @param {Hook.Client} client
  * @constructor
  */
-DL.KeyValues = function(client) {
+Hook.KeyValues = function(client) {
   this.client = client;
 };
 
@@ -11039,7 +11038,7 @@ DL.KeyValues = function(client) {
  *       console.log(key.value);
  *     });
  */
-DL.KeyValues.prototype.get = function(key, callback) {
+Hook.KeyValues.prototype.get = function(key, callback) {
   var promise = this.client.get('key/' + key);
   if (callback) {
     promise.then.apply(promise, [callback]);
@@ -11059,29 +11058,32 @@ DL.KeyValues.prototype.get = function(key, callback) {
  *       console.log(key);
  *     });
  */
-DL.KeyValues.prototype.set = function(key, value) {
+Hook.KeyValues.prototype.set = function(key, value) {
   return this.client.post('key/' + key, { value: value });
 };
 
+Hook.Model = function() {
+};
+
 /**
- * @module DL
- * @class DL.Pagination
+ * @module Hook
+ * @class Hook.Pagination
  *
- * @param {DL.Collection} collection
+ * @param {Hook.Collection} collection
  * @param {Number} perPage
  * @constructor
  */
-DL.Pagination = function(collection) {
+Hook.Pagination = function(collection) {
   this.fetching = true;
 
   /**
    * @property collection
-   * @type {DL.Collection}
+   * @type {Hook.Collection}
    */
   this.collection = collection;
 };
 
-DL.Pagination.prototype._fetchComplete = function(response) {
+Hook.Pagination.prototype._fetchComplete = function(response) {
   this.fetching = false;
 
   /**
@@ -11131,7 +11133,7 @@ DL.Pagination.prototype._fetchComplete = function(response) {
  * @method hasNext
  * @return {Boolean}
  */
-DL.Pagination.prototype.hasNext = function() {
+Hook.Pagination.prototype.hasNext = function() {
   return (this.current_page < this.to);
 };
 
@@ -11139,22 +11141,22 @@ DL.Pagination.prototype.hasNext = function() {
  * @method isFetching
  * @return {Booelan}
  */
-DL.Pagination.prototype.isFetching = function() {
+Hook.Pagination.prototype.isFetching = function() {
   return this.fetching;
 };
 
-DL.Pagination.prototype.then = function() {
+Hook.Pagination.prototype.then = function() {
 };
 
 
 /**
- * @module DL
- * @class DL.System
+ * @module Hook
+ * @class Hook.System
  *
  * @param {Client} client
  * @constructor
  */
-DL.System = function(client) {
+Hook.System = function(client) {
   this.client = client;
 };
 
@@ -11163,7 +11165,7 @@ DL.System = function(client) {
  * @method time
  * @return {Promise}
  */
-DL.System.prototype.time = function() {
+Hook.System.prototype.time = function() {
   var promise = this.client.get('system/time');
   if (arguments.length > 0) {
     promise.then.apply(promise, arguments);
@@ -11172,8 +11174,8 @@ DL.System.prototype.time = function() {
 };
 
 /**
- * @module DL
- * @class DL.Channel.SSE
+ * @module Hook
+ * @class Hook.Channel.SSE
  *
  * @param {Client} client
  * @param {String} namespace
@@ -11181,7 +11183,7 @@ DL.System.prototype.time = function() {
  * @constructor
  *
  */
-DL.Channel.SSE = function(client, collection, options) {
+Hook.Channel.SSE = function(client, collection, options) {
   this.collection = collection;
   this.client_id = null;
   this.callbacks = {};
@@ -11229,7 +11231,7 @@ DL.Channel.SSE = function(client, collection, options) {
  *
  *
  */
-DL.Channel.SSE.prototype.subscribe = function(event, callback) {
+Hook.Channel.SSE.prototype.subscribe = function(event, callback) {
   if (typeof(callback)==="undefined") {
     callback = event;
     event = '_default';
@@ -11263,7 +11265,7 @@ DL.Channel.SSE.prototype.subscribe = function(event, callback) {
 
 /**
  */
-DL.Channel.SSE.prototype._trigger = function(event, data) {
+Hook.Channel.SSE.prototype._trigger = function(event, data) {
   console.log("Trigger: ", event, data);
   // always try to dispatch default message handler
   if (event.indexOf('state:')===-1 && this.callbacks._default) {
@@ -11280,7 +11282,7 @@ DL.Channel.SSE.prototype._trigger = function(event, data) {
  * @method isConnected
  * @return {Boolean}
  */
-DL.Channel.SSE.prototype.isConnected = function() {
+Hook.Channel.SSE.prototype.isConnected = function() {
   return (this.readyState !== null && this.readyState !== EventSource.CLOSED);
 };
 
@@ -11289,7 +11291,7 @@ DL.Channel.SSE.prototype.isConnected = function() {
  * @method unsubscribe
  * @param {String} event
  */
-DL.Channel.SSE.prototype.unsubscribe = function(event) {
+Hook.Channel.SSE.prototype.unsubscribe = function(event) {
   if (this.callbacks[event]) {
     this.callbacks[event] = null;
   }
@@ -11302,14 +11304,14 @@ DL.Channel.SSE.prototype.unsubscribe = function(event) {
  * @param {Object} message
  * @return {Promise}
  */
-DL.Channel.SSE.prototype.publish = function(event, message) {
+Hook.Channel.SSE.prototype.publish = function(event, message) {
   if (typeof(message)==="undefined") { message = {}; }
   message.client_id = this.client_id;
   message.event = event;
   return this.collection.create(message);
 };
 
-DL.Channel.SSE.prototype.connect = function() {
+Hook.Channel.SSE.prototype.connect = function() {
   // Return success if already connected.
   if (this.readyState !== null) {
     var deferred = when.defer();
@@ -11361,9 +11363,9 @@ DL.Channel.SSE.prototype.connect = function() {
  * Disconnect from channel, publishing a 'disconnected' message.
  * @method disconnect
  * @param {Boolean} synchronous default = false
- * @return {DL.Channel} this
+ * @return {Hook.Channel} this
  */
-DL.Channel.SSE.prototype.disconnect = function(sync) {
+Hook.Channel.SSE.prototype.disconnect = function(sync) {
   if (this.isConnected()) {
     this.close();
     this.publish('disconnected', {
@@ -11378,7 +11380,7 @@ DL.Channel.SSE.prototype.disconnect = function(sync) {
  * @method close
  * @return {Channel} this
  */
-DL.Channel.SSE.prototype.close = function() {
+Hook.Channel.SSE.prototype.close = function() {
   if (this.event_source) {
     this.event_source.close();
   }
@@ -11388,8 +11390,8 @@ DL.Channel.SSE.prototype.close = function() {
 
 
 /**
- * @module DL
- * @class DL.Channel.WEBSOCKETS
+ * @module Hook
+ * @class Hook.Channel.WEBSOCKETS
  *
  * @param {Client} client
  * @param {String} namespace
@@ -11407,7 +11409,7 @@ DL.Channel.SSE.prototype.close = function() {
  *       url: "ws://localhost:8080"
  *     });
  */
-DL.Channel.WEBSOCKETS = function(client, collection, options) {
+Hook.Channel.WEBSOCKETS = function(client, collection, options) {
   var that = this;
 
   this.client = client;
@@ -11448,15 +11450,15 @@ DL.Channel.WEBSOCKETS = function(client, collection, options) {
 
 // Inherits from Events
 
-DL.Channel.WEBSOCKETS.prototype = new DL.Events();
-DL.Channel.WEBSOCKETS.prototype.constructor = DL.Channel.WEBSOCKETS;
+Hook.Channel.WEBSOCKETS.prototype = new Hook.Events();
+Hook.Channel.WEBSOCKETS.prototype.constructor = Hook.Channel.WEBSOCKETS;
 
 /**
  * Subscribe to channel. Publishes a 'connected' message on the first time.
  * @method subscribe
  * @param {String} event (optional)
  * @param {Function} callback
- * @return {DL.Channel}
+ * @return {Hook.Channel}
  *
  * @example Registering for a single custom event
  *
@@ -11474,7 +11476,7 @@ DL.Channel.WEBSOCKETS.prototype.constructor = DL.Channel.WEBSOCKETS;
  *     });
  *
  */
-DL.Channel.WEBSOCKETS.prototype.subscribe = function(event, callback) {
+Hook.Channel.WEBSOCKETS.prototype.subscribe = function(event, callback) {
   this.ws.subscribe(this.collection.name + '.' + event, function(topic, data) {
     callback(data);
   });
@@ -11486,7 +11488,7 @@ DL.Channel.WEBSOCKETS.prototype.subscribe = function(event, callback) {
  * @method isConnected
  * @return {Boolean}
  */
-DL.Channel.WEBSOCKETS.prototype.isConnected = function() {
+Hook.Channel.WEBSOCKETS.prototype.isConnected = function() {
   return this.ws && this.ws._websocket_connected;
 };
 
@@ -11494,9 +11496,9 @@ DL.Channel.WEBSOCKETS.prototype.isConnected = function() {
  * Unsubscribe to a event listener
  * @method unsubscribe
  * @param {String} event
- * @return {DL.Channel}
+ * @return {Hook.Channel}
  */
-DL.Channel.WEBSOCKETS.prototype.unsubscribe = function(event) {
+Hook.Channel.WEBSOCKETS.prototype.unsubscribe = function(event) {
   if (this.ws && this.ws._subscriptions[this.collection.name + '.' + event]) {
     this.ws.unsubscribe(this.collection.name + '.' + event);
   }
@@ -11509,9 +11511,9 @@ DL.Channel.WEBSOCKETS.prototype.unsubscribe = function(event) {
  * @param {String} event
  * @param {Object} message
  * @param {Object} options 'exclude' and 'elegible' are optional options.
- * @return {DL.Channel}
+ * @return {Hook.Channel}
  */
-DL.Channel.WEBSOCKETS.prototype.publish = function(event, message, options) {
+Hook.Channel.WEBSOCKETS.prototype.publish = function(event, message, options) {
   var exclude = [], eligible = [];
 
   if (typeof(options)==="undefined") {
@@ -11533,9 +11535,9 @@ DL.Channel.WEBSOCKETS.prototype.publish = function(event, message, options) {
 /**
  * Disconnect from channel, publishing a 'disconnected' message.
  * @method disconnect
- * @return {DL.Channel} this
+ * @return {Hook.Channel} this
  */
-DL.Channel.WEBSOCKETS.prototype.disconnect = function() {
+Hook.Channel.WEBSOCKETS.prototype.disconnect = function() {
   this.ws.close();
   return this;
 };
@@ -11545,11 +11547,11 @@ DL.Channel.WEBSOCKETS.prototype.disconnect = function() {
  * @param {String} procedure
  * @return {Promise}
  */
-DL.Channel.WEBSOCKETS.prototype.call = function(procedure, callbacks) {
+Hook.Channel.WEBSOCKETS.prototype.call = function(procedure, callbacks) {
   this.ws.call(procedure, callbacks);
   return this;
 };
-DL.Channel.WEBSOCKETS.prototype.connect = function() {
+Hook.Channel.WEBSOCKETS.prototype.connect = function() {
   this.ws.connect();
   return this;
 };

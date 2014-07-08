@@ -1,22 +1,22 @@
 /**
- * @module DL
- * @class DL.Pagination
+ * @module Hook
+ * @class Hook.Pagination
  *
- * @param {DL.Collection} collection
+ * @param {Hook.Collection} collection
  * @param {Number} perPage
  * @constructor
  */
-DL.Pagination = function(collection) {
+Hook.Pagination = function(collection) {
   this.fetching = true;
 
   /**
    * @property collection
-   * @type {DL.Collection}
+   * @type {Hook.Collection}
    */
   this.collection = collection;
 };
 
-DL.Pagination.prototype._fetchComplete = function(response) {
+Hook.Pagination.prototype._fetchComplete = function(response) {
   this.fetching = false;
 
   /**
@@ -66,7 +66,7 @@ DL.Pagination.prototype._fetchComplete = function(response) {
  * @method hasNext
  * @return {Boolean}
  */
-DL.Pagination.prototype.hasNext = function() {
+Hook.Pagination.prototype.hasNext = function() {
   return (this.current_page < this.to);
 };
 
@@ -74,9 +74,9 @@ DL.Pagination.prototype.hasNext = function() {
  * @method isFetching
  * @return {Booelan}
  */
-DL.Pagination.prototype.isFetching = function() {
+Hook.Pagination.prototype.isFetching = function() {
   return this.fetching;
 };
 
-DL.Pagination.prototype.then = function() {
+Hook.Pagination.prototype.then = function() {
 };

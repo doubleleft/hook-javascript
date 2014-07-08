@@ -1,25 +1,18 @@
-dl-api-javascript
+hook-javascript client
 ===
 
-dl-api javascript client.
+hook javascript client.
 
-# How-to build
+How to use
 ---
 
-    $ npm install -g grunt-cli bower
-    $ npm install
-    $ bower install
-    $ grunt
+Hook.Client is the entry-point for using hook.
 
-# Simple Usage
-
-DL.Client is the entry-point for using dl-api.
-
-You should instantiate a global javascript client for consuming dl-api.
+You should instantiate a global javascript client for consuming hook.
 
 ```javascript
-window.dl = new DL.Client({
-  url:   "http://local-or-remote-dl-api-address.com/api/public/index.php/",
+window.hook = new Hook.Client({
+  url:   "http://local-or-remote-hook.com/index.php/",
   appId: 1,    // your app's id
   key: 'test'  // your app's public key
 });
@@ -28,7 +21,7 @@ window.dl = new DL.Client({
 After that, you're free to instantiate collections
 
 ```javascript
-dl.collection('posts').create({
+hook.collection('posts').create({
   title: "Post name",
   summary: "My awesome new post",
   stars: 5
@@ -38,7 +31,7 @@ dl.collection('posts').create({
 And filter then, using `where`
 
 ```javascript
-var c = dl.collection('posts');
+var c = hook.collection('posts');
 c.where('author','Vicente'); // equal operator may be omitted
 c.where('stars','>',10);     // support '<' and '>' operators
 c.then(function(result) {
@@ -46,9 +39,22 @@ c.then(function(result) {
 });
 ```
 
-# API Docs
+How to build
+---
 
-For a more complete documentation, check the [API reference](http://doubleleft.github.io/dl-api-javascript/).
+You'll need [nodejs](http://nodejs.org/) installed first. Then run the following
+commands:
+
+    $ npm install -g grunt-cli bower
+    $ npm install
+    $ bower install
+    $ grunt
+
+
+API Docs
+---
+
+For a more complete documentation, check the [API reference](http://doubleleft.github.io/hook-javascript/).
 
 To build and publish the docs:
 
