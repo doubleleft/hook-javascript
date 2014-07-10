@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/hook-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 7/8/2014
+ * @build 7/10/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -506,7 +506,7 @@ Hook.Auth = function(client) {
   this.currentUser = null;
 
   var now = new Date(),
-      tokenExpiration = new Date(parseInt((window.localStorage.getItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_EXPIRATION)) || 0, 10) * 1000),
+      tokenExpiration = new Date(window.localStorage.getItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_EXPIRATION)),
       currentUser = window.localStorage.getItem(this.client.appId + '-' + Hook.Auth.AUTH_DATA_KEY);
 
   // Fill current user only when it isn't expired yet.
@@ -597,8 +597,6 @@ Hook.Auth.prototype.register = function(provider, data) {
  *     }, function(data){
  *       console.log("User not found or password invalid.", data);
  *     });
- *
- * Verify if user is already registered, and log-in if succeed.
  */
 Hook.Auth.prototype.login = function(provider, data) {
   var promise, that = this;
@@ -607,6 +605,33 @@ Hook.Auth.prototype.login = function(provider, data) {
   promise.then(function(data) {
     that._registerToken(data);
   });
+  return promise;
+};
+
+/**
+ * Update current user info.
+ *
+ * @method update
+ * @param {Object} data
+ * @return {Promise}
+ *
+ * @example
+ *
+ *     client.auth.update({ score: 100 }).then(function(data){
+ *       console.log("updated successfully: ", data);
+ *     }).otherwise(function(data){
+ *       console.log("error: ", data);
+ *     });
+ */
+Hook.Auth.prototype.update = function(data) {
+  if (!this.currentUser) { throw new Error("not logged in."); }
+
+  var that = this;
+  var promise = this.client.collection('auth').update(this.currentUser._id, data);
+
+  // update localStorage info
+  promise.then(function(data) { that.setCurrentUser(data); });
+
   return promise;
 };
 
