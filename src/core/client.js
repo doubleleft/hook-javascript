@@ -113,6 +113,7 @@ Hook.Client.prototype.channel = function(name, options) {
 };
 
 /**
+ * Create resource
  * @method post
  * @param {String} segments
  * @param {Object} data
@@ -125,6 +126,7 @@ Hook.Client.prototype.post = function(segments, data) {
 };
 
 /**
+ * Retrieve a resource
  * @method get
  * @param {String} segments
  * @param {Object} data
@@ -134,6 +136,7 @@ Hook.Client.prototype.get = function(segments, data) {
 };
 
 /**
+ * Update existing resource
  * @method put
  * @param {String} segments
  * @param {Object} data
@@ -143,6 +146,7 @@ Hook.Client.prototype.put = function(segments, data) {
 };
 
 /**
+ * Delete existing resource.
  * @method delete
  * @param {String} segments
  */

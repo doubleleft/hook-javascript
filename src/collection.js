@@ -330,10 +330,11 @@ Hook.Collection.prototype.first = function() {
 
 /**
  * First or create
- * method firstorCreate
- * param {Object} data
- * param {Function} callback
- * return {Promise}
+ *
+ * @method firstOrCreate
+ * @param {Object} data
+ * @param {Function} callback
+ * @return {Promise}
  *
  * example Return the first match for 'data' param, or create it.
  *
@@ -342,14 +343,9 @@ Hook.Collection.prototype.first = function() {
  *     });
  */
 Hook.Collection.prototype.firstOrCreate = function(data) {
-  throw new Error("Not implemented");
-  // var promise;
-  // this.options.first = 1;
-  // promise = this.client.post(this.segments, { data: data, options: this.buildQuery() });
-  // if (arguments.length > 1) {
-  //   promise.then(arguments[1]);
-  // }
-  // return promise;
+  this.options.first = 1;
+  this.options.data = data;
+  return this.client.post(this.segments, this.buildQuery());
 };
 
 /**
@@ -663,12 +659,12 @@ Hook.Collection.prototype.buildQuery = function() {
   }
 
   var f, shortnames = {
-    paginate: 'p',
-    first: 'f',
-    aggregation: 'aggr',
-    operation: 'op',
-    data: 'data',
-    with: 'with'
+    paginate: 'p',        // pagination (perPage)
+    first: 'f',           // first / firstOrCreate
+    aggregation: 'aggr',  // min / max / count / avg / sum
+    operation: 'op',      // increment / decrement
+    data: 'data',         // updateAll / firstOrCreate
+    with: 'with'          // relationships
   };
 
   for (f in shortnames) {
