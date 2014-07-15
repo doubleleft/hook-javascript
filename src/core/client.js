@@ -6,7 +6,7 @@
  * ```javascript
  * window.dl = new Hook.Client({
  *   url: "http://local-or-remote-dl-api-address.com/api/public/index.php/",
- *   appId: 1,    // your app's id
+ *   app_id: 1,   // your app's id
  *   key: 'test'  // your app's public key
  * });
  * ```
@@ -15,9 +15,9 @@
  * @class Hook.Client
  *
  * @param {Object} options
- *   @param {String} options.appId
+ *   @param {String} options.app_id
  *   @param {String} options.key
- *   @param {String} options.url default: http://dl-api.dev
+ *   @param {String} options.url default: http://hook.dev
  *
  * @constructor
  */
@@ -30,8 +30,8 @@ if(typeof(window.FormData)==="undefined"){
 }
 
 Hook.Client = function(options) {
-  this.url = options.url || "http://dl-api.dev/api/public/index.php/";
-  this.appId = options.appId;
+  this.url = options.endpoint || options.url || "http://hook.dev/index.php/";
+  this.app_id = options.app_id;
   this.key = options.key;
   this.proxy = options.proxy;
 
@@ -185,7 +185,7 @@ Hook.Client.prototype.request = function(segments, method, data) {
 
   } else if (typeof(XDomainRequest) !== "undefined") {
     // XMLHttpRequest#setRequestHeader isn't implemented on Internet Explorer's XDomainRequest
-    segments += "?X-App-Id=" + this.appId + "&X-App-Key=" + this.key;
+    segments += "?X-App-Id=" + this.app_id + "&X-App-Key=" + this.key;
     var auth_token = this.auth.getToken();
     if (auth_token) { segments += '&X-Auth-Token=' + auth_token; }
   }
@@ -230,7 +230,7 @@ Hook.Client.prototype.request = function(segments, method, data) {
 Hook.Client.prototype.getHeaders = function() {
   // App authentication request headers
   var request_headers = {
-    'X-App-Id': this.appId,
+    'X-App-Id': this.app_id,
     'X-App-Key': this.key,
   }, auth_token;
 
