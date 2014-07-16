@@ -33,7 +33,6 @@ Hook.Client = function(options) {
   this.url = options.endpoint || options.url || "http://hook.dev/index.php/";
   this.app_id = options.app_id;
   this.key = options.key;
-  this.proxy = options.proxy;
 
   // append last slash if doesn't have it
   if (this.url.lastIndexOf('/') != this.url.length - 1) {
@@ -179,18 +178,14 @@ Hook.Client.prototype.request = function(segments, method, data) {
     request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
   }
 
-  if (this.proxy) {
-    // Forward API endpoint to proxy
-    request_headers["X-Endpoint"] = this.url;
-
-  } else if (typeof(XDomainRequest) !== "undefined") {
+  if (typeof(XDomainRequest) !== "undefined") {
     // XMLHttpRequest#setRequestHeader isn't implemented on Internet Explorer's XDomainRequest
     segments += "?X-App-Id=" + this.app_id + "&X-App-Key=" + this.key;
     var auth_token = this.auth.getToken();
     if (auth_token) { segments += '&X-Auth-Token=' + auth_token; }
   }
 
-  deferred.promise.xhr = uxhr((this.proxy || this.url) + segments, payload, {
+  deferred.promise.xhr = uxhr(this.url + segments, payload, {
     method: method,
     headers: request_headers,
     sync: synchronous,
@@ -203,6 +198,8 @@ Hook.Client.prototype.request = function(segments, method, data) {
       }
 
       if (data === false || data === null || data.error) {
+        // log error on console
+        if (data && data.error) { console.error(data.error); }
         deferred.resolver.reject(data);
       } else {
         deferred.resolver.resolve(data);
