@@ -53,6 +53,16 @@ Hook.Collection.prototype.create = function(data) {
 };
 
 /**
+ * Fields that should be retrieved from the database
+ * @method select
+ * @return {Hook.Collection} this
+ */
+Hook.Collection.prototype.select = function() {
+  this.options.select = arguments;
+  return this;
+};
+
+/**
  * Get collection data, based on `where` params.
  * @method get
  * @return {Hook.Collection} this
@@ -65,7 +75,7 @@ Hook.Collection.prototype.get = function() {
  * Add `where` param
  * @method where
  * @param {Object | String} where params or field name
- * @param {String} operation '<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between', 'like'
+ * @param {String} operation '<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between', 'like', 'not_null'
  * @param {String} value value
  * @return {Hook.Collection} this
  *
@@ -100,10 +110,11 @@ Hook.Collection.prototype.get = function() {
  *     })
  *
  */
-Hook.Collection.prototype.where = function(objects, _operation, _value) {
+Hook.Collection.prototype.where = function(objects, _operation, _value, _boolean) {
   var field,
       operation = (typeof(_value)==="undefined") ? '=' : _operation,
-      value = (typeof(_value)==="undefined") ? _operation : _value;
+      value = (typeof(_value)==="undefined") ? _operation : _value,
+      boolean = (typeof(_boolean)==="undefined") ? 'and' : _boolean;
 
   if (typeof(objects)==="object") {
     for (field in objects) {
@@ -115,14 +126,26 @@ Hook.Collection.prototype.where = function(objects, _operation, _value) {
         } else {
           value = objects[field];
         }
-        this.addWhere(field, operation, value);
+        this.addWhere(field, operation, value, boolean);
       }
     }
   } else {
-    this.addWhere(objects, operation, value);
+    this.addWhere(objects, operation, value, boolean);
   }
 
   return this;
+};
+
+/**
+ * Add OR query param
+ * @method orWhere
+ * @param {Object | String} where params or field name
+ * @param {String} operation '<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between', 'like', 'not_null'
+ * @param {String} value value
+ * @return {Hook.Collection} this
+ */
+Hook.Collection.prototype.orWhere = function(objects, _operation, _value) {
+  return this.where(objects, _operation, _value, "or");
 };
 
 /**
@@ -620,8 +643,8 @@ Hook.Collection.prototype.updateAll = function(data) {
   return this.client.put(this.segments, this.buildQuery());
 };
 
-Hook.Collection.prototype.addWhere = function(field, operation, value) {
-  this.wheres.push([field, operation.toLowerCase(), value]);
+Hook.Collection.prototype.addWhere = function(field, operation, value, boolean) {
+  this.wheres.push([field, operation.toLowerCase(), value, boolean]);
   return this;
 };
 
@@ -664,7 +687,8 @@ Hook.Collection.prototype.buildQuery = function() {
     aggregation: 'aggr',  // min / max / count / avg / sum
     operation: 'op',      // increment / decrement
     data: 'data',         // updateAll / firstOrCreate
-    with: 'with'          // relationships
+    with: 'with',         // relationships
+    select: 'select'      // fields to return
   };
 
   for (f in shortnames) {
