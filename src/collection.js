@@ -383,6 +383,16 @@ Hook.Collection.prototype.then = function() {
 };
 
 /**
+ * Alias for then & console.log.bind(console)
+ * @method debug
+ * @return {Promise}
+ */
+Hook.Collection.prototype.debug = function(func) {
+  func = (typeof(func) == "undefined") ? "log" : func;
+  return this.then(console[func].bind(console));
+};
+
+/**
  * Clear collection filtering state
  * @method reset
  * @return {Hook.Collection} this

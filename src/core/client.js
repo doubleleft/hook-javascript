@@ -31,7 +31,7 @@ if(typeof(window.FormData)==="undefined"){
 
 Hook.Client = function(options) {
   this.url = options.endpoint || options.url || "http://hook.dev/index.php/";
-  this.app_id = options.app_id;
+  this.app_id = options.app_id || options.appId;
   this.key = options.key;
 
   // append last slash if doesn't have it
