@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/hook-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 7/10/2014
+ * @build 7/21/2014
  */
 (function(window) {
   /**

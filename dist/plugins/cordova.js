@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/hook-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 7/10/2014
+ * @build 7/21/2014
  */
 (function(window) {
   //
@@ -8935,7 +8935,7 @@ window.Hook = Hook;
  * ```javascript
  * window.dl = new Hook.Client({
  *   url: "http://local-or-remote-dl-api-address.com/api/public/index.php/",
- *   appId: 1,    // your app's id
+ *   app_id: 1,   // your app's id
  *   key: 'test'  // your app's public key
  * });
  * ```
@@ -8944,9 +8944,9 @@ window.Hook = Hook;
  * @class Hook.Client
  *
  * @param {Object} options
- *   @param {String} options.appId
+ *   @param {String} options.app_id
  *   @param {String} options.key
- *   @param {String} options.url default: http://dl-api.dev
+ *   @param {String} options.url default: http://hook.dev
  *
  * @constructor
  */
@@ -8959,10 +8959,9 @@ if(typeof(window.FormData)==="undefined"){
 }
 
 Hook.Client = function(options) {
-  this.url = options.url || "http://dl-api.dev/api/public/index.php/";
-  this.appId = options.appId;
+  this.url = options.endpoint || options.url || "http://hook.dev/index.php/";
+  this.app_id = options.app_id || options.appId;
   this.key = options.key;
-  this.proxy = options.proxy;
 
   // append last slash if doesn't have it
   if (this.url.lastIndexOf('/') != this.url.length - 1) {
@@ -8980,9 +8979,9 @@ Hook.Client = function(options) {
   this.auth = new Hook.Auth(this);
 
   /**
-   * @property {Hook.Fiels} files
+   * @property {Hook.Collection} files
    */
-  this.files = new Hook.Files(this);
+  this.files = this.collection("files");
 
   /**
    * @property {Hook.System} system
@@ -9042,6 +9041,7 @@ Hook.Client.prototype.channel = function(name, options) {
 };
 
 /**
+ * Create resource
  * @method post
  * @param {String} segments
  * @param {Object} data
@@ -9054,6 +9054,7 @@ Hook.Client.prototype.post = function(segments, data) {
 };
 
 /**
+ * Retrieve a resource
  * @method get
  * @param {String} segments
  * @param {Object} data
@@ -9063,6 +9064,7 @@ Hook.Client.prototype.get = function(segments, data) {
 };
 
 /**
+ * Update existing resource
  * @method put
  * @param {String} segments
  * @param {Object} data
@@ -9072,6 +9074,7 @@ Hook.Client.prototype.put = function(segments, data) {
 };
 
 /**
+ * Delete existing resource.
  * @method delete
  * @param {String} segments
  */
@@ -9104,18 +9107,14 @@ Hook.Client.prototype.request = function(segments, method, data) {
     request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
   }
 
-  if (this.proxy) {
-    // Forward API endpoint to proxy
-    request_headers["X-Endpoint"] = this.url;
-
-  } else if (typeof(XDomainRequest) !== "undefined") {
+  if (typeof(XDomainRequest) !== "undefined") {
     // XMLHttpRequest#setRequestHeader isn't implemented on Internet Explorer's XDomainRequest
-    segments += "?X-App-Id=" + this.appId + "&X-App-Key=" + this.key;
+    segments += "?X-App-Id=" + this.app_id + "&X-App-Key=" + this.key;
     var auth_token = this.auth.getToken();
     if (auth_token) { segments += '&X-Auth-Token=' + auth_token; }
   }
 
-  deferred.promise.xhr = uxhr((this.proxy || this.url) + segments, payload, {
+  deferred.promise.xhr = uxhr(this.url + segments, payload, {
     method: method,
     headers: request_headers,
     sync: synchronous,
@@ -9128,6 +9127,8 @@ Hook.Client.prototype.request = function(segments, method, data) {
       }
 
       if (data === false || data === null || data.error) {
+        // log error on console
+        if (data && data.error) { console.error(data.error); }
         deferred.resolver.reject(data);
       } else {
         deferred.resolver.resolve(data);
@@ -9155,7 +9156,7 @@ Hook.Client.prototype.request = function(segments, method, data) {
 Hook.Client.prototype.getHeaders = function() {
   // App authentication request headers
   var request_headers = {
-    'X-App-Id': this.appId,
+    'X-App-Id': this.app_id,
     'X-App-Key': this.key,
   }, auth_token;
 
@@ -9530,7 +9531,9 @@ Hook.Auth.prototype.login = function(provider, data) {
  *     });
  */
 Hook.Auth.prototype.update = function(data) {
-  if (!this.currentUser) { throw new Error("not logged in."); }
+  if (!this.currentUser) {
+    throw new Error("not logged in.");
+  }
 
   var that = this;
   var promise = this.client.collection('auth').update(this.currentUser._id, data);
@@ -9706,6 +9709,16 @@ Hook.Collection.prototype.create = function(data) {
 };
 
 /**
+ * Fields that should be retrieved from the database
+ * @method select
+ * @return {Hook.Collection} this
+ */
+Hook.Collection.prototype.select = function() {
+  this.options.select = arguments;
+  return this;
+};
+
+/**
  * Get collection data, based on `where` params.
  * @method get
  * @return {Hook.Collection} this
@@ -9718,7 +9731,7 @@ Hook.Collection.prototype.get = function() {
  * Add `where` param
  * @method where
  * @param {Object | String} where params or field name
- * @param {String} operation '<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between', 'like'
+ * @param {String} operation '<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between', 'like', 'not_null'
  * @param {String} value value
  * @return {Hook.Collection} this
  *
@@ -9753,10 +9766,11 @@ Hook.Collection.prototype.get = function() {
  *     })
  *
  */
-Hook.Collection.prototype.where = function(objects, _operation, _value) {
+Hook.Collection.prototype.where = function(objects, _operation, _value, _boolean) {
   var field,
       operation = (typeof(_value)==="undefined") ? '=' : _operation,
-      value = (typeof(_value)==="undefined") ? _operation : _value;
+      value = (typeof(_value)==="undefined") ? _operation : _value,
+      boolean = (typeof(_boolean)==="undefined") ? 'and' : _boolean;
 
   if (typeof(objects)==="object") {
     for (field in objects) {
@@ -9768,14 +9782,26 @@ Hook.Collection.prototype.where = function(objects, _operation, _value) {
         } else {
           value = objects[field];
         }
-        this.addWhere(field, operation, value);
+        this.addWhere(field, operation, value, boolean);
       }
     }
   } else {
-    this.addWhere(objects, operation, value);
+    this.addWhere(objects, operation, value, boolean);
   }
 
   return this;
+};
+
+/**
+ * Add OR query param
+ * @method orWhere
+ * @param {Object | String} where params or field name
+ * @param {String} operation '<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between', 'like', 'not_null'
+ * @param {String} value value
+ * @return {Hook.Collection} this
+ */
+Hook.Collection.prototype.orWhere = function(objects, _operation, _value) {
+  return this.where(objects, _operation, _value, "or");
 };
 
 /**
@@ -9983,10 +10009,11 @@ Hook.Collection.prototype.first = function() {
 
 /**
  * First or create
- * method firstorCreate
- * param {Object} data
- * param {Function} callback
- * return {Promise}
+ *
+ * @method firstOrCreate
+ * @param {Object} data
+ * @param {Function} callback
+ * @return {Promise}
  *
  * example Return the first match for 'data' param, or create it.
  *
@@ -9995,14 +10022,9 @@ Hook.Collection.prototype.first = function() {
  *     });
  */
 Hook.Collection.prototype.firstOrCreate = function(data) {
-  throw new Error("Not implemented");
-  // var promise;
-  // this.options.first = 1;
-  // promise = this.client.post(this.segments, { data: data, options: this.buildQuery() });
-  // if (arguments.length > 1) {
-  //   promise.then(arguments[1]);
-  // }
-  // return promise;
+  this.options.first = 1;
+  this.options.data = data;
+  return this.client.post(this.segments, this.buildQuery());
 };
 
 /**
@@ -10014,6 +10036,16 @@ Hook.Collection.prototype.then = function() {
   var promise = this.get();
   promise.then.apply(promise, arguments);
   return promise;
+};
+
+/**
+ * Alias for then & console.log.bind(console)
+ * @method debug
+ * @return {Promise}
+ */
+Hook.Collection.prototype.debug = function(func) {
+  func = (typeof(func) == "undefined") ? "log" : func;
+  return this.then(console[func].bind(console));
 };
 
 /**
@@ -10277,8 +10309,8 @@ Hook.Collection.prototype.updateAll = function(data) {
   return this.client.put(this.segments, this.buildQuery());
 };
 
-Hook.Collection.prototype.addWhere = function(field, operation, value) {
-  this.wheres.push([field, operation.toLowerCase(), value]);
+Hook.Collection.prototype.addWhere = function(field, operation, value, boolean) {
+  this.wheres.push([field, operation.toLowerCase(), value, boolean]);
   return this;
 };
 
@@ -10316,12 +10348,13 @@ Hook.Collection.prototype.buildQuery = function() {
   }
 
   var f, shortnames = {
-    paginate: 'p',
-    first: 'f',
-    aggregation: 'aggr',
-    operation: 'op',
-    data: 'data',
-    with: 'with'
+    paginate: 'p',        // pagination (perPage)
+    first: 'f',           // first / firstOrCreate
+    aggregation: 'aggr',  // min / max / count / avg / sum
+    operation: 'op',      // increment / decrement
+    data: 'data',         // updateAll / firstOrCreate
+    with: 'with',         // relationships
+    select: 'select'      // fields to return
   };
 
   for (f in shortnames) {

@@ -50,11 +50,6 @@ Hook.Client = function(options) {
   this.auth = new Hook.Auth(this);
 
   /**
-   * @property {Hook.Fiels} files
-   */
-  this.files = new Hook.Files(this);
-
-  /**
    * @property {Hook.System} system
    */
   this.system = new Hook.System(this);
