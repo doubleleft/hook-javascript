@@ -48,7 +48,7 @@ c.then(function(result) {
 
 # API Docs
 
-For a more complete documentation, check the [API reference](http://doubleleft.github.io/dl-api-javascript/).
+For a more complete documentation, check the [API reference](http://doubleleft.github.io/hook-javascript/).
 
 To build and publish the docs:
 
