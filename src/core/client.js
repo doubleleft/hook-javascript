@@ -263,6 +263,9 @@ DL.Client.prototype.getPayload = function(method, data) {
         if (typeof(value)==='undefined' || value === null) {
           continue;
 
+        } else if (typeof(value)==='number') {
+          value = value.toString();
+
         } else if (typeof(value)==="string") {
           //
           // Do nothing...

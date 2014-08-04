@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/dl-api-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 6/26/2014
+ * @build 8/4/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -285,6 +285,9 @@ DL.Client.prototype.getPayload = function(method, data) {
 
         if (typeof(value)==='undefined' || value === null) {
           continue;
+
+        } else if (typeof(value)==='number') {
+          value = value.toString();
 
         } else if (typeof(value)==="string") {
           //
