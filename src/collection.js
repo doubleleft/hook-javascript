@@ -235,8 +235,9 @@ Hook.Collection.prototype.group = function() {
  *       console.log("Total:", total);
  *     });
  */
-Hook.Collection.prototype.count = function() {
-  this.options.aggregation = {method: 'count', field: null};
+Hook.Collection.prototype.count = function(field) {
+  field = (typeof(field)==="undefined") ? '*' : field;
+  this.options.aggregation = {method: 'count', field: field};
   var promise = this.get();
   if (arguments.length > 0) {
     promise.then.apply(promise, arguments);
