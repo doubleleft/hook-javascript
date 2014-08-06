@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/hook-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 7/21/2014
+ * @build 7/30/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -71,11 +71,6 @@ Hook.Client = function(options) {
    * @property {Hook.Auth} auth
    */
   this.auth = new Hook.Auth(this);
-
-  /**
-   * @property {Hook.Collection} files
-   */
-  this.files = this.collection("files");
 
   /**
    * @property {Hook.System} system
@@ -985,8 +980,9 @@ Hook.Collection.prototype.group = function() {
  *       console.log("Total:", total);
  *     });
  */
-Hook.Collection.prototype.count = function() {
-  this.options.aggregation = {method: 'count', field: null};
+Hook.Collection.prototype.count = function(field) {
+  field = (typeof(field)==="undefined") ? '*' : field;
+  this.options.aggregation = {method: 'count', field: field};
   var promise = this.get();
   if (arguments.length > 0) {
     promise.then.apply(promise, arguments);
@@ -1472,61 +1468,6 @@ Hook.Collection.prototype.buildQuery = function() {
  * constructor
  */
 Hook.CollectionItem = function(collection, _id) {};
-
-/**
- * @module Hook
- * @class Hook.Files
- */
-Hook.Files = function(client) {
-  this.client = client;
-};
-
-/**
- * @method upload
- * @param {Canvas|Blob} data
- * @param {String} filename [optional]
- * @param {String} mimeType [optional]
- * @return {Promise}
- */
-Hook.Files.prototype.upload = function(data, fileName, mimeType){
-  var formData = new FormData();
-  if(data instanceof HTMLCanvasElement && data.toBlob){
-	var deferred = when.defer();
-    var self = this;
-    data.toBlob(function(blob){
-      self.upload(blob, fileName, mimeType).then(deferred.resolver.resolve, deferred.resolver.reject);
-    }, mimeType || "image/png");
-
-	return deferred.promise;
-  }
-
-  try {
-    formData.append('file', data, fileName || "dlApiFile");
-  } catch(e) {
-    formData.append('file', data);
-  }
-  return this.client.post('files', formData);
-};
-
-/**
- * Get file data by id.
- * @method get
- * @param {Number|String} _id
- * @return {Promise}
- */
-Hook.Files.prototype.get = function(_id) {
-  return this.client.get('files/' + _id);
-};
-
-/**
- * Remove file by id.
- * @method remove
- * @param {Number|String} _id
- * @return {Promise}
- */
-Hook.Files.prototype.remove = function(_id) {
-  return this.client.remove('files/' + _id);
-};
 
 /**
  * @module Hook

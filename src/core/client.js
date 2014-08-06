@@ -186,11 +186,9 @@ Hook.Client.prototype.request = function(segments, method, data) {
     sync: synchronous,
     success: function(response) {
       var data = null;
-      try{
-        data = JSON.parse(response);
-      } catch(e) {
-        //something wrong with JSON. IE throws exception on JSON.parse
-      }
+      try {
+        data = JSON.parseWithDate(response);
+      } catch(e) { }
 
       if (data === false || data === null || data.error) {
         // log error on console
@@ -202,11 +200,10 @@ Hook.Client.prototype.request = function(segments, method, data) {
     },
     error: function(response) {
       var data = null;
-      try{
-        data = JSON.parse(response);
-      }catch(e){
-      }
-      console.log("Error: ", data || "invalid json response");
+      try {
+        data = JSON.parseWithDate(response);
+      } catch(e) { }
+      console.log("Error: ", data || "Invalid JSON response.");
       deferred.resolver.reject(data);
     }
   });

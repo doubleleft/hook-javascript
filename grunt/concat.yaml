@@ -12,6 +12,7 @@ javascripts:
   src:
     - 'src/wrap/begin.js'
 
+    - 'bower_components/json.date/src/json.date-extensions.js'
     - 'bower_components/when/when.js'
     - 'bower_components/uxhr/uxhr.js'
     - 'bower_components/lodash/dist/lodash.js'
@@ -26,15 +27,6 @@ javascripts:
     - 'src/wrap/end.js'
   dest: 'dist/hook.js'
 
-amd:
-  src:
-    - 'src/wrap/amd-begin.js'
-    - 'src/core/*.js'
-    - 'src/*.js'
-    - 'src/channel/*.js'
-    - 'src/wrap/amd-end.js'
-  dest: 'dist/amd/hook.js'
-
 plugin_backbone:
   src:
     - 'src/plugins/backbone.js'
@@ -43,6 +35,8 @@ plugin_backbone:
 plugin_cordova:
   src:
     - 'src/wrap/begin.js'
+
+    - 'bower_components/json.date/src/json.date-extensions.js'
     - 'bower_components/when/when.js'
     - 'bower_components/uxhr/uxhr.js'
     - 'bower_components/lodash/dist/lodash.js'

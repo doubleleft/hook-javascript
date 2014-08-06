@@ -15,6 +15,7 @@
     "bower_components"
   ],
   "dependencies" : {
+    "json.date": "RickStrahl/json.date-extensions#f16379c45f0150047c547ab821e94aad00b2c2a9",
     "uxhr": "endel/uxhr#a484e430e224375b786072da5abb94dfd3c68685",
     "qunit": "~1.9.0",
     "when": "~2.8.0",
