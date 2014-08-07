@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/hook-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 8/6/2014
+ * @build 8/7/2014
  */
 (function(window) {
   //
@@ -26,7 +26,7 @@
 
 /**
  * JSON Date Extensions - JSON date parsing extensions
- * 
+ *
  * (c) 2014 Rick Strahl, West Wind Technologies
  *
  * Released under MIT License
@@ -48,7 +48,7 @@
             /// Globally enables JSON date parsing for JSON.parse().
             /// Replaces the default JSON.parse() method and adds
             /// the datePaser() extension to the processing chain.
-            /// </summary>    
+            /// </summary>
             /// <param name="reset" type="bool">when set restores the original JSON.parse() function</param>
 
             // if any parameter is passed reset
@@ -67,7 +67,7 @@
 
         /// <summary>
         /// Creates a new filter that processes dates and also delegates to a chain filter optionaly.
-        /// </summary>    
+        /// </summary>
         /// <param name="chainFilter" type="Function">property name that is parsed</param>
         /// <returns type="Function">returns a new chainning filter for dates</returns>
         function createDateParser(chainFilter) {
@@ -95,7 +95,7 @@
 
         /// <summary>
         /// A filter that can be used with JSON.parse to convert dates.
-        /// </summary>    
+        /// </summary>
         /// <param name="key" type="string">property name that is parsed</param>
         /// <param name="value" type="any">property value</param>
         /// <returns type="date">returns date or the original value if not a date string</returns>
@@ -105,7 +105,7 @@
             /// <summary>
             /// Wrapper around the JSON.parse() function that adds a date
             /// filtering extension. Returns all dates as real JavaScript dates.
-            /// </summary>    
+            /// </summary>
             /// <param name="json" type="string">JSON to be parsed</param>
             /// <returns type="any">parsed value or object</returns>
             var parse = JSON._parseSaved ? JSON._parseSaved : JSON.parse;
@@ -125,19 +125,19 @@
             /// (without the JSON string quotes).
             /// If you pass a date the date is returned as is. If you pass null
             /// null or the nullDateVal is returned.
-            /// </summary>    
+            /// </summary>
             /// <param name="dtString" type="var">Date String in ISO or MSAJAX format</param>
             /// <param name="nullDateVal" type="var">value to return if date can't be parsed</param>
-            /// <returns type="date">date or the nullDateVal (null by default)</returns> 
+            /// <returns type="date">date or the nullDateVal (null by default)</returns>
             if (!nullDateVal)
                 nullDateVal = null;
-            
+
             if (!dtString)
                 return nullDateVal; // empty
 
             if (dtString.getTime)
                 return dtString; // already a date
-            
+
             if (dtString[0] === '"' || dtString[0] === "'")
                 // strip off JSON quotes
                 dtString = dtString.substr(1, dtString.length - 2);
@@ -9905,7 +9905,7 @@ Hook.Client.prototype.request = function(segments, method, data) {
       var data = null;
       try {
         data = JSON.parseWithDate(response);
-      } catch(e){ }
+      } catch(e) { }
       console.log("Error: ", data || "Invalid JSON response.");
       deferred.resolver.reject(data);
     }
@@ -10003,7 +10003,17 @@ Hook.Client.prototype.getPayload = function(method, data) {
       }
     }
 
-    payload = payload || JSON.stringify(data);
+    payload = payload || JSON.stringify(data, function(key, value) {
+      if (this[key] instanceof Date) {
+        return Math.round(this[key].getTime() / 1000);
+      } else {
+        return value;
+      }
+    });
+
+    // empty payload, return null.
+    if (payload == "{}") { return null; }
+
     if (method==="GET" && typeof(payload)==="string") {
       payload = encodeURIComponent(payload);
     }

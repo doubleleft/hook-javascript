@@ -326,7 +326,14 @@ Hook.Client.prototype.getPayload = function(method, data) {
       }
     }
 
-    payload = payload || JSON.stringify(data);
+    payload = payload || JSON.stringify(data, function(key, value) {
+      if (this[key] instanceof Date) {
+        return Math.round(value.getTime() / 1000);
+      } else {
+        return value;
+      }
+    });
+
     if (method==="GET" && typeof(payload)==="string") {
       payload = encodeURIComponent(payload);
     }
