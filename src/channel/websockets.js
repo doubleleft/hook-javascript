@@ -47,11 +47,24 @@ Hook.Channel.WEBSOCKETS = function(client, collection, options) {
   // WAMP message debugging
   ab.debug(options.debug === true, options.verbose === true, options.debug === true);
 
+  // subscribe to queued events when successfully connected.
+  this.queued_subscriptions = {};
+  this.on('connected', function() {
+    for (var event in that.queued_subscriptions) {
+      if (that.queued_subscriptions.hasOwnProperty(event)) {
+        that.subscribe(event, that.queued_subscriptions[event]);
+      }
+    }
+    that.queued_subscriptions = null;
+  });
+
   ab.connect(options.url, function(session) {
     that.ws = session;
     that.client_id = session.sessionid();
     that.trigger('connected');
-  }, null, {
+  }, function(err) {
+    console.error("Can't connect with WebSocket server: " + options.url, err);
+  }, {
     retryDelay: 1000,
     maxRetries: 10
   });
@@ -86,9 +99,15 @@ Hook.Channel.WEBSOCKETS.prototype.constructor = Hook.Channel.WEBSOCKETS;
  *
  */
 Hook.Channel.WEBSOCKETS.prototype.subscribe = function(event, callback) {
-  this.ws.subscribe(this.collection.name + '.' + event, function(topic, data) {
-    callback(data);
-  });
+  if (!this.ws) {
+    // not connected yet, let's postpone this subscription.
+    this.queued_subscriptions[event] = callback;
+
+  } else {
+    this.ws.subscribe(this.collection.name + '.' + event, function(topic, data) {
+      callback(data);
+    });
+  }
   return this;
 };
 
