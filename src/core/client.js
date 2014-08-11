@@ -22,17 +22,10 @@
  * @constructor
  */
 
-//
-// IE9<: prevent crash when FormData isn't defined.
-//
-if(typeof(window.FormData)==="undefined"){
-    window.FormData = function(){ this.append=function(){}; };
-}
-
 Hook.Client = function(options) {
-  this.url = options.endpoint || options.url || "http://hook.dev/index.php/";
-  this.app_id = options.app_id || options.appId;
-  this.key = options.key;
+  this.url = options.endpoint || options.url || window.location.origin;
+  this.app_id = options.app_id || options.appId || "";
+  this.key = options.key || "";
 
   // append last slash if doesn't have it
   if (this.url.lastIndexOf('/') != this.url.length - 1) {
