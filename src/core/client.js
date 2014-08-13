@@ -23,6 +23,7 @@
  */
 
 Hook.Client = function(options) {
+  if (!options) { options = {}; }
   this.url = options.endpoint || options.url || window.location.origin;
   this.app_id = options.app_id || options.appId || "";
   this.key = options.key || "";
