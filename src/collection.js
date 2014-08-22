@@ -212,6 +212,18 @@ Hook.Collection.prototype.with = function() {
 
 
 /**
+ * The 'distinct' can be used to return only distinct (different) values.
+ * @method distinct
+ * @param {String} field
+ * @param {String} ... more fields
+ * @return {Hook.Collection} this
+ */
+Hook.Collection.prototype.distinct = function() {
+  this.options.distinct = true;
+  return this;
+};
+
+/**
  * Group results by field
  * @method group
  * @param {String} field
@@ -699,7 +711,8 @@ Hook.Collection.prototype.buildQuery = function() {
     operation: 'op',      // increment / decrement
     data: 'data',         // updateAll / firstOrCreate
     with: 'with',         // relationships
-    select: 'select'      // fields to return
+    select: 'select',     // fields to return
+    distinct: 'distinct'  // use distinct operation
   };
 
   for (f in shortnames) {
