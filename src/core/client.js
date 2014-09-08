@@ -171,7 +171,7 @@ DL.Client.prototype.request = function(segments, method, data) {
 
   // Compute request headers
   request_headers = this.getHeaders();
-  if(!(payload instanceof FormData)){
+  if (!(payload instanceof FormData)){
     request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
   }
 
@@ -263,14 +263,10 @@ DL.Client.prototype.getPayload = function(method, data) {
         if (typeof(value)==='undefined' || value === null) {
           continue;
 
-        } else if (typeof(value)==='number') {
+        } else if (typeof(value)==='boolean' || typeof(value)==='number' || typeof(value)==="string") {
           value = value.toString();
 
-        } else if (typeof(value)==="string") {
-          //
-          // Do nothing...
-          //
-          // IE8 can't compare instanceof String with HTMLInputElement. LOL
+        // IE8 can't compare instanceof String with HTMLInputElement.
         } else if (value instanceof HTMLInputElement && value.files && value.files.length > 0) {
           filename = value.files[0].name;
           value = value.files[0];
@@ -293,16 +289,12 @@ DL.Client.prototype.getPayload = function(method, data) {
         // Consider serialization to keep data types here: http://phpjs.org/functions/serialize/
         //
         if (!(value instanceof Array)) { // fixme
-          try {
+          if (typeof(value)==="string") {
+            formdata.append(field, value);
+          } else {
             formdata.append(field, value, filename || "file");
-          } catch (e) {
-            try {
-              // on cli-console (nodejs), here throwns error when using Collection.updateAll
-              formdata.append(field, value);
-            } catch (e2) {}
           }
         }
-
       }
 
       if (worth) {
