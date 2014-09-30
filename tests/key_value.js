@@ -2,7 +2,7 @@ asyncTest("Key-value: set", function() {
   expect(1);
 
   client.keys.set('something', 'data').then(function(data) {
-    ok(data.value == "data", "SET");
+    ok(data == "data", "SET");
   }).done(function() {
     start();
   });

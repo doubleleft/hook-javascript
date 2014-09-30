@@ -1,7 +1,7 @@
 window.client = new Hook.Client({
   url: "http://hook.dev/index.php/",
-  appId: '1',
-  key: "62f260a5a1c1f06e60909c2f1fddbf88"
+  app_id: '1',
+  key: "59599df42f7d54663b74a0b18828be05"
 });
 
 window.ascii_rand = function(length) {
@@ -15,6 +15,6 @@ window.ascii_rand = function(length) {
 
 test("API", function() {
   ok( client.url == "http://hook.dev/index.php/", "url OK");
-  ok( client.appId == "1", "'appId' OK");
-  ok( client.key == "62f260a5a1c1f06e60909c2f1fddbf88", "'secret' OK");
+  ok( client.app_id == "1", "'app_id' OK");
+  ok( client.key == "59599df42f7d54663b74a0b18828be05", "'secret' OK");
 });
