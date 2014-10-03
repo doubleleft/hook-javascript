@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/hook-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 8/8/2014
+ * @build 10/3/2014
  */
 (function(window) {
   //
@@ -9725,17 +9725,11 @@ window.Hook = Hook;
  * @constructor
  */
 
-//
-// IE9<: prevent crash when FormData isn't defined.
-//
-if(typeof(window.FormData)==="undefined"){
-    window.FormData = function(){ this.append=function(){}; };
-}
-
 Hook.Client = function(options) {
-  this.url = options.endpoint || options.url || "http://hook.dev/index.php/";
-  this.app_id = options.app_id || options.appId;
-  this.key = options.key;
+  if (!options) { options = {}; }
+  this.url = options.endpoint || options.url || window.location.origin;
+  this.app_id = options.app_id || options.appId || "";
+  this.key = options.key || "";
 
   // append last slash if doesn't have it
   if (this.url.lastIndexOf('/') != this.url.length - 1) {
@@ -10139,6 +10133,16 @@ Hook.Iterable.prototype = {
     return deferred.promise;
   }
 };
+
+// IE9<: prevent crash when FormData isn't defined.
+if(typeof(window.FormData)==="undefined"){
+  window.FormData = function(){ this.append=function(){}; };
+}
+
+// Support location.origin
+if (!window.location.origin) {
+  window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+}
 
 /**
  * @module Hook
@@ -10644,6 +10648,18 @@ Hook.Collection.prototype.with = function() {
 
 
 /**
+ * The 'distinct' can be used to return only distinct (different) values.
+ * @method distinct
+ * @param {String} field
+ * @param {String} ... more fields
+ * @return {Hook.Collection} this
+ */
+Hook.Collection.prototype.distinct = function() {
+  this.options.distinct = true;
+  return this;
+};
+
+/**
  * Group results by field
  * @method group
  * @param {String} field
@@ -11131,7 +11147,8 @@ Hook.Collection.prototype.buildQuery = function() {
     operation: 'op',      // increment / decrement
     data: 'data',         // updateAll / firstOrCreate
     with: 'with',         // relationships
-    select: 'select'      // fields to return
+    select: 'select',     // fields to return
+    distinct: 'distinct'  // use distinct operation
   };
 
   for (f in shortnames) {
