@@ -1,12 +1,12 @@
 /**
- * @module DL
- * @class DL.Collection
+ * @module Hook
+ * @class Hook.Collection
  *
- * @param {DL.Client} client
+ * @param {Hook.Client} client
  * @param {String} name
  * @constructor
  */
-DL.Collection = function(client, name) {
+Hook.Collection = function(client, name) {
   this.client = client;
 
   this.name = this._validateName(name);
@@ -15,15 +15,15 @@ DL.Collection = function(client, name) {
   this.segments = 'collection/' + this.name;
 };
 
-// Inherits from DL.Iterable
-DL.Collection.prototype = new DL.Iterable();
-DL.Collection.prototype.constructor = DL.Collection;
+// Inherits from Hook.Iterable
+Hook.Collection.prototype = new Hook.Iterable();
+Hook.Collection.prototype.constructor = Hook.Collection;
 
 /**
  * Create a new resource
  * @method create
  * @param {Object} data
- * @return {DL.Collection} this
+ * @return {Hook.Collection} this
  *
  * @example Creating an entry
  *
@@ -48,16 +48,26 @@ DL.Collection.prototype.constructor = DL.Collection;
  *     });
  *
  */
-DL.Collection.prototype.create = function(data) {
+Hook.Collection.prototype.create = function(data) {
   return this.client.post(this.segments, data);
+};
+
+/**
+ * Fields that should be retrieved from the database
+ * @method select
+ * @return {Hook.Collection} this
+ */
+Hook.Collection.prototype.select = function() {
+  this.options.select = arguments;
+  return this;
 };
 
 /**
  * Get collection data, based on `where` params.
  * @method get
- * @return {DL.Collection} this
+ * @return {Hook.Collection} this
  */
-DL.Collection.prototype.get = function() {
+Hook.Collection.prototype.get = function() {
   return this.client.get(this.segments, this.buildQuery());
 };
 
@@ -65,9 +75,9 @@ DL.Collection.prototype.get = function() {
  * Add `where` param
  * @method where
  * @param {Object | String} where params or field name
- * @param {String} operation '<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between', 'like'
+ * @param {String} operation '<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between', 'like', 'not_null'
  * @param {String} value value
- * @return {DL.Collection} this
+ * @return {Hook.Collection} this
  *
  * @example Multiple 'where' calls
  *
@@ -100,10 +110,11 @@ DL.Collection.prototype.get = function() {
  *     })
  *
  */
-DL.Collection.prototype.where = function(objects, _operation, _value) {
+Hook.Collection.prototype.where = function(objects, _operation, _value, _boolean) {
   var field,
       operation = (typeof(_value)==="undefined") ? '=' : _operation,
-      value = (typeof(_value)==="undefined") ? _operation : _value;
+      value = (typeof(_value)==="undefined") ? _operation : _value,
+      boolean = (typeof(_boolean)==="undefined") ? 'and' : _boolean;
 
   if (typeof(objects)==="object") {
     for (field in objects) {
@@ -115,16 +126,27 @@ DL.Collection.prototype.where = function(objects, _operation, _value) {
         } else {
           value = objects[field];
         }
-        this.addWhere(field, operation, value);
+        this.addWhere(field, operation, value, boolean);
       }
     }
   } else {
-    this.addWhere(objects, operation, value);
+    this.addWhere(objects, operation, value, boolean);
   }
 
   return this;
 };
 
+/**
+ * Add OR query param
+ * @method orWhere
+ * @param {Object | String} where params or field name
+ * @param {String} operation '<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between', 'like', 'not_null'
+ * @param {String} value value
+ * @return {Hook.Collection} this
+ */
+Hook.Collection.prototype.orWhere = function(objects, _operation, _value) {
+  return this.where(objects, _operation, _value, "or");
+};
 
 /**
  * Find first item by _id
@@ -148,7 +170,7 @@ DL.Collection.prototype.where = function(objects, _operation, _value) {
  *     });
  *
  */
-DL.Collection.prototype.find = function(_id) {
+Hook.Collection.prototype.find = function(_id) {
   var promise = this.client.get(this.segments + '/' + _id, this.buildQuery());
   if (arguments.length > 1) {
     return promise.then.apply(promise, Array.prototype.slice.call(arguments,1));
@@ -157,13 +179,58 @@ DL.Collection.prototype.find = function(_id) {
 };
 
 /**
+ * Set the relationships that should be eager loaded.
+ * @method with
+ * @param {String} ...
+ * @return {Hook.Collection}
+ *
+ * @example Simple relationship
+ *
+ *     client.collection('books').with('author').each(function(book) {
+ *       console.log("Author: ", book.author.name);
+ *     });
+ *
+ * @example Multiple relationships
+ *
+ *     client.collection('books').with('author', 'publisher').each(function(book) {
+ *       console.log("Author: ", book.author.name);
+ *       console.log("Publisher: ", book.publisher.name);
+ *     });
+ *
+ * @example Nested relationships
+ *
+ *     client.collection('books').with('author.contacts').each(function(book) {
+ *       console.log("Author: ", book.author.name);
+ *       console.log("Contacts: ", book.author.contacts);
+ *     });
+ *
+ */
+Hook.Collection.prototype.with = function() {
+  this.options.with = arguments;
+  return this;
+};
+
+
+/**
+ * The 'distinct' can be used to return only distinct (different) values.
+ * @method distinct
+ * @param {String} field
+ * @param {String} ... more fields
+ * @return {Hook.Collection} this
+ */
+Hook.Collection.prototype.distinct = function() {
+  this.options.distinct = true;
+  return this;
+};
+
+/**
  * Group results by field
  * @method group
  * @param {String} field
  * @param {String} ... more fields
- * @return {DL.Collection} this
+ * @return {Hook.Collection} this
  */
-DL.Collection.prototype.group = function() {
+Hook.Collection.prototype.group = function() {
   this._group = arguments;
   return this;
 };
@@ -180,8 +247,9 @@ DL.Collection.prototype.group = function() {
  *       console.log("Total:", total);
  *     });
  */
-DL.Collection.prototype.count = function() {
-  this.options.aggregation = {method: 'count', field: null};
+Hook.Collection.prototype.count = function(field) {
+  field = (typeof(field)==="undefined") ? '*' : field;
+  this.options.aggregation = {method: 'count', field: field};
   var promise = this.get();
   if (arguments.length > 0) {
     promise.then.apply(promise, arguments);
@@ -202,7 +270,7 @@ DL.Collection.prototype.count = function() {
  *       console.log("max: ", data);
  *     });
  */
-DL.Collection.prototype.max = function(field) {
+Hook.Collection.prototype.max = function(field) {
   this.options.aggregation = {method: 'max', field: field};
   var promise = this.get();
   if (arguments.length > 1) {
@@ -224,7 +292,7 @@ DL.Collection.prototype.max = function(field) {
  *       console.log("min: ", data);
  *     });
  */
-DL.Collection.prototype.min = function(field) {
+Hook.Collection.prototype.min = function(field) {
   this.options.aggregation = {method: 'min', field: field};
   var promise = this.get();
   if (arguments.length > 1) {
@@ -246,7 +314,7 @@ DL.Collection.prototype.min = function(field) {
  *       console.log("avg: ", data);
  *     });
  */
-DL.Collection.prototype.avg = function(field) {
+Hook.Collection.prototype.avg = function(field) {
   this.options.aggregation = {method: 'avg', field: field};
   var promise = this.get();
   if (arguments.length > 1) {
@@ -268,7 +336,7 @@ DL.Collection.prototype.avg = function(field) {
  *       console.log("sum: ", data);
  *     });
  */
-DL.Collection.prototype.sum = function(field) {
+Hook.Collection.prototype.sum = function(field) {
   this.options.aggregation = {method: 'sum', field: field};
   var promise = this.get();
   if (arguments.length > 1) {
@@ -289,7 +357,7 @@ DL.Collection.prototype.sum = function(field) {
  *       console.log("Last created user:", data);
  *     });
  */
-DL.Collection.prototype.first = function() {
+Hook.Collection.prototype.first = function() {
   this.options.first = 1;
   var promise = this.get();
   promise.then.apply(promise, arguments);
@@ -298,10 +366,11 @@ DL.Collection.prototype.first = function() {
 
 /**
  * First or create
- * method firstorCreate
- * param {Object} data
- * param {Function} callback
- * return {Promise}
+ *
+ * @method firstOrCreate
+ * @param {Object} data
+ * @param {Function} callback
+ * @return {Promise}
  *
  * example Return the first match for 'data' param, or create it.
  *
@@ -309,15 +378,10 @@ DL.Collection.prototype.first = function() {
  *       console.log("Unique row: ", data);
  *     });
  */
-DL.Collection.prototype.firstOrCreate = function(data) {
-  throw new Error("Not implemented");
-  // var promise;
-  // this.options.first = 1;
-  // promise = this.client.post(this.segments, { data: data, options: this.buildQuery() });
-  // if (arguments.length > 1) {
-  //   promise.then(arguments[1]);
-  // }
-  // return promise;
+Hook.Collection.prototype.firstOrCreate = function(data) {
+  this.options.first = 1;
+  this.options.data = data;
+  return this.client.post(this.segments, this.buildQuery());
 };
 
 /**
@@ -325,24 +389,35 @@ DL.Collection.prototype.firstOrCreate = function(data) {
  * @method then
  * @return {Promise}
  */
-DL.Collection.prototype.then = function() {
+Hook.Collection.prototype.then = function() {
   var promise = this.get();
   promise.then.apply(promise, arguments);
   return promise;
 };
 
 /**
+ * Alias for then & console.log.bind(console)
+ * @method debug
+ * @return {Promise}
+ */
+Hook.Collection.prototype.debug = function(func) {
+  func = (typeof(func) == "undefined") ? "log" : func;
+  return this.then(console[func].bind(console));
+};
+
+/**
  * Clear collection filtering state
  * @method reset
- * @return {DL.Collection} this
+ * @return {Hook.Collection} this
  */
-DL.Collection.prototype.reset = function() {
+Hook.Collection.prototype.reset = function() {
   this.options = {};
   this.wheres = [];
   this.ordering = [];
   this._group = [];
   this._limit = null;
   this._offset = null;
+  this._remember = null;
   return this;
 };
 
@@ -350,7 +425,7 @@ DL.Collection.prototype.reset = function() {
  * @method sort
  * @param {String} field
  * @param {Number|String} direction
- * @return {DL.Collection} this
+ * @return {Hook.Collection} this
  *
  * @example Return just the first element for current query
  *
@@ -365,7 +440,7 @@ DL.Collection.prototype.reset = function() {
  *     client.collection('users').sort('created_at', -1).then(function(data) {  });
  *     client.collection('users').sort('created_at', 'desc').then(function(data) {  });
  */
-DL.Collection.prototype.sort = function(field, direction) {
+Hook.Collection.prototype.sort = function(field, direction) {
   if (!direction) {
     direction = "asc";
   } else if (typeof(direction)==="number") {
@@ -378,7 +453,7 @@ DL.Collection.prototype.sort = function(field, direction) {
 /**
  * @method limit
  * @param {Number} int
- * @return {DL.Collection} this
+ * @return {Hook.Collection} this
  *
  * @example Limit the number of rows to retrieve
  *
@@ -392,7 +467,7 @@ DL.Collection.prototype.sort = function(field, direction) {
  *       console.log("last 5 rows updated, after 5 lastest: ", data);
  *     });
  */
-DL.Collection.prototype.limit = function(int) {
+Hook.Collection.prototype.limit = function(int) {
   this._limit = int;
   return this;
 };
@@ -402,10 +477,29 @@ DL.Collection.prototype.limit = function(int) {
  * @see limit
  *
  * @param {Number} int
- * @return {DL.Collection} this
+ * @return {Hook.Collection} this
  */
-DL.Collection.prototype.offset = function(int) {
+Hook.Collection.prototype.offset = function(int) {
   this._offset = int;
+  return this;
+};
+
+/**
+ * Indicate that the query results should be cached.
+ *
+ * @method remember
+ * @param {Number} minutes
+ * @return {Hook.Collection} this
+ *
+ * @example Caching a query
+ *
+ *     client.collection('posts').sort('updated_at', -1).limit(5).remember(10).then(function(data) {
+ *       // ...
+ *     });
+ *
+ */
+Hook.Collection.prototype.remember = function(minutes) {
+  this._remember = minutes;
   return this;
 };
 
@@ -413,7 +507,7 @@ DL.Collection.prototype.offset = function(int) {
  * Get channel for this collection.
  * @method channel
  * @param {Object} options (optional)
- * @return {DL.Channel}
+ * @return {Hook.Channel}
  *
  * @example Streaming collection data
  *
@@ -425,25 +519,25 @@ DL.Collection.prototype.offset = function(int) {
  *     client.collection('messages').create({type: 'new-game', text: "yey, streaming will catch me!"});
  *
  */
-DL.Collection.prototype.channel = function(options) {
+Hook.Collection.prototype.channel = function(options) {
   throw new Error("Not implemented.");
-  // return new DL.Channel(this.client, this, options);
+  // return new Hook.Channel(this.client, this, options);
 };
 
 /**
  * @method paginate
- * @return {DL.Pagination}
+ * @return {Hook.Pagination}
  *
  * @param {Mixed} perpage_or_callback
  * @param {Function} onComplete
  * @param {Function} onError (optional)
  */
-DL.Collection.prototype.paginate = function(perPage, onComplete, onError) {
-  var pagination = new DL.Pagination(this);
+Hook.Collection.prototype.paginate = function(perPage, onComplete, onError) {
+  var pagination = new Hook.Pagination(this);
 
   if (!onComplete) {
     onComplete = perPage;
-    perPage = DL.defaults.perPage;
+    perPage = Hook.defaults.perPage;
   }
 
   this.options.paginate = perPage;
@@ -459,7 +553,7 @@ DL.Collection.prototype.paginate = function(perPage, onComplete, onError) {
  * Drop entire collection. This operation is irreversible.
  * @return {Promise}
  */
-DL.Collection.prototype.drop = function() {
+Hook.Collection.prototype.drop = function() {
   return this.client.remove(this.segments);
 };
 
@@ -481,7 +575,7 @@ DL.Collection.prototype.drop = function() {
  *       console.log("Success:", data.success);
  *     });
  */
-DL.Collection.prototype.remove = function(_id) {
+Hook.Collection.prototype.remove = function(_id) {
   var path = this.segments;
   if (typeof(_id)!=="undefined") {
     path += '/' + _id;
@@ -501,7 +595,7 @@ DL.Collection.prototype.remove = function(_id) {
  *       console.log("Success:", data.success);
  *     });
  */
-DL.Collection.prototype.update = function(_id, data) {
+Hook.Collection.prototype.update = function(_id, data) {
   return this.client.post(this.segments + '/' + _id, data);
 };
 
@@ -518,7 +612,7 @@ DL.Collection.prototype.update = function(_id, data) {
  *       console.log(numRows, " users has been updated");
  *     });
  */
-DL.Collection.prototype.increment = function(field, value) {
+Hook.Collection.prototype.increment = function(field, value) {
   this.options.operation = { method: 'increment', field: field, value: value };
   var promise = this.client.put(this.segments, this.buildQuery());
   if (arguments.length > 0) {
@@ -540,7 +634,7 @@ DL.Collection.prototype.increment = function(field, value) {
  *       console.log(numRows, " users has been updated");
  *     });
  */
-DL.Collection.prototype.decrement = function(field, value) {
+Hook.Collection.prototype.decrement = function(field, value) {
   this.options.operation = { method: 'decrement', field: field, value: value };
   var promise = this.client.put(this.segments, this.buildQuery());
   if (arguments.length > 0) {
@@ -567,17 +661,17 @@ DL.Collection.prototype.decrement = function(field, value) {
  *       console.log(numRows, " users has been updated");
  *     });
  */
-DL.Collection.prototype.updateAll = function(data) {
+Hook.Collection.prototype.updateAll = function(data) {
   this.options.data = data;
   return this.client.put(this.segments, this.buildQuery());
 };
 
-DL.Collection.prototype.addWhere = function(field, operation, value) {
-  this.wheres.push([field, operation.toLowerCase(), value]);
+Hook.Collection.prototype.addWhere = function(field, operation, value, boolean) {
+  this.wheres.push([field, operation.toLowerCase(), value, boolean]);
   return this;
 };
 
-DL.Collection.prototype._validateName = function(name) {
+Hook.Collection.prototype._validateName = function(name) {
   var regexp = /^[a-z_\/0-9]+$/;
 
   if (!regexp.test(name)) {
@@ -587,12 +681,13 @@ DL.Collection.prototype._validateName = function(name) {
   return name;
 };
 
-DL.Collection.prototype.buildQuery = function() {
+Hook.Collection.prototype.buildQuery = function() {
   var query = {};
 
-  // apply limit / offset
+  // apply limit / offset and remember
   if (this._limit !== null) { query.limit = this._limit; }
   if (this._offset !== null) { query.offset = this._offset; }
+  if (this._remember !== null) { query.remember = this._remember; }
 
   // apply wheres
   if (this.wheres.length > 0) {
@@ -610,11 +705,14 @@ DL.Collection.prototype.buildQuery = function() {
   }
 
   var f, shortnames = {
-    paginate: 'p',
-    first: 'f',
-    aggregation: 'aggr',
-    operation: 'op',
-    data: 'data'
+    paginate: 'p',        // pagination (perPage)
+    first: 'f',           // first / firstOrCreate
+    aggregation: 'aggr',  // min / max / count / avg / sum
+    operation: 'op',      // increment / decrement
+    data: 'data',         // updateAll / firstOrCreate
+    with: 'with',         // relationships
+    select: 'select',     // fields to return
+    distinct: 'distinct'  // use distinct operation
   };
 
   for (f in shortnames) {
@@ -628,4 +726,3 @@ DL.Collection.prototype.buildQuery = function() {
 
   return query;
 };
-

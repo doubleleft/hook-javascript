@@ -1,11 +1,11 @@
 /**
- * @module DL
+ * @module Hook
  */
-var DL = {
+var Hook = {
   VERSION: "0.1.0",
   defaults: {
     perPage: 50
   }
 };
 
-window.DL = DL;
+window.Hook = Hook;

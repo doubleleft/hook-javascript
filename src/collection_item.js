@@ -1,10 +1,9 @@
 /**
- * module DL
- * class DL.CollectionItem
+ * module Hook
+ * class Hook.CollectionItem
  *
- * param {DL.Collection} collection
+ * param {Hook.Collection} collection
  * param {Number|String} _id
  * constructor
  */
-DL.CollectionItem = function(collection, _id) {};
-
+Hook.CollectionItem = function(collection, _id) {};

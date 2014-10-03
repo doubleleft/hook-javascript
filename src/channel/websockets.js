@@ -1,6 +1,6 @@
 /**
- * @module DL
- * @class DL.Channel.WEBSOCKETS
+ * @module Hook
+ * @class Hook.Channel.WEBSOCKETS
  *
  * @param {Client} client
  * @param {String} namespace
@@ -18,7 +18,7 @@
  *       url: "ws://localhost:8080"
  *     });
  */
-DL.Channel.WEBSOCKETS = function(client, collection, options) {
+Hook.Channel.WEBSOCKETS = function(client, collection, options) {
   var that = this;
 
   this.client = client;
@@ -47,11 +47,24 @@ DL.Channel.WEBSOCKETS = function(client, collection, options) {
   // WAMP message debugging
   ab.debug(options.debug === true, options.verbose === true, options.debug === true);
 
+  // subscribe to queued events when successfully connected.
+  this.queued_subscriptions = {};
+  this.on('connected', function() {
+    for (var event in that.queued_subscriptions) {
+      if (that.queued_subscriptions.hasOwnProperty(event)) {
+        that.subscribe(event, that.queued_subscriptions[event]);
+      }
+    }
+    that.queued_subscriptions = null;
+  });
+
   ab.connect(options.url, function(session) {
     that.ws = session;
     that.client_id = session.sessionid();
     that.trigger('connected');
-  }, null, {
+  }, function(err) {
+    console.error("Can't connect with WebSocket server: " + options.url, err);
+  }, {
     retryDelay: 1000,
     maxRetries: 10
   });
@@ -59,15 +72,15 @@ DL.Channel.WEBSOCKETS = function(client, collection, options) {
 
 // Inherits from Events
 
-DL.Channel.WEBSOCKETS.prototype = new DL.Events();
-DL.Channel.WEBSOCKETS.prototype.constructor = DL.Channel.WEBSOCKETS;
+Hook.Channel.WEBSOCKETS.prototype = new Hook.Events();
+Hook.Channel.WEBSOCKETS.prototype.constructor = Hook.Channel.WEBSOCKETS;
 
 /**
  * Subscribe to channel. Publishes a 'connected' message on the first time.
  * @method subscribe
  * @param {String} event (optional)
  * @param {Function} callback
- * @return {DL.Channel}
+ * @return {Hook.Channel}
  *
  * @example Registering for a single custom event
  *
@@ -85,10 +98,16 @@ DL.Channel.WEBSOCKETS.prototype.constructor = DL.Channel.WEBSOCKETS;
  *     });
  *
  */
-DL.Channel.WEBSOCKETS.prototype.subscribe = function(event, callback) {
-  this.ws.subscribe(this.collection.name + '.' + event, function(topic, data) {
-    callback(data);
-  });
+Hook.Channel.WEBSOCKETS.prototype.subscribe = function(event, callback) {
+  if (!this.ws) {
+    // not connected yet, let's postpone this subscription.
+    this.queued_subscriptions[event] = callback;
+
+  } else {
+    this.ws.subscribe(this.collection.name + '.' + event, function(topic, data) {
+      callback(data);
+    });
+  }
   return this;
 };
 
@@ -97,7 +116,7 @@ DL.Channel.WEBSOCKETS.prototype.subscribe = function(event, callback) {
  * @method isConnected
  * @return {Boolean}
  */
-DL.Channel.WEBSOCKETS.prototype.isConnected = function() {
+Hook.Channel.WEBSOCKETS.prototype.isConnected = function() {
   return this.ws && this.ws._websocket_connected;
 };
 
@@ -105,9 +124,9 @@ DL.Channel.WEBSOCKETS.prototype.isConnected = function() {
  * Unsubscribe to a event listener
  * @method unsubscribe
  * @param {String} event
- * @return {DL.Channel}
+ * @return {Hook.Channel}
  */
-DL.Channel.WEBSOCKETS.prototype.unsubscribe = function(event) {
+Hook.Channel.WEBSOCKETS.prototype.unsubscribe = function(event) {
   if (this.ws && this.ws._subscriptions[this.collection.name + '.' + event]) {
     this.ws.unsubscribe(this.collection.name + '.' + event);
   }
@@ -120,9 +139,9 @@ DL.Channel.WEBSOCKETS.prototype.unsubscribe = function(event) {
  * @param {String} event
  * @param {Object} message
  * @param {Object} options 'exclude' and 'elegible' are optional options.
- * @return {DL.Channel}
+ * @return {Hook.Channel}
  */
-DL.Channel.WEBSOCKETS.prototype.publish = function(event, message, options) {
+Hook.Channel.WEBSOCKETS.prototype.publish = function(event, message, options) {
   var exclude = [], eligible = [];
 
   if (typeof(options)==="undefined") {
@@ -144,9 +163,9 @@ DL.Channel.WEBSOCKETS.prototype.publish = function(event, message, options) {
 /**
  * Disconnect from channel, publishing a 'disconnected' message.
  * @method disconnect
- * @return {DL.Channel} this
+ * @return {Hook.Channel} this
  */
-DL.Channel.WEBSOCKETS.prototype.disconnect = function() {
+Hook.Channel.WEBSOCKETS.prototype.disconnect = function() {
   this.ws.close();
   return this;
 };
@@ -156,11 +175,11 @@ DL.Channel.WEBSOCKETS.prototype.disconnect = function() {
  * @param {String} procedure
  * @return {Promise}
  */
-DL.Channel.WEBSOCKETS.prototype.call = function(procedure, callbacks) {
+Hook.Channel.WEBSOCKETS.prototype.call = function(procedure, callbacks) {
   this.ws.call(procedure, callbacks);
   return this;
 };
-DL.Channel.WEBSOCKETS.prototype.connect = function() {
+Hook.Channel.WEBSOCKETS.prototype.connect = function() {
   this.ws.connect();
   return this;
 };

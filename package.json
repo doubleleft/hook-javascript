@@ -1,9 +1,9 @@
 {
-	"name": "dl-api-js",
-	"title": "JavaScript Client for dl-api",
-	"description": "JavaScript client to Doubleleft API",
+	"name": "hook-javascript",
+	"title": "JavaScript Client for hook",
+	"description": "JavaScript client to hook",
 	"version": "0.0.1",
-	"homepage": "http://github.com/doubleleft/dl-api",
+	"homepage": "http://github.com/doubleleft/hook-javascript",
 	"authors": [{
 		"name": "Endel Dreyer",
 		"email": "edreyer@doubleleft.com"
@@ -11,10 +11,10 @@
 	"keywords": ["api", "dl", "rest"],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/doubleleft/dl-api.git"
+		"url": "https://github.com/doubleleft/hook-javascript.git"
 	},
 	"bugs": {
-		"url": "https://github.com/doubleleft/dl-api/issues"
+		"url": "https://github.com/doubleleft/hook-javascript/issues"
 	},
 	"devDependencies": {
 		"grunt": "0.4.1",

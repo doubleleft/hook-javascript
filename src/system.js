@@ -1,11 +1,11 @@
 /**
- * @module DL
- * @class DL.System
+ * @module Hook
+ * @class Hook.System
  *
  * @param {Client} client
  * @constructor
  */
-DL.System = function(client) {
+Hook.System = function(client) {
   this.client = client;
 };
 
@@ -14,7 +14,7 @@ DL.System = function(client) {
  * @method time
  * @return {Promise}
  */
-DL.System.prototype.time = function() {
+Hook.System.prototype.time = function() {
   var promise = this.client.get('system/time');
   if (arguments.length > 0) {
     promise.then.apply(promise, arguments);

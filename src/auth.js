@@ -1,12 +1,12 @@
 /**
  * Deals with user registration/authentication
- * @module DL
- * @class DL.Auth
- * @extends DL.Events
- * @param {DL.Client} client
+ * @module Hook
+ * @class Hook.Auth
+ * @extends Hook.Events
+ * @param {Hook.Client} client
  * @constructor
  */
-DL.Auth = function(client) {
+Hook.Auth = function(client) {
   this.client = client;
 
   /**
@@ -16,8 +16,8 @@ DL.Auth = function(client) {
   this.currentUser = null;
 
   var now = new Date(),
-      tokenExpiration = new Date(parseInt((window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_EXPIRATION)) || 0, 10) * 1000),
-      currentUser = window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
+      tokenExpiration = new Date(window.localStorage.getItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_EXPIRATION)),
+      currentUser = window.localStorage.getItem(this.client.appId + '-' + Hook.Auth.AUTH_DATA_KEY);
 
   // Fill current user only when it isn't expired yet.
   if (currentUser && now.getTime() < tokenExpiration.getTime()) {
@@ -26,29 +26,29 @@ DL.Auth = function(client) {
 };
 
 // Inherits from Events
-DL.Auth.prototype = new DL.Events();
-DL.Auth.prototype.constructor = DL.Auth;
+Hook.Auth.prototype = new Hook.Events();
+Hook.Auth.prototype.constructor = Hook.Auth;
 
 // Constants
-DL.Auth.AUTH_DATA_KEY = 'dl-api-auth-data';
-DL.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
-DL.Auth.AUTH_TOKEN_EXPIRATION = 'dl-api-auth-token-expiration';
+Hook.Auth.AUTH_DATA_KEY = 'dl-api-auth-data';
+Hook.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
+Hook.Auth.AUTH_TOKEN_EXPIRATION = 'dl-api-auth-token-expiration';
 
 /**
  * @method setUserData
  * @param {Object} data
- * @return {DL.Auth} this
+ * @return {Hook.Auth} this
  */
-DL.Auth.prototype.setCurrentUser = function(data) {
+Hook.Auth.prototype.setCurrentUser = function(data) {
   if (!data) {
     // trigger logout event
     this.trigger('logout', this.currentUser);
     this.currentUser = data;
 
-    window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
-    window.localStorage.removeItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY);
+    window.localStorage.removeItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_KEY);
+    window.localStorage.removeItem(this.client.appId + '-' + Hook.Auth.AUTH_DATA_KEY);
   } else {
-    window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_DATA_KEY, JSON.stringify(data));
+    window.localStorage.setItem(this.client.appId + '-' + Hook.Auth.AUTH_DATA_KEY, JSON.stringify(data));
 
     // trigger login event
     this.currentUser = data;
@@ -83,7 +83,7 @@ DL.Auth.prototype.setCurrentUser = function(data) {
  *     }, {scope: 'email'});
  *
  */
-DL.Auth.prototype.register = function(provider, data) {
+Hook.Auth.prototype.register = function(provider, data) {
   var promise, that = this;
   if (typeof(data)==="undefined") { data = {}; }
   promise = this.client.post('auth/' + provider, data);
@@ -91,15 +91,6 @@ DL.Auth.prototype.register = function(provider, data) {
     that._registerToken(data);
   });
   return promise;
-};
-
-/**
- * @method authenticate
- * @see register
- */
-DL.Auth.prototype.authenticate = function() {
-  console.log("auth.authenticate method is deprecated. Please use auth.register.");
-  return this.register.apply(this, arguments);
 };
 
 /**
@@ -116,13 +107,11 @@ DL.Auth.prototype.authenticate = function() {
  *     }, function(data){
  *       console.log("User not found or password invalid.", data);
  *     });
- *
- * Verify if user is already registered, and log-in if succeed.
  */
-DL.Auth.prototype.login = function(provider, data) {
+Hook.Auth.prototype.login = function(provider, data) {
   var promise, that = this;
   if (typeof(data)==="undefined") { data = {}; }
-  promise = this.client.post('auth/' + provider + '/verify', data);
+  promise = this.client.post('auth/' + provider + '/login', data);
   promise.then(function(data) {
     that._registerToken(data);
   });
@@ -130,12 +119,32 @@ DL.Auth.prototype.login = function(provider, data) {
 };
 
 /**
- * @method verify
- * @see login
+ * Update current user info.
+ *
+ * @method update
+ * @param {Object} data
+ * @return {Promise}
+ *
+ * @example
+ *
+ *     client.auth.update({ score: 100 }).then(function(data){
+ *       console.log("updated successfully: ", data);
+ *     }).otherwise(function(data){
+ *       console.log("error: ", data);
+ *     });
  */
-DL.Auth.prototype.verify = function() {
-  console.log("auth.verify method is deprecated. Please use auth.login.");
-  return this.login.apply(this, arguments);
+Hook.Auth.prototype.update = function(data) {
+  if (!this.currentUser) {
+    throw new Error("not logged in.");
+  }
+
+  var that = this;
+  var promise = this.client.collection('auth').update(this.currentUser._id, data);
+
+  // update localStorage info
+  promise.then(function(data) { that.setCurrentUser(data); });
+
+  return promise;
 };
 
 /**
@@ -156,7 +165,7 @@ DL.Auth.prototype.verify = function() {
  *       console.log("User not found: ", data);
  *     });
  */
-DL.Auth.prototype.forgotPassword = function(data) {
+Hook.Auth.prototype.forgotPassword = function(data) {
   if (typeof(data)==="undefined") { data = {}; }
   return this.client.post('auth/email/forgotPassword', data);
 };
@@ -186,7 +195,7 @@ DL.Auth.prototype.forgotPassword = function(data) {
  *     });
  *
  */
-DL.Auth.prototype.resetPassword = function(data) {
+Hook.Auth.prototype.resetPassword = function(data) {
   if (typeof(data)==="string") { data = { password: data }; }
   if (typeof(data.token)==="undefined") {
     data.token = window.location.href.match(/[\?|&]token=([a-z0-9]+)/);
@@ -199,9 +208,9 @@ DL.Auth.prototype.resetPassword = function(data) {
 
 /**
  * @method logout
- * @return {DL.Auth} this
+ * @return {Hook.Auth} this
  */
-DL.Auth.prototype.logout = function() {
+Hook.Auth.prototype.logout = function() {
   return this.setCurrentUser(null);
 };
 
@@ -209,15 +218,15 @@ DL.Auth.prototype.logout = function() {
  * @method getToken
  * @return {String|null}
  */
-DL.Auth.prototype.getToken = function() {
-  return window.localStorage.getItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY);
+Hook.Auth.prototype.getToken = function() {
+  return window.localStorage.getItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_KEY);
 };
 
-DL.Auth.prototype._registerToken = function(data) {
+Hook.Auth.prototype._registerToken = function(data) {
   if (data.token) {
     // register authentication token on localStorage
-    window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_KEY, data.token.token);
-    window.localStorage.setItem(this.client.appId + '-' + DL.Auth.AUTH_TOKEN_EXPIRATION, data.token.expire_at);
+    window.localStorage.setItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_KEY, data.token.token);
+    window.localStorage.setItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_EXPIRATION, data.token.expire_at);
     delete data.token;
 
     // Store curent user

@@ -1,3 +1,10 @@
+/*
+ * hook-javascript v0.1.0
+ * https://github.com/doubleleft/hook-javascript
+ *
+ * @copyright 2014 Doubleleft
+ * @build 10/3/2014
+ */
 (function(window) {
   /**
    * @module Backbone

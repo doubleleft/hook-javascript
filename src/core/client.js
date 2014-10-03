@@ -1,39 +1,32 @@
 /**
- * DL.Client is the entry-point for using dl-api.
+ * Hook.Client is the entry-point for using dl-api.
  *
  * You should instantiate a global javascript client for consuming dl-api.
  *
  * ```javascript
- * window.dl = new DL.Client({
+ * window.dl = new Hook.Client({
  *   url: "http://local-or-remote-dl-api-address.com/api/public/index.php/",
- *   appId: 1,    // your app's id
+ *   app_id: 1,   // your app's id
  *   key: 'test'  // your app's public key
  * });
  * ```
  *
- * @module DL
- * @class DL.Client
+ * @module Hook
+ * @class Hook.Client
  *
  * @param {Object} options
- *   @param {String} options.appId
+ *   @param {String} options.app_id
  *   @param {String} options.key
- *   @param {String} options.url default: http://dl-api.dev
+ *   @param {String} options.url default: http://hook.dev
  *
  * @constructor
  */
 
-//
-// IE9<: prevent crash when FormData isn't defined.
-//
-if(typeof(window.FormData)==="undefined"){
-    window.FormData = function(){ this.append=function(){}; };
-}
-
-DL.Client = function(options) {
-  this.url = options.url || "http://dl-api.dev/api/public/index.php/";
-  this.appId = options.appId;
-  this.key = options.key;
-  this.proxy = options.proxy;
+Hook.Client = function(options) {
+  if (!options) { options = {}; }
+  this.url = options.endpoint || options.url || window.location.origin;
+  this.app_id = options.app_id || options.appId || "";
+  this.key = options.key || "";
 
   // append last slash if doesn't have it
   if (this.url.lastIndexOf('/') != this.url.length - 1) {
@@ -41,34 +34,29 @@ DL.Client = function(options) {
   }
 
   /**
-   * @property {DL.KeyValues} keys
+   * @property {Hook.KeyValues} keys
    */
-  this.keys = new DL.KeyValues(this);
+  this.keys = new Hook.KeyValues(this);
 
   /**
-   * @property {DL.Auth} auth
+   * @property {Hook.Auth} auth
    */
-  this.auth = new DL.Auth(this);
+  this.auth = new Hook.Auth(this);
 
   /**
-   * @property {DL.Fiels} files
+   * @property {Hook.System} system
    */
-  this.files = new DL.Files(this);
-
-  /**
-   * @property {DL.System} system
-   */
-  this.system = new DL.System(this);
+  this.system = new Hook.System(this);
 
   // Setup all registered plugins.
-  DL.Plugin.Manager.setup(this);
+  Hook.Plugin.Manager.setup(this);
 };
 
 /**
  * Get collection instance.
  * @method collection
  * @param {String} collectionName
- * @return {DL.Collection}
+ * @return {Hook.Collection}
  *
  * @example Retrieve a collection reference. Your collection tables are created on demand.
  *
@@ -79,8 +67,8 @@ DL.Client = function(options) {
  *     var highscores = client.collection('highscores');
  *
  */
-DL.Client.prototype.collection = function(collectionName) {
-  return new DL.Collection(this, collectionName);
+Hook.Client.prototype.collection = function(collectionName) {
+  return new Hook.Collection(this, collectionName);
 };
 
 /**
@@ -88,7 +76,7 @@ DL.Client.prototype.collection = function(collectionName) {
  * @method channel
  * @param {String} name
  * @param {Object} options (optional)
- * @return {DL.Channel}
+ * @return {Hook.Channel}
  *
  * @example Create a channel using Servet-Sent Events transport.
  *
@@ -99,7 +87,7 @@ DL.Client.prototype.collection = function(collectionName) {
  *     var channel = client.channel('messages', { transport: "websockets" });
  *
  */
-DL.Client.prototype.channel = function(name, options) {
+Hook.Client.prototype.channel = function(name, options) {
   if (typeof(options)==="undefined") { options = {}; }
 
   var collection = this.collection(name);
@@ -109,15 +97,16 @@ DL.Client.prototype.channel = function(name, options) {
   if (!options.transport) { options.transport = 'sse'; }
   options.transport = options.transport.toUpperCase();
 
-  return new DL.Channel[options.transport](this, collection, options);
+  return new Hook.Channel[options.transport](this, collection, options);
 };
 
 /**
+ * Create resource
  * @method post
  * @param {String} segments
  * @param {Object} data
  */
-DL.Client.prototype.post = function(segments, data) {
+Hook.Client.prototype.post = function(segments, data) {
   if (typeof(data)==="undefined") {
     data = {};
   }
@@ -125,28 +114,31 @@ DL.Client.prototype.post = function(segments, data) {
 };
 
 /**
+ * Retrieve a resource
  * @method get
  * @param {String} segments
  * @param {Object} data
  */
-DL.Client.prototype.get = function(segments, data) {
+Hook.Client.prototype.get = function(segments, data) {
   return this.request(segments, "GET", data);
 };
 
 /**
+ * Update existing resource
  * @method put
  * @param {String} segments
  * @param {Object} data
  */
-DL.Client.prototype.put = function(segments, data) {
+Hook.Client.prototype.put = function(segments, data) {
   return this.request(segments, "PUT", data);
 };
 
 /**
+ * Delete existing resource.
  * @method delete
  * @param {String} segments
  */
-DL.Client.prototype.remove = function(segments, data) {
+Hook.Client.prototype.remove = function(segments, data) {
   return this.request(segments, "DELETE", data);
 };
 
@@ -156,7 +148,7 @@ DL.Client.prototype.remove = function(segments, data) {
  * @param {String} method
  * @param {Object} data
  */
-DL.Client.prototype.request = function(segments, method, data) {
+Hook.Client.prototype.request = function(segments, method, data) {
   var payload, request_headers, deferred = when.defer(),
       synchronous = false;
 
@@ -175,30 +167,26 @@ DL.Client.prototype.request = function(segments, method, data) {
     request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
   }
 
-  if (this.proxy) {
-    // Forward API endpoint to proxy
-    request_headers["X-Endpoint"] = this.url;
-
-  } else if (typeof(XDomainRequest) !== "undefined") {
+  if (typeof(XDomainRequest) !== "undefined") {
     // XMLHttpRequest#setRequestHeader isn't implemented on Internet Explorer's XDomainRequest
-    segments += "?X-App-Id=" + this.appId + "&X-App-Key=" + this.key;
+    segments += "?X-App-Id=" + this.app_id + "&X-App-Key=" + this.key;
     var auth_token = this.auth.getToken();
     if (auth_token) { segments += '&X-Auth-Token=' + auth_token; }
   }
 
-  deferred.promise.xhr = uxhr((this.proxy || this.url) + segments, payload, {
+  deferred.promise.xhr = uxhr(this.url + segments, payload, {
     method: method,
     headers: request_headers,
     sync: synchronous,
     success: function(response) {
       var data = null;
-      try{
-        data = JSON.parse(response);
-      } catch(e) {
-        //something wrong with JSON. IE throws exception on JSON.parse
-      }
+      try {
+        data = JSON.parseWithDate(response);
+      } catch(e) { }
 
       if (data === false || data === null || data.error) {
+        // log error on console
+        if (data && data.error) { console.error(data.error); }
         deferred.resolver.reject(data);
       } else {
         deferred.resolver.resolve(data);
@@ -206,11 +194,10 @@ DL.Client.prototype.request = function(segments, method, data) {
     },
     error: function(response) {
       var data = null;
-      try{
-        data = JSON.parse(response);
-      }catch(e){
-      }
-      console.log("Error: ", data || "invalid json response");
+      try {
+        data = JSON.parseWithDate(response);
+      } catch(e) { }
+      console.log("Error: ", data || "Invalid JSON response.");
       deferred.resolver.reject(data);
     }
   });
@@ -223,10 +210,10 @@ DL.Client.prototype.request = function(segments, method, data) {
  * @method getHeaders
  * @return {Object}
  */
-DL.Client.prototype.getHeaders = function() {
+Hook.Client.prototype.getHeaders = function() {
   // App authentication request headers
   var request_headers = {
-    'X-App-Id': this.appId,
+    'X-App-Id': this.app_id,
     'X-App-Key': this.key,
   }, auth_token;
 
@@ -245,7 +232,7 @@ DL.Client.prototype.getHeaders = function() {
  * @param {Object} data
  * @return {String|FormData}
  */
-DL.Client.prototype.getPayload = function(method, data) {
+Hook.Client.prototype.getPayload = function(method, data) {
   var payload = null;
   if (data) {
 
@@ -302,7 +289,17 @@ DL.Client.prototype.getPayload = function(method, data) {
       }
     }
 
-    payload = payload || JSON.stringify(data);
+    payload = payload || JSON.stringify(data, function(key, value) {
+      if (this[key] instanceof Date) {
+        return Math.round(this[key].getTime() / 1000);
+      } else {
+        return value;
+      }
+    });
+
+    // empty payload, return null.
+    if (payload == "{}") { return null; }
+
     if (method==="GET" && typeof(payload)==="string") {
       payload = encodeURIComponent(payload);
     }
@@ -310,7 +307,7 @@ DL.Client.prototype.getPayload = function(method, data) {
   return payload;
 }
 
-DL.Client.prototype.serialize = function(obj, prefix) {
+Hook.Client.prototype.serialize = function(obj, prefix) {
   var str = [];
   for (var p in obj) {
     if (obj.hasOwnProperty(p)) {

@@ -1,11 +1,20 @@
-window.client = new DL.Client({
-  url: "http://dl-api.ddll.co/",
-  appId: '1',
-  key: "q1uU7tFtXnLad6FIGGn2cB+gxcx64/uPoDhqe2Zn5AE="
+window.client = new Hook.Client({
+  url: "http://hook.dev/index.php/",
+  app_id: '1',
+  key: "59599df42f7d54663b74a0b18828be05"
 });
 
+window.ascii_rand = function(length) {
+  var str = "";
+  for (var i=0; i < length; i++) {
+    var charCode = 97 + Math.floor((Math.random() * 25));
+    str += String.fromCharCode(charCode);
+  }
+  return str; //  + ((new Date()).getTime().toString().substr(8))
+}
+
 test("API", function() {
-  ok( client.url == "http://dl-api.ddll.co/", "url OK");
-  ok( client.appId == "1", "'appId' OK");
-  ok( client.key == "test", "'secret' OK");
+  ok( client.url == "http://hook.dev/index.php/", "url OK");
+  ok( client.app_id == "1", "'app_id' OK");
+  ok( client.key == "59599df42f7d54663b74a0b18828be05", "'secret' OK");
 });

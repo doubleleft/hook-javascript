@@ -1,9 +1,9 @@
-asyncTest("Plugin: Backbone.DLModel", function() {
+asyncTest("Plugin: Backbone.HookModel", function() {
   expect(1);
 
-  Backbone.dlapi = client;
+  Backbone.hook = client;
 
-  var Post = Backbone.DLModel.extend({name: "posts"});
+  var Post = Backbone.HookModel.extend({name: "posts"});
   var entry = new Post({
     title: "I'm a Backbone model",
     description: "Syncing with dl-api."

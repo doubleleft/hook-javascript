@@ -1,13 +1,9 @@
 /*
- * dl-api-javascript v0.1.0
- * https://github.com/doubleleft/dl-api-javascript
+ * hook-javascript v0.1.0
+ * https://github.com/doubleleft/hook-javascript
  *
  * @copyright 2014 Doubleleft
-<<<<<<< HEAD
- * @build 9/8/2014
-=======
- * @build 7/8/2014
->>>>>>> dev
+ * @build 7/30/2014
  */
 (function(define) { 'use strict';
 define(function (require) {
@@ -33,7 +29,7 @@ window.Hook = Hook;
  * ```javascript
  * window.dl = new Hook.Client({
  *   url: "http://local-or-remote-dl-api-address.com/api/public/index.php/",
- *   appId: 1,    // your app's id
+ *   app_id: 1,   // your app's id
  *   key: 'test'  // your app's public key
  * });
  * ```
@@ -42,9 +38,9 @@ window.Hook = Hook;
  * @class Hook.Client
  *
  * @param {Object} options
- *   @param {String} options.appId
+ *   @param {String} options.app_id
  *   @param {String} options.key
- *   @param {String} options.url default: http://dl-api.dev
+ *   @param {String} options.url default: http://hook.dev
  *
  * @constructor
  */
@@ -57,10 +53,9 @@ if(typeof(window.FormData)==="undefined"){
 }
 
 Hook.Client = function(options) {
-  this.url = options.url || "http://dl-api.dev/api/public/index.php/";
-  this.appId = options.appId;
+  this.url = options.endpoint || options.url || "http://hook.dev/index.php/";
+  this.app_id = options.app_id || options.appId;
   this.key = options.key;
-  this.proxy = options.proxy;
 
   // append last slash if doesn't have it
   if (this.url.lastIndexOf('/') != this.url.length - 1) {
@@ -76,11 +71,6 @@ Hook.Client = function(options) {
    * @property {Hook.Auth} auth
    */
   this.auth = new Hook.Auth(this);
-
-  /**
-   * @property {Hook.Fiels} files
-   */
-  this.files = new Hook.Files(this);
 
   /**
    * @property {Hook.System} system
@@ -140,6 +130,7 @@ Hook.Client.prototype.channel = function(name, options) {
 };
 
 /**
+ * Create resource
  * @method post
  * @param {String} segments
  * @param {Object} data
@@ -152,6 +143,7 @@ Hook.Client.prototype.post = function(segments, data) {
 };
 
 /**
+ * Retrieve a resource
  * @method get
  * @param {String} segments
  * @param {Object} data
@@ -161,6 +153,7 @@ Hook.Client.prototype.get = function(segments, data) {
 };
 
 /**
+ * Update existing resource
  * @method put
  * @param {String} segments
  * @param {Object} data
@@ -170,6 +163,7 @@ Hook.Client.prototype.put = function(segments, data) {
 };
 
 /**
+ * Delete existing resource.
  * @method delete
  * @param {String} segments
  */
@@ -198,22 +192,18 @@ Hook.Client.prototype.request = function(segments, method, data) {
 
   // Compute request headers
   request_headers = this.getHeaders();
-  if (!(payload instanceof FormData)){
+  if(!(payload instanceof FormData)){
     request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
   }
 
-  if (this.proxy) {
-    // Forward API endpoint to proxy
-    request_headers["X-Endpoint"] = this.url;
-
-  } else if (typeof(XDomainRequest) !== "undefined") {
+  if (typeof(XDomainRequest) !== "undefined") {
     // XMLHttpRequest#setRequestHeader isn't implemented on Internet Explorer's XDomainRequest
-    segments += "?X-App-Id=" + this.appId + "&X-App-Key=" + this.key;
+    segments += "?X-App-Id=" + this.app_id + "&X-App-Key=" + this.key;
     var auth_token = this.auth.getToken();
     if (auth_token) { segments += '&X-Auth-Token=' + auth_token; }
   }
 
-  deferred.promise.xhr = uxhr((this.proxy || this.url) + segments, payload, {
+  deferred.promise.xhr = uxhr(this.url + segments, payload, {
     method: method,
     headers: request_headers,
     sync: synchronous,
@@ -226,6 +216,8 @@ Hook.Client.prototype.request = function(segments, method, data) {
       }
 
       if (data === false || data === null || data.error) {
+        // log error on console
+        if (data && data.error) { console.error(data.error); }
         deferred.resolver.reject(data);
       } else {
         deferred.resolver.resolve(data);
@@ -253,7 +245,7 @@ Hook.Client.prototype.request = function(segments, method, data) {
 Hook.Client.prototype.getHeaders = function() {
   // App authentication request headers
   var request_headers = {
-    'X-App-Id': this.appId,
+    'X-App-Id': this.app_id,
     'X-App-Key': this.key,
   }, auth_token;
 
@@ -290,10 +282,11 @@ Hook.Client.prototype.getPayload = function(method, data) {
         if (typeof(value)==='undefined' || value === null) {
           continue;
 
-        } else if (typeof(value)==='boolean' || typeof(value)==='number' || typeof(value)==="string") {
-          value = value.toString();
-
-        // IE8 can't compare instanceof String with HTMLInputElement.
+        } else if (typeof(value)==="string") {
+          //
+          // Do nothing...
+          //
+          // IE8 can't compare instanceof String with HTMLInputElement. LOL
         } else if (value instanceof HTMLInputElement && value.files && value.files.length > 0) {
           filename = value.files[0].name;
           value = value.files[0];
@@ -316,12 +309,16 @@ Hook.Client.prototype.getPayload = function(method, data) {
         // Consider serialization to keep data types here: http://phpjs.org/functions/serialize/
         //
         if (!(value instanceof Array)) { // fixme
-          if (typeof(value)==="string") {
-            formdata.append(field, value);
-          } else {
+          try {
             formdata.append(field, value, filename || "file");
+          } catch (e) {
+            try {
+              // on cli-console (nodejs), here throwns error when using Collection.updateAll
+              formdata.append(field, value);
+            } catch (e2) {}
           }
         }
+
       }
 
       if (worth) {
@@ -329,7 +326,14 @@ Hook.Client.prototype.getPayload = function(method, data) {
       }
     }
 
-    payload = payload || JSON.stringify(data);
+    payload = payload || JSON.stringify(data, function(key, value) {
+      if (this[key] instanceof Date) {
+        return Math.round(value.getTime() / 1000);
+      } else {
+        return value;
+      }
+    });
+
     if (method==="GET" && typeof(payload)==="string") {
       payload = encodeURIComponent(payload);
     }
@@ -505,7 +509,7 @@ Hook.Auth = function(client) {
   this.currentUser = null;
 
   var now = new Date(),
-      tokenExpiration = new Date(parseInt((window.localStorage.getItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_EXPIRATION)) || 0, 10) * 1000),
+      tokenExpiration = new Date(window.localStorage.getItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_EXPIRATION)),
       currentUser = window.localStorage.getItem(this.client.appId + '-' + Hook.Auth.AUTH_DATA_KEY);
 
   // Fill current user only when it isn't expired yet.
@@ -596,8 +600,6 @@ Hook.Auth.prototype.register = function(provider, data) {
  *     }, function(data){
  *       console.log("User not found or password invalid.", data);
  *     });
- *
- * Verify if user is already registered, and log-in if succeed.
  */
 Hook.Auth.prototype.login = function(provider, data) {
   var promise, that = this;
@@ -606,6 +608,35 @@ Hook.Auth.prototype.login = function(provider, data) {
   promise.then(function(data) {
     that._registerToken(data);
   });
+  return promise;
+};
+
+/**
+ * Update current user info.
+ *
+ * @method update
+ * @param {Object} data
+ * @return {Promise}
+ *
+ * @example
+ *
+ *     client.auth.update({ score: 100 }).then(function(data){
+ *       console.log("updated successfully: ", data);
+ *     }).otherwise(function(data){
+ *       console.log("error: ", data);
+ *     });
+ */
+Hook.Auth.prototype.update = function(data) {
+  if (!this.currentUser) {
+    throw new Error("not logged in.");
+  }
+
+  var that = this;
+  var promise = this.client.collection('auth').update(this.currentUser._id, data);
+
+  // update localStorage info
+  promise.then(function(data) { that.setCurrentUser(data); });
+
   return promise;
 };
 
@@ -774,6 +805,16 @@ Hook.Collection.prototype.create = function(data) {
 };
 
 /**
+ * Fields that should be retrieved from the database
+ * @method select
+ * @return {Hook.Collection} this
+ */
+Hook.Collection.prototype.select = function() {
+  this.options.select = arguments;
+  return this;
+};
+
+/**
  * Get collection data, based on `where` params.
  * @method get
  * @return {Hook.Collection} this
@@ -786,7 +827,7 @@ Hook.Collection.prototype.get = function() {
  * Add `where` param
  * @method where
  * @param {Object | String} where params or field name
- * @param {String} operation '<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between', 'like'
+ * @param {String} operation '<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between', 'like', 'not_null'
  * @param {String} value value
  * @return {Hook.Collection} this
  *
@@ -821,10 +862,11 @@ Hook.Collection.prototype.get = function() {
  *     })
  *
  */
-Hook.Collection.prototype.where = function(objects, _operation, _value) {
+Hook.Collection.prototype.where = function(objects, _operation, _value, _boolean) {
   var field,
       operation = (typeof(_value)==="undefined") ? '=' : _operation,
-      value = (typeof(_value)==="undefined") ? _operation : _value;
+      value = (typeof(_value)==="undefined") ? _operation : _value,
+      boolean = (typeof(_boolean)==="undefined") ? 'and' : _boolean;
 
   if (typeof(objects)==="object") {
     for (field in objects) {
@@ -836,14 +878,26 @@ Hook.Collection.prototype.where = function(objects, _operation, _value) {
         } else {
           value = objects[field];
         }
-        this.addWhere(field, operation, value);
+        this.addWhere(field, operation, value, boolean);
       }
     }
   } else {
-    this.addWhere(objects, operation, value);
+    this.addWhere(objects, operation, value, boolean);
   }
 
   return this;
+};
+
+/**
+ * Add OR query param
+ * @method orWhere
+ * @param {Object | String} where params or field name
+ * @param {String} operation '<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between', 'like', 'not_null'
+ * @param {String} value value
+ * @return {Hook.Collection} this
+ */
+Hook.Collection.prototype.orWhere = function(objects, _operation, _value) {
+  return this.where(objects, _operation, _value, "or");
 };
 
 /**
@@ -933,8 +987,9 @@ Hook.Collection.prototype.group = function() {
  *       console.log("Total:", total);
  *     });
  */
-Hook.Collection.prototype.count = function() {
-  this.options.aggregation = {method: 'count', field: null};
+Hook.Collection.prototype.count = function(field) {
+  field = (typeof(field)==="undefined") ? '*' : field;
+  this.options.aggregation = {method: 'count', field: field};
   var promise = this.get();
   if (arguments.length > 0) {
     promise.then.apply(promise, arguments);
@@ -1051,10 +1106,11 @@ Hook.Collection.prototype.first = function() {
 
 /**
  * First or create
- * method firstorCreate
- * param {Object} data
- * param {Function} callback
- * return {Promise}
+ *
+ * @method firstOrCreate
+ * @param {Object} data
+ * @param {Function} callback
+ * @return {Promise}
  *
  * example Return the first match for 'data' param, or create it.
  *
@@ -1063,14 +1119,9 @@ Hook.Collection.prototype.first = function() {
  *     });
  */
 Hook.Collection.prototype.firstOrCreate = function(data) {
-  throw new Error("Not implemented");
-  // var promise;
-  // this.options.first = 1;
-  // promise = this.client.post(this.segments, { data: data, options: this.buildQuery() });
-  // if (arguments.length > 1) {
-  //   promise.then(arguments[1]);
-  // }
-  // return promise;
+  this.options.first = 1;
+  this.options.data = data;
+  return this.client.post(this.segments, this.buildQuery());
 };
 
 /**
@@ -1082,6 +1133,16 @@ Hook.Collection.prototype.then = function() {
   var promise = this.get();
   promise.then.apply(promise, arguments);
   return promise;
+};
+
+/**
+ * Alias for then & console.log.bind(console)
+ * @method debug
+ * @return {Promise}
+ */
+Hook.Collection.prototype.debug = function(func) {
+  func = (typeof(func) == "undefined") ? "log" : func;
+  return this.then(console[func].bind(console));
 };
 
 /**
@@ -1345,8 +1406,8 @@ Hook.Collection.prototype.updateAll = function(data) {
   return this.client.put(this.segments, this.buildQuery());
 };
 
-Hook.Collection.prototype.addWhere = function(field, operation, value) {
-  this.wheres.push([field, operation.toLowerCase(), value]);
+Hook.Collection.prototype.addWhere = function(field, operation, value, boolean) {
+  this.wheres.push([field, operation.toLowerCase(), value, boolean]);
   return this;
 };
 
@@ -1384,12 +1445,13 @@ Hook.Collection.prototype.buildQuery = function() {
   }
 
   var f, shortnames = {
-    paginate: 'p',
-    first: 'f',
-    aggregation: 'aggr',
-    operation: 'op',
-    data: 'data',
-    with: 'with'
+    paginate: 'p',        // pagination (perPage)
+    first: 'f',           // first / firstOrCreate
+    aggregation: 'aggr',  // min / max / count / avg / sum
+    operation: 'op',      // increment / decrement
+    data: 'data',         // updateAll / firstOrCreate
+    with: 'with',         // relationships
+    select: 'select'      // fields to return
   };
 
   for (f in shortnames) {
@@ -1413,61 +1475,6 @@ Hook.Collection.prototype.buildQuery = function() {
  * constructor
  */
 Hook.CollectionItem = function(collection, _id) {};
-
-/**
- * @module Hook
- * @class Hook.Files
- */
-Hook.Files = function(client) {
-  this.client = client;
-};
-
-/**
- * @method upload
- * @param {Canvas|Blob} data
- * @param {String} filename [optional]
- * @param {String} mimeType [optional]
- * @return {Promise}
- */
-Hook.Files.prototype.upload = function(data, fileName, mimeType){
-  var formData = new FormData();
-  if(data instanceof HTMLCanvasElement && data.toBlob){
-	var deferred = when.defer();
-    var self = this;
-    data.toBlob(function(blob){
-      self.upload(blob, fileName, mimeType).then(deferred.resolver.resolve, deferred.resolver.reject);
-    }, mimeType || "image/png");
-
-	return deferred.promise;
-  }
-
-  try {
-    formData.append('file', data, fileName || "dlApiFile");
-  } catch(e) {
-    formData.append('file', data);
-  }
-  return this.client.post('files', formData);
-};
-
-/**
- * Get file data by id.
- * @method get
- * @param {Number|String} _id
- * @return {Promise}
- */
-Hook.Files.prototype.get = function(_id) {
-  return this.client.get('files/' + _id);
-};
-
-/**
- * Remove file by id.
- * @method remove
- * @param {Number|String} _id
- * @return {Promise}
- */
-Hook.Files.prototype.remove = function(_id) {
-  return this.client.remove('files/' + _id);
-};
 
 /**
  * @module Hook
