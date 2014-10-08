@@ -50,12 +50,6 @@ commands:
     $ bower install
     $ grunt
 
-
-API Docs
----
-
-For a more complete documentation, check the [API reference](http://doubleleft.github.io/hook-javascript/).
-
 To build and publish the docs:
 
 ```bash
