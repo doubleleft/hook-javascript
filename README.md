@@ -1,24 +1,25 @@
 hook-javascript client
 ===
 
-hook javascript client.
+JavaScript client for [hook](https://github.com/doubleleft/hook).
+
+- [Documentation](http://doubleleft.github.io/hook-javascript/classes/Hook.Client.html).
+- [Plugins](https://github.com/doubleleft/hook-javascript/wiki/Plugins).
 
 How to use
 ---
 
-Hook.Client is the entry-point for using hook.
-
-You should instantiate a global javascript client for consuming hook.
+Initialize with your app's credentials:
 
 ```javascript
-window.hook = new Hook.Client({
+var hook = new Hook.Client({
   url:   "http://local-or-remote-hook.com/index.php/",
   appId: 1,    // your app's id
   key: 'test'  // your app's public key
 });
 ```
 
-After that, you're free to instantiate collections
+Creating collection entries:
 
 ```javascript
 hook.collection('posts').create({
@@ -28,16 +29,15 @@ hook.collection('posts').create({
 });
 ```
 
-And filter then, using `where`
+Filtering:
 
 ```javascript
-var c = hook.collection('posts');
-c.where('author','Vicente'); // equal operator may be omitted
-c.where('stars','>',10);     // support '<' and '>' operators
-c.then(function(result) {
-  console.log(result);
+hook.collection('posts').where('stars', '>=', 5).then(function(data) {
+  console.log(data);
 });
 ```
+
+View full documentation [here](http://doubleleft.github.io/hook-javascript/classes/Hook.Client.html).
 
 How to build
 ---
@@ -61,3 +61,8 @@ To build and publish the docs:
 ```bash
 make publish-docs
 ```
+
+License
+---
+
+MIT

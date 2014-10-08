@@ -7,4 +7,4 @@ compile:
   themedir: 'yuidoc-theme'
   options:
     paths: 'src/'
-    outdir: '../dl-api-javascript-docs'
+    outdir: '../hook-javascript-docs'

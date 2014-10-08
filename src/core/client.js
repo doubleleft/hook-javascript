@@ -4,8 +4,8 @@
  * You should instantiate a global javascript client for consuming dl-api.
  *
  * ```javascript
- * window.dl = new Hook.Client({
- *   url: "http://local-or-remote-dl-api-address.com/api/public/index.php/",
+ * var client = new Hook.Client({
+ *   url: "http://local-or-remote-dl-api-address.com/public/index.php/",
  *   app_id: 1,   // your app's id
  *   key: 'test'  // your app's public key
  * });
