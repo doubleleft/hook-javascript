@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/hook-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 10/7/2014
+ * @build 10/19/2014
  */
 (function(window) {
   //
@@ -10231,34 +10231,25 @@ Hook.Auth.prototype.setCurrentUser = function(data) {
 };
 
 /**
- * Register user using current authentication provider.
- * @param {String} provider
+ * Register a user.
  * @param {Object} data
  * @method register
  *
  * @example Register with email address
  *
- *     client.auth.register('email', {
- *       email: "daliberti@doubleleft.com",
- *       name: "Danilo Aliberti",
- *       password: "123"
+ *     client.auth.register({
+ *       email: "endel@doubleleft.com",
+ *       password: "12345",
+ *       name: "Endel Dreyer"
  *     }).then(function(user) {
  *       console.log("Registered user: ", user);
  *     });
  *
- * @example Register with Facebook
- *
- *     FB.login(function(response) {
- *       client.auth.register('facebook', response.authResponse).then(function(user) {
- *         console.log("Registered user: ", user);
- *       });
- *     }, {scope: 'email'});
- *
  */
-Hook.Auth.prototype.register = function(provider, data) {
+Hook.Auth.prototype.register = function(data) {
   var promise, that = this;
   if (typeof(data)==="undefined") { data = {}; }
-  promise = this.client.post('auth/' + provider, data);
+  promise = this.client.post('auth/email', data);
   promise.then(function(data) {
     that._registerToken(data);
   });
@@ -10268,22 +10259,21 @@ Hook.Auth.prototype.register = function(provider, data) {
 /**
  * Verify if user is already registered, and log-in if succeed.
  * @method login
- * @param {String} provider
  * @param {Object} data
  * @return {Promise}
  *
  * @example
  *
- *     client.auth.login('email', {email: "edreyer@doubleleft.com", password: "123"}).then(function(data){
+ *     client.auth.login({email: "edreyer@doubleleft.com", password: "123"}).then(function(data){
  *       console.log("User found: ", data);
  *     }, function(data){
  *       console.log("User not found or password invalid.", data);
  *     });
  */
-Hook.Auth.prototype.login = function(provider, data) {
+Hook.Auth.prototype.login = function(data) {
   var promise, that = this;
   if (typeof(data)==="undefined") { data = {}; }
-  promise = this.client.post('auth/' + provider + '/login', data);
+  promise = this.client.post('auth/email/login', data);
   promise.then(function(data) {
     that._registerToken(data);
   });

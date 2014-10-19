@@ -27,7 +27,6 @@
   },
   "devDependencies": {
     "backbone": "~1.1.2",
-    "jquery": "~2.1.0",
-    "winchan": "mozilla/winchan#ac4b142c"
+    "jquery": "~2.1.0"
   }
 }
