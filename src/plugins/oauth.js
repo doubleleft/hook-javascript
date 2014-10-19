@@ -8,6 +8,7 @@ Hook.Plugin.OAuth = function(client) {
 
 Hook.Plugin.OAuth.prototype.popup = function(provider, windowFeatures) {
   var popup,
+      closePopupTimeout,
       self = this,
       success = false,
       allowedHost = this.client.url.match(/https?:\/\/[^\/]+/)[0],
@@ -22,6 +23,7 @@ Hook.Plugin.OAuth.prototype.popup = function(provider, windowFeatures) {
       return;
 
     success = true;
+    clearTimeout(closePopupTimeout);
     popup.close();
 
     // register user token
@@ -36,11 +38,11 @@ Hook.Plugin.OAuth.prototype.popup = function(provider, windowFeatures) {
 
   popup = window.open(href, '_blank', 'height=600,width=600');
   popup.onbeforeunload = function() {
-    if (!success) {
+    if (!success && popup.location.href.indexOf(allowedHost) === -1) {
       // user canceled the action
       deferred.resolver.reject("canceled");
+      self.removeListener("message", messageListener, false);
     }
-    self.removeListener("message", messageListener, false);
   }
   window.popup = popup;
 
