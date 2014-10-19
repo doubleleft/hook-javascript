@@ -8,7 +8,6 @@ Hook.Plugin.OAuth = function(client) {
 
 Hook.Plugin.OAuth.prototype.popup = function(provider, windowFeatures) {
   var popup,
-      closePopupTimeout,
       self = this,
       success = false,
       allowedHost = this.client.url.match(/https?:\/\/[^\/]+/)[0],
@@ -23,7 +22,6 @@ Hook.Plugin.OAuth.prototype.popup = function(provider, windowFeatures) {
       return;
 
     success = true;
-    clearTimeout(closePopupTimeout);
     popup.close();
 
     // register user token
@@ -44,7 +42,6 @@ Hook.Plugin.OAuth.prototype.popup = function(provider, windowFeatures) {
       self.removeListener("message", messageListener, false);
     }
   }
-  window.popup = popup;
 
   return deferred.promise;
 };
