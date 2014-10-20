@@ -3,7 +3,7 @@ asyncTest("Authentication: Email login (success)", function() {
 
   // register dummy user first
   var email = ascii_rand(8) + "@" + ascii_rand(5) + ".com";
-  client.auth.register('email', {
+  client.auth.register({
     email: email,
     name: "Endel Dreyer",
     password: "teste"
@@ -13,7 +13,7 @@ asyncTest("Authentication: Email login (success)", function() {
     ok(client.auth.currentUser == null, "should have clean session before login");
 
     // test for successful login
-    client.auth.login('email', {
+    client.auth.login({
       email: email,
       name: "Endel Dreyer",
       password: "teste"
@@ -36,13 +36,13 @@ asyncTest("Authentication: Email login (error)", function() {
 
   // register dummy user first
   var email = ascii_rand(8) + "@" + ascii_rand(5) + ".com";
-  client.auth.register('email', {
+  client.auth.register({
     email: email,
     name: "Endel Dreyer",
     password: "teste"
   }).done(function() {
 
-    var promise = client.auth.login('email', {
+    var promise = client.auth.login({
       email: "edreyer@doubleleft.com",
       name: "Endel Dreyer",
       password: "i'm using the wrong password here"

@@ -3,7 +3,7 @@ asyncTest("Auth: register by email", function() {
 
   var email = ascii_rand(8) + "@" + ascii_rand(5) + ".com";
 
-  client.auth.register('email', {
+  client.auth.register({
     email: email,
     name: "Endel Dreyer",
     password: "teste"

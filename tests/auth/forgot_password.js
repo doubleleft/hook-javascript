@@ -4,7 +4,7 @@ asyncTest("Authentication: Forgot password (send)", function() {
   var email = ascii_rand(8) + "@" + ascii_rand(5) + ".com";
 
   // register dummy user
-  client.auth.register('email', {
+  client.auth.register({
     email: email,
     name: "Endel Dreyer",
     password: "teste"
