@@ -7,63 +7,34 @@ Hook.Plugin.OAuth = function(client) {
 };
 
 Hook.Plugin.OAuth.prototype.popup = function(provider, windowFeatures) {
-  var popup,
-      self = this,
-      success = false,
-      allowedHost = this.client.url.match(/https?:\/\/[^\/]+/)[0],
-      href = this.client.url + "oauth/" + provider,
+  var self = this,
+      href = this.client.url + "oauth/" + provider + "?X-App-Id=" + this.client.app_id + "&X-App-Key=" + this.client.key,
+      href_relay = this.client.url + "oauth/relay_frame" + "?X-App-Id=" + this.client.app_id + "&X-App-Key=" + this.client.key,
       deferred = when.defer();
 
-  href += "?X-App-Id=" + this.client.app_id + "&X-App-Key=" + this.client.key;
-  href += "&popup=1";
+  WinChan.open({
+    url: href,
+    relay_url: href_relay,
+    window_features: "menubar=0,location=0,resizable=0,scrollbars=0,status=0,dialog=1,width=700,height=375",
+  }, function(err, r) {
+    // err is a string on failure, otherwise r is the response object
 
-  var messageListener = function(event) {
-    if (event.origin !== allowedHost)
-      return;
+    if (!err && r) {
+      // register user token
+      self.client.auth._registerToken(r);
 
-    success = true;
-    popup.close();
+      // resolve oauth promise
+      deferred.resolver.resolve(r);
+    }
 
-    // register user token
-    self.client.auth._registerToken(event.data);
-
-    // resolve oauth promise
-    deferred.resolver.resolve(event.data);
-  };
-
-  // register window postMessage listener
-  this.addListener("message", messageListener, false);
-
-  popup = window.open(href, '_blank', 'height=600,width=600');
-  popup.onbeforeunload = function() {
-    if (!success && popup.location.href.indexOf(allowedHost) === -1) {
-      // user canceled the action
+    if (err && r == "closed window") {
       deferred.resolver.reject("canceled");
       self.removeListener("message", messageListener, false);
     }
-  }
+  });
 
   return deferred.promise;
 };
-
-if (typeof window.addEventListener === 'function') {
-  // W3C Standard
-  Hook.Plugin.OAuth.prototype.addListener = function(eventType, listener, useCapture) {
-    window.addEventListener(eventType, listener, useCapture);
-  };
-  Hook.Plugin.OAuth.prototype.removeListener = function(eventType, listener, useCapture) {
-    window.removeEventListener(eventType, listener, useCapture);
-  };
-
-} else if (typeof window.attachEvent === 'function') {
-  // MSIE
-  Hook.Plugin.OAuth.prototype.addListener = function(eventType, listener, useCapture) {
-    window.attachEvent('on'+eventType, listener, useCapture);
-  };
-  Hook.Plugin.OAuth.prototype.removeListener = function(eventType, listener, useCapture) {
-    window.detachEvent('on'+eventType, listener, useCapture);
-  };
-}
 
 // Register plugin
 Hook.Plugin.Manager.register('oauth', Hook.Plugin.OAuth);
