@@ -31,7 +31,6 @@ Hook.Plugin.OAuth.prototype.popup = function(provider, windowFeatures) {
 
     if (err && r == "closed window") {
       deferred.resolver.reject("canceled");
-      self.removeListener("message", messageListener, false);
     }
   });
 
