@@ -1,6 +1,8 @@
 (function(window) {
   /**
    * @module Backbone
+   *
+   * @requires backbone.js ~1.1.2
    */
 
   /**

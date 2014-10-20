@@ -1,6 +1,8 @@
 /**
  * @module Hook.Plugin
  * @class OAuth
+ *
+ * @requires winchan ~ac4b142c
  */
 Hook.Plugin.OAuth = function(client) {
   this.client = client;
