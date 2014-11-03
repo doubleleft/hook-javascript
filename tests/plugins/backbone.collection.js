@@ -14,7 +14,8 @@ asyncTest("Plugin: Backbone.HookCollection", function() {
 
   var posts = new PostCollection();
   posts.on('fetch', function(collection, response, options) {
-    console.log("Fetch: ", collection, response, options);
+    ok(collection);
+    start();
   });
   posts.getLast();
 });

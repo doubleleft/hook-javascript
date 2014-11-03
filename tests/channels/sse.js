@@ -3,7 +3,7 @@ asyncTest("Channels: Server-Sent Events", function() {
 
   var messages = client.channel('messages');
   messages.subscribe(function(event, message) {
-    console.log("message: ", event,  message)
+    // console.log("message: ", event,  message)
   }).then(function() {
     messages.publish('event-name', {
       data: 'message-data'

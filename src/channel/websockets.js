@@ -38,7 +38,7 @@ Hook.Channel.WEBSOCKETS = function(client, collection, options) {
     options.url = url;
   }
 
-  options.url += this.collection.name + "?X-App-Id=" + this.client.appId + "&X-App-Key=" + this.client.key;
+  options.url += this.collection.name + "?X-App-Id=" + this.client.app_id + "&X-App-Key=" + this.client.key;
   var auth_token = this.client.auth.getToken();
   if (auth_token) {
     options.url += '&X-Auth-Token=' + auth_token;

@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/hook-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 10/23/2014
+ * @build 11/3/2014
  */
 (function(window) {
   //
@@ -11572,7 +11572,7 @@ Hook.Channel.WEBSOCKETS = function(client, collection, options) {
     options.url = url;
   }
 
-  options.url += this.collection.name + "?X-App-Id=" + this.client.appId + "&X-App-Key=" + this.client.key;
+  options.url += this.collection.name + "?X-App-Id=" + this.client.app_id + "&X-App-Key=" + this.client.key;
   var auth_token = this.client.auth.getToken();
   if (auth_token) {
     options.url += '&X-Auth-Token=' + auth_token;
