@@ -3,10 +3,10 @@ php:
   - 5.6
 
 before_script:
-  - git clone https://github.com/doubleleft/hook.git
-  - sudo sh ./hook/.travis/install_dependencies.sh
+  - git clone --depth=1 https://github.com/doubleleft/hook.git
+  - cd ./hook && sudo sh ./.travis/install_dependencies.sh && cd -
   - travis_retry composer self-update
-  - travis_retry composer install -d hook
+  - travis_retry composer install --no-dev --prefer-dist -d hook
   - npm install -g grunt-cli
   - npm install -g bower
   - bower install
