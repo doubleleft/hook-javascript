@@ -1,2 +1,4 @@
 all:
-- 'tests/index.html'
+  options:
+    urls:
+      - 'http://localhost:8888/tests/index.html'

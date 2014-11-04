@@ -25,6 +25,7 @@
 		"grunt-contrib-jshint": "*",
 		"grunt-contrib-uglify": "*",
 		"grunt-contrib-qunit": "*",
+		"grunt-contrib-connect": "*",
 		"grunt-loader": "0.2.1"
 	}
 }
