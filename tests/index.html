@@ -13,6 +13,7 @@
       type: 'GET',
       url: 'app.json',
       dataType: 'json',
+      async: false,
       success: function(data) {
         window.appData = data;
         window.client = new Hook.Client({
@@ -20,8 +21,7 @@
           app_id: data.keys[1].app_id,
           key: data.keys[1].key
         });
-      },
-      async: false
+      }
     });
   </script>
 

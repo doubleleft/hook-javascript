@@ -17,6 +17,10 @@ before_script:
   - travis_retry composer install --no-dev --prefer-dist -d hook
   - cd ./hook && sh ./.travis/install_server.sh && cd -
 
+  # create default app for testing
+  - curl -XPOST http://hook.dev/public/index.php/apps --data '{"app":{"name":"hook-javascript"}}' > tests/app.json
+  - cat tests/app.json
+
   # install javascript dependencies and compile dist files
   - npm install -g grunt-cli
   - npm install -g bower
