@@ -1,11 +1,11 @@
 /**
- * Hook.Client is the entry-point for using dl-api.
+ * Hook.Client is the entry-point for using hook.
  *
- * You should instantiate a global javascript client for consuming dl-api.
+ * You should instantiate a global javascript client for consuming hook.
  *
  * ```javascript
  * var client = new Hook.Client({
- *   url: "http://local-or-remote-dl-api-address.com/public/index.php/",
+ *   url: "http://local-or-remote-hook-address.com/public/index.php/",
  *   app_id: 1,   // your app's id
  *   key: 'test'  // your app's public key
  * });

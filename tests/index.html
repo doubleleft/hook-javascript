@@ -1,11 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>dl-api client tests</title>
+	<title>hook-javascript tests</title>
 	<meta charset="utf-8">
 
 	<link rel="stylesheet" href="../bower_components/qunit/qunit/qunit.css">
 	<script type="text/javascript" src="../dist/hook.js"></script>
+	<script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
+
+  <script type="text/javascript">
+    $.ajax({
+      type: 'GET',
+      url: 'app.json',
+      dataType: 'json',
+      success: function(data) {
+        window.appData = data;
+        window.client = new Hook.Client({
+          url: "http://hook.dev/public/index.php/",
+          app_id: data.keys[1].app_id,
+          key: data.keys[1].key
+        });
+      },
+      async: false
+    });
+  </script>
+
 </head>
 <body>
   <div id="fb-root"></div>
@@ -31,7 +50,6 @@
 
   <!-- devDependencies -->
 	<script type="text/javascript" src="../bower_components/qunit/qunit/qunit.js"></script>
-	<script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
 
 	<script src="api.js"></script>
 

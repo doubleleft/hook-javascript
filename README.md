@@ -1,4 +1,4 @@
-hook-javascript client
+hook-javascript client ![Build status](https://travis-ci.org/doubleleft/hook-javascript.svg?branch=master)
 ===
 
 JavaScript client for [hook](https://github.com/doubleleft/hook).

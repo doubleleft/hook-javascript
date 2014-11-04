@@ -9,7 +9,7 @@
 		"name": "Endel Dreyer",
 		"email": "edreyer@doubleleft.com"
 	}],
-	"keywords": ["api", "dl", "rest"],
+	"keywords": ["hook", "javascript", "client"],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/doubleleft/hook-javascript.git"

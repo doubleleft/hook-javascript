@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/hook-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 11/3/2014
+ * @build 11/4/2014
  */
 (function(window) {
   //
@@ -9702,13 +9702,13 @@ var Hook = {
 window.Hook = Hook;
 
 /**
- * Hook.Client is the entry-point for using dl-api.
+ * Hook.Client is the entry-point for using hook.
  *
- * You should instantiate a global javascript client for consuming dl-api.
+ * You should instantiate a global javascript client for consuming hook.
  *
  * ```javascript
  * var client = new Hook.Client({
- *   url: "http://local-or-remote-dl-api-address.com/public/index.php/",
+ *   url: "http://local-or-remote-hook-address.com/public/index.php/",
  *   app_id: 1,   // your app's id
  *   key: 'test'  // your app's public key
  * });
@@ -10188,8 +10188,8 @@ Hook.Auth = function(client) {
   this.currentUser = null;
 
   var now = new Date(),
-      tokenExpiration = new Date(window.localStorage.getItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_EXPIRATION)),
-      currentUser = window.localStorage.getItem(this.client.appId + '-' + Hook.Auth.AUTH_DATA_KEY);
+      tokenExpiration = new Date(window.localStorage.getItem(this.client.app_id + '-' + Hook.Auth.AUTH_TOKEN_EXPIRATION)),
+      currentUser = window.localStorage.getItem(this.client.app_id + '-' + Hook.Auth.AUTH_DATA_KEY);
 
   // Fill current user only when it isn't expired yet.
   if (currentUser && now.getTime() < tokenExpiration.getTime()) {
@@ -10202,9 +10202,9 @@ Hook.Auth.prototype = new Hook.Events();
 Hook.Auth.prototype.constructor = Hook.Auth;
 
 // Constants
-Hook.Auth.AUTH_DATA_KEY = 'dl-api-auth-data';
-Hook.Auth.AUTH_TOKEN_KEY = 'dl-api-auth-token';
-Hook.Auth.AUTH_TOKEN_EXPIRATION = 'dl-api-auth-token-expiration';
+Hook.Auth.AUTH_DATA_KEY = 'hook-auth-data';
+Hook.Auth.AUTH_TOKEN_KEY = 'hook-auth-token';
+Hook.Auth.AUTH_TOKEN_EXPIRATION = 'hook-auth-token-expiration';
 
 /**
  * @method setUserData
@@ -10217,10 +10217,10 @@ Hook.Auth.prototype.setCurrentUser = function(data) {
     this.trigger('logout', this.currentUser);
     this.currentUser = data;
 
-    window.localStorage.removeItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_KEY);
-    window.localStorage.removeItem(this.client.appId + '-' + Hook.Auth.AUTH_DATA_KEY);
+    window.localStorage.removeItem(this.client.app_id + '-' + Hook.Auth.AUTH_TOKEN_KEY);
+    window.localStorage.removeItem(this.client.app_id + '-' + Hook.Auth.AUTH_DATA_KEY);
   } else {
-    window.localStorage.setItem(this.client.appId + '-' + Hook.Auth.AUTH_DATA_KEY, JSON.stringify(data));
+    window.localStorage.setItem(this.client.app_id + '-' + Hook.Auth.AUTH_DATA_KEY, JSON.stringify(data));
 
     // trigger login event
     this.currentUser = data;
@@ -10381,14 +10381,14 @@ Hook.Auth.prototype.logout = function() {
  * @return {String|null}
  */
 Hook.Auth.prototype.getToken = function() {
-  return window.localStorage.getItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_KEY);
+  return window.localStorage.getItem(this.client.app_id + '-' + Hook.Auth.AUTH_TOKEN_KEY);
 };
 
 Hook.Auth.prototype._registerToken = function(data) {
   if (data.token) {
     // register authentication token on localStorage
-    window.localStorage.setItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_KEY, data.token.token);
-    window.localStorage.setItem(this.client.appId + '-' + Hook.Auth.AUTH_TOKEN_EXPIRATION, data.token.expire_at);
+    window.localStorage.setItem(this.client.app_id + '-' + Hook.Auth.AUTH_TOKEN_KEY, data.token.token);
+    window.localStorage.setItem(this.client.app_id + '-' + Hook.Auth.AUTH_TOKEN_EXPIRATION, data.token.expire_at);
     delete data.token;
 
     // Store curent user
