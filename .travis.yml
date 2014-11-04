@@ -5,9 +5,9 @@ php:
 before_script:
   # install hook server
   - git clone --depth=1 https://github.com/doubleleft/hook.git
-  - cd ./hook && sh ./.travis/install_dependencies.sh && cd -
   - travis_retry composer self-update
   - travis_retry composer install --no-dev --prefer-dist -d hook
+  - cd ./hook && sh ./.travis/install_server.sh && cd -
 
   # install javascript dependencies and compile dist files
   - npm install -g grunt-cli
