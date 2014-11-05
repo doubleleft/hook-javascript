@@ -279,7 +279,12 @@ Hook.Client.prototype.getPayload = function(method, data) {
           if (typeof(value)==="string") {
             formdata.append(field, value);
           } else {
-            formdata.append(field, value, filename || "file");
+            try {
+              formdata.append(field, value, filename || "file");
+            } catch (e) {
+              // TODO:
+              // Node.js (CLI console) throws exception here
+            }
           }
         }
       }

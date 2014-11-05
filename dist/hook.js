@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/hook-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 11/4/2014
+ * @build 11/5/2014
  */
 (function(window) {
   //
@@ -9982,7 +9982,12 @@ Hook.Client.prototype.getPayload = function(method, data) {
           if (typeof(value)==="string") {
             formdata.append(field, value);
           } else {
-            formdata.append(field, value, filename || "file");
+            try {
+              formdata.append(field, value, filename || "file");
+            } catch (e) {
+              // TODO:
+              // Node.js (CLI console) throws exception here
+            }
           }
         }
       }
