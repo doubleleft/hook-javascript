@@ -2,13 +2,18 @@ all:
   options:
     urls:
       - localhost:8888/tests/index.html
-    build: '1'
+    build: 0
     testname: hook-javascript client tests
     browsers:
-      - browserName: 'firefox'
-        version: '19'
-        platform: 'XP'
+      - browserName: 'firefox',
       - browserName: 'chrome'
-        version: '31'
+      - browserName: 'safari'
+      - browserName: 'opera'
       - browserName: 'internet explorer'
         version: '8'
+      - browserName: 'internet explorer'
+        version: '9'
+      - browserName: 'internet explorer'
+        version: '10'
+      - browserName: 'internet explorer'
+        version: '11'
