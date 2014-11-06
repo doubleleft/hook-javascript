@@ -2,11 +2,6 @@ language: php
 php:
   - 5.6
 
-env:
-  global:
-    - secure: kggQMkI+fvr0W6d24m6r4sOBoMu4isg38WZ7dDaZD3CPZe44faGL/uSmrWLw9F8q6T7FxvUF4Zu31NG5X4JHddx9oPxDLTmwfC2pPjhOntOON4L6Ga1gpAyA8u2KuXnrjK+F5vHbv8G46L7+s7eRP23L9HHRfeiLWALlOx7nlTY=
-    - secure: a5mc0IQzxZzippCm8pIJWRw48p3lLAoJD734ueD+CUxDh7uEr5kbKg32tUzL6+aHauJIIbRgKV75DXHO/kzv3ChzQqtGhOtJxzgLMNcjl7IXQpSXAXXwyjy/LWsLPCxKLr574OM7dWlUBx0bT/9JVY66TnwB6rbw3EpyQkDn63s=
-
 addons:
   sauce_connect: true
 
@@ -29,4 +24,4 @@ before_script:
   - grunt
 
 script:
-  - grunt test
+  - grunt travis

@@ -1,4 +1,4 @@
-
 module.exports = function(grunt) {
-	require('grunt-loader').load(grunt);
+  grunt.loadNpmTasks('grunt-saucelabs');
+  require('grunt-loader').load(grunt);
 };
