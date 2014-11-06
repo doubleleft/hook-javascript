@@ -2,9 +2,6 @@ language: php
 php:
   - 5.6
 
-addons:
-  sauce_connect: true
-
 before_script:
   # install hook server
   - git clone --depth=1 https://github.com/doubleleft/hook.git

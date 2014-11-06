@@ -5,7 +5,7 @@ all:
     build: 0
     testname: hook-javascript client tests
     browsers:
-      - browserName: 'firefox',
+      - browserName: 'firefox'
       - browserName: 'chrome'
       - browserName: 'safari'
       - browserName: 'opera'
