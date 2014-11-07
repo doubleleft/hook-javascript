@@ -2,7 +2,7 @@ hook-javascript client
 ===
 
 ![Build status](https://travis-ci.org/doubleleft/hook-javascript.svg?branch=master)
-[![Selenium Test Status](https://saucelabs.com/browser-matrix/endel.svg)](https://saucelabs.com/u/endel)
+[![Selenium Test Status](https://saucelabs.com/browser-matrix/hook-javascript.svg)](https://saucelabs.com/u/hook-javascript)
 
 JavaScript client for [hook](https://github.com/doubleleft/hook).
 
