@@ -7,7 +7,15 @@ all:
     testname: hook-javascript client tests
     browsers:
       - browserName: 'firefox'
+      - browserName: 'firefox'
+        version: '32'
+      - browserName: 'firefox'
+        version: '31'
       - browserName: 'chrome'
+      - browserName: 'chrome'
+        version: '34'
+      - browserName: 'chrome'
+        version: '33'
       - browserName: 'safari'
       - browserName: 'opera'
       - browserName: 'internet explorer'
