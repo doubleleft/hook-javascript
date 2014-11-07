@@ -1,5 +1,6 @@
 all:
   options:
+    'max-duration': 360
     urls:
       - localhost:8888/tests/index.html
     build: 0
