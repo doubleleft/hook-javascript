@@ -1,9 +1,9 @@
 /*
- * hook-javascript v0.1.0
+ * hook-javascript v0.2.1
  * https://github.com/doubleleft/hook-javascript
  *
  * @copyright 2014 Doubleleft
- * @build 11/5/2014
+ * @build 11/11/2014
  */
 (function(window) {
   //
@@ -9917,7 +9917,7 @@ Hook.Client.prototype.getHeaders = function() {
   // App authentication request headers
   var request_headers = {
     'X-App-Id': this.app_id,
-    'X-App-Key': this.key,
+    'X-App-Key': this.key
   }, auth_token;
 
   // Forward user authentication token, if it is set
@@ -10606,33 +10606,33 @@ Hook.Collection.prototype.find = function(_id) {
 
 /**
  * Set the relationships that should be eager loaded.
- * @method with
+ * @method join
  * @param {String} ...
  * @return {Hook.Collection}
  *
  * @example Simple relationship
  *
- *     client.collection('books').with('author').each(function(book) {
+ *     client.collection('books').join('author').each(function(book) {
  *       console.log("Author: ", book.author.name);
  *     });
  *
  * @example Multiple relationships
  *
- *     client.collection('books').with('author', 'publisher').each(function(book) {
+ *     client.collection('books').join('author', 'publisher').each(function(book) {
  *       console.log("Author: ", book.author.name);
  *       console.log("Publisher: ", book.publisher.name);
  *     });
  *
  * @example Nested relationships
  *
- *     client.collection('books').with('author.contacts').each(function(book) {
+ *     client.collection('books').join('author.contacts').each(function(book) {
  *       console.log("Author: ", book.author.name);
  *       console.log("Contacts: ", book.author.contacts);
  *     });
  *
  */
-Hook.Collection.prototype.with = function() {
-  this.options.with = arguments;
+Hook.Collection.prototype.join = function() {
+  this.options['with'] = arguments;
   return this;
 };
 
@@ -11136,7 +11136,7 @@ Hook.Collection.prototype.buildQuery = function() {
     aggregation: 'aggr',  // min / max / count / avg / sum
     operation: 'op',      // increment / decrement
     data: 'data',         // updateAll / firstOrCreate
-    with: 'with',         // relationships
+    with: 'with',         // join / relationships
     select: 'select',     // fields to return
     distinct: 'distinct'  // use distinct operation
   };

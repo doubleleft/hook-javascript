@@ -1,12 +1,12 @@
 {
   "name": "hook-javascript",
-  "description": "Doubleleft API javascript client.",
-  "version": "0.1.0",
+  "description": "hook javascript client",
+  "version": "0.2.1",
   "homepage": "https://github.com/doubleleft/hook-javascript",
   "main": "./dist/hook.js",
   "ignore": [
     "src",
-    "dl-ext",
+    "hook-ext",
     "docs",
     "grunt",
     "tests",

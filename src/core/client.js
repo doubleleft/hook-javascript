@@ -214,7 +214,7 @@ Hook.Client.prototype.getHeaders = function() {
   // App authentication request headers
   var request_headers = {
     'X-App-Id': this.app_id,
-    'X-App-Key': this.key,
+    'X-App-Key': this.key
   }, auth_token;
 
   // Forward user authentication token, if it is set
