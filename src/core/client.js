@@ -17,20 +17,22 @@
  * @param {Object} options
  *   @param {String} options.app_id
  *   @param {String} options.key
- *   @param {String} options.url default: http://hook.dev
+ *   @param {String} options.endpoint default: http://hook.dev
  *
  * @constructor
  */
 
 Hook.Client = function(options) {
   if (!options) { options = {}; }
-  this.url = options.endpoint || options.url || window.location.origin;
+  this.endpoint = options.endpoint || options.url || window.location.origin;
   this.app_id = options.app_id || options.appId || "";
   this.key = options.key || "";
 
+  this.options = (typeof(options.options) !== "undefined") ? options.options : {};
+
   // append last slash if doesn't have it
-  if (this.url.lastIndexOf('/') != this.url.length - 1) {
-    this.url += "/";
+  if (this.endpoint.lastIndexOf('/') != this.endpoint.length - 1) {
+    this.endpoint += "/";
   }
 
   /**
@@ -101,6 +103,29 @@ Hook.Client.prototype.channel = function(name, options) {
 };
 
 /**
+ * Get remote URL string.
+ * @method url
+ * @param {String} route
+ * @return {String}
+ *
+ * @example Downloading data from a hook route
+ *
+ *     location.href = client.url('download', { something: "hey" })
+ *
+ * @example Using custom hook route for image catpcha
+ *
+ *     // Implementing custom route for captcha: https://github.com/doubleleft/hook/wiki/Composer-dependencies
+ *     var img = new Image();
+ *     img.src = client.url('captcha');
+ *
+ */
+Hook.Client.prototype.url = function(route, params) {
+  var serializedParams = "";
+  if (params) { serializedParams = "&" + this.serialize(params); }
+  return this.endpoint + route + this._getCredentialsParams() + serializedParams;
+};
+
+/**
  * Create resource
  * @method post
  * @param {String} segments
@@ -167,14 +192,18 @@ Hook.Client.prototype.request = function(segments, method, data) {
     request_headers["Content-Type"] = 'application/json'; // exchange data via JSON to keep basic data types
   }
 
-  if (typeof(XDomainRequest) !== "undefined") {
-    // XMLHttpRequest#setRequestHeader isn't implemented on Internet Explorer's XDomainRequest
-    segments += "?X-App-Id=" + this.app_id + "&X-App-Key=" + this.key;
-    var auth_token = this.auth.getToken();
-    if (auth_token) { segments += '&X-Auth-Token=' + auth_token; }
+  // Use method override? (some web servers doesn't respond to DELETE/PUT requests)
+  if (method !== "GET" && method !== "POST" && this.options.method_override) {
+    request_headers['X-HTTP-Method-Override'] = method;
+    method = "POST";
   }
 
-  deferred.promise.xhr = uxhr(this.url + segments, payload, {
+  if (typeof(XDomainRequest) !== "undefined") {
+    // XMLHttpRequest#setRequestHeader isn't implemented on Internet Explorer's XDomainRequest
+    segments += this._getCredentialsParams();
+  }
+
+  deferred.promise.xhr = uxhr(this.endpoint + segments, payload, {
     method: method,
     headers: request_headers,
     sync: synchronous,
@@ -310,6 +339,13 @@ Hook.Client.prototype.getPayload = function(method, data) {
     }
   }
   return payload;
+}
+
+Hook.Client.prototype._getCredentialsParams = function() {
+  var params = "?X-App-Id=" + this.app_id + "&X-App-Key=" + this.key;
+  var auth_token = this.auth.getToken();
+  if (auth_token) { params += '&X-Auth-Token=' + auth_token; }
+  return params;
 }
 
 Hook.Client.prototype.serialize = function(obj, prefix) {
