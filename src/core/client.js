@@ -253,8 +253,8 @@ DL.Client.prototype.getPayload = function(method, data) {
       payload = data;
     } else if (method !== "GET") {
       var field, value, filename,
-          formdata = new FormData(),
-          worth = false;
+      formdata = new FormData(),
+      worth = false;
 
       for (field in data) {
         value = data[field];
@@ -263,11 +263,10 @@ DL.Client.prototype.getPayload = function(method, data) {
         if (typeof(value)==='undefined' || value === null) {
           continue;
 
-        } else if (typeof(value)==="string") {
-          //
-          // Do nothing...
-          //
-          // IE8 can't compare instanceof String with HTMLInputElement. LOL
+        } else if (typeof(value)==='boolean' || typeof(value)==='number' || typeof(value)==="string") {
+          value = value.toString();
+
+          // IE8 can't compare instanceof String with HTMLInputElement.
         } else if (value instanceof HTMLInputElement && value.files && value.files.length > 0) {
           filename = value.files[0].name;
           value = value.files[0];
@@ -290,16 +289,17 @@ DL.Client.prototype.getPayload = function(method, data) {
         // Consider serialization to keep data types here: http://phpjs.org/functions/serialize/
         //
         if (!(value instanceof Array)) { // fixme
-          try {
-            formdata.append(field, value, filename || "file");
-          } catch (e) {
+          if (typeof(value)==="string") {
+            formdata.append(field, value);
+          } else {
             try {
-              // on cli-console (nodejs), here throwns error when using Collection.updateAll
-              formdata.append(field, value);
-            } catch (e2) {}
+              formdata.append(field, value, filename || "file");
+            } catch (e) {
+              // TODO:
+              // Node.js (CLI console) throws exception here
+            }
           }
         }
-
       }
 
       if (worth) {
@@ -307,7 +307,17 @@ DL.Client.prototype.getPayload = function(method, data) {
       }
     }
 
-    payload = payload || JSON.stringify(data);
+    payload = payload || JSON.stringify(data, function(key, value) {
+      if (this[key] instanceof Date) {
+        return Math.round(this[key].getTime() / 1000);
+      } else {
+        return value;
+      }
+    });
+
+    // empty payload, return null.
+    if (payload == "{}") { return null; }
+
     if (method==="GET" && typeof(payload)==="string") {
       payload = encodeURIComponent(payload);
     }
