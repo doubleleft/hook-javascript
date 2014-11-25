@@ -169,7 +169,7 @@ Hook.Client.prototype.request = function(segments, method, data) {
 
   if (typeof(XDomainRequest) !== "undefined") {
     // XMLHttpRequest#setRequestHeader isn't implemented on Internet Explorer's XDomainRequest
-    segments += "?X-App-Id=" + this.app_id + "&X-App-Key=" + this.key;
+    segments += "?X-App-Id=" + this.app_id + "&X-App-Key=" + this.key + "&r=" + Math.floor(Math.random()*1000);
     var auth_token = this.auth.getToken();
     if (auth_token) { segments += '&X-Auth-Token=' + auth_token; }
   }
