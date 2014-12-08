@@ -613,7 +613,7 @@ Hook.Collection.prototype.update = function(_id, data) {
  *     });
  */
 Hook.Collection.prototype.increment = function(field, value) {
-  this.options.operation = { method: 'increment', field: field, value: value };
+  this.options.operation = { method: 'increment', field: field, value: value || 1 };
   var promise = this.client.put(this.segments, this.buildQuery());
   if (arguments.length > 0) {
     promise.then.apply(promise, arguments);
@@ -635,7 +635,7 @@ Hook.Collection.prototype.increment = function(field, value) {
  *     });
  */
 Hook.Collection.prototype.decrement = function(field, value) {
-  this.options.operation = { method: 'decrement', field: field, value: value };
+  this.options.operation = { method: 'decrement', field: field, value: value || 1 };
   var promise = this.client.put(this.segments, this.buildQuery());
   if (arguments.length > 0) {
     promise.then.apply(promise, arguments);
