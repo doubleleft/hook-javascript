@@ -1,0 +1,12 @@
+[ { "browserName": "firefox" },
+  { "browserName": "firefox", "version": "32" },
+  { "browserName": "firefox", "version": "31" },
+  { "browserName": "chrome" },
+  { "browserName": "chrome", "version": "34" },
+  { "browserName": "chrome", "version": "33" },
+  { "browserName": "safari" },
+  { "browserName": "opera" },
+  { "browserName": "internet explorer", "version": "8" },
+  { "browserName": "internet explorer", "version": "9" },
+  { "browserName": "internet explorer", "version": "10" },
+  { "browserName": "internet explorer", "version": "11" } ]

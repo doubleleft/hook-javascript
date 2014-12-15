@@ -1,32 +1,41 @@
 {
-	"name": "hook-javascript",
-	"title": "hook javascript client",
-	"description": "hook javascript client",
-	"version": "0.3.0",
-	"homepage": "http://github.com/doubleleft/hook-javascript",
-	"main": "dist/hook.js",
-	"authors": [{
-		"name": "Endel Dreyer",
-		"email": "edreyer@doubleleft.com"
-	}],
-	"keywords": ["hook", "javascript", "client"],
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/doubleleft/hook-javascript.git"
-	},
-	"bugs": {
-		"url": "https://github.com/doubleleft/hook-javascript/issues"
-	},
-	"devDependencies": {
-		"grunt": "0.4.1",
-		"grunt-contrib-yuidoc": "*",
-		"grunt-contrib-concat": "*",
-		"grunt-contrib-watch": "*",
-		"grunt-contrib-jshint": "*",
-		"grunt-contrib-uglify": "*",
-		"grunt-contrib-qunit": "*",
-		"grunt-contrib-connect": "*",
-		"grunt-saucelabs": "~8.3.2",
-		"grunt-loader": "0.2.1"
-	}
+  "name": "hook-javascript",
+  "title": "hook javascript client",
+  "description": "hook javascript client",
+  "version": "0.3.0",
+  "homepage": "http://github.com/doubleleft/hook-javascript",
+  "main": "build/hook.js",
+  "authors": [{
+    "name": "Endel Dreyer",
+    "email": "edreyer@doubleleft.com"
+  }],
+  "scripts": {
+    "watch": "watchify -t 6to5ify src/hook.js -s Hook -o build/hook.js",
+    "build": "browserify -t 6to5ify src/hook.js -s Hook  -o build/hook.js && npm run uglifyjs",
+    "uglifyjs": "uglifyjs build/hook.js -o build/hook.min.js"
+  },
+  "keywords": ["hook", "javascript", "client"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/doubleleft/hook-javascript.git"
+  },
+  "bugs": {
+    "url": "https://github.com/doubleleft/hook-javascript/issues"
+  },
+  "dependencies": {
+    "uxhr": "git://github.com/endel/uxhr",
+    "when": "~2.8.0",
+    "event-source-polyfill": "git://github.com/Yaffle/EventSource"
+  },
+  "devDependencies": {
+    "bower": "~1.3.12",
+    "browserify": "~7.0.1",
+    "debowerify": "~1.2.0",
+    "watchify": "~2.2.1",
+    "6to5ify": "~1.4.0",
+    "uglify-js": "~2.4.16",
+    "grunt": "0.4.1",
+    "grunt-saucelabs": "~8.3.2",
+    "grunt-contrib-connect": "*"
+  }
 }

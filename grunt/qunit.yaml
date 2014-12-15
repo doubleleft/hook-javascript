@@ -1,4 +1,0 @@
-all:
-  options:
-    urls:
-      - 'http://localhost:8888/tests/index.html'

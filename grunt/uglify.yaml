@@ -1,5 +1,0 @@
-javascripts:
-  files:
-    'dist/hook.min.js': <%= concat.javascripts.dest %>
-  options:
-    # preserveComments: 'some'

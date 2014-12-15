@@ -16,9 +16,8 @@ before_script:
   # install javascript dependencies and compile dist files
   - npm install -g grunt-cli
   - npm install -g bower
-  - bower install
   - npm install
-  - grunt
+  - grunt test
 
 script:
   - grunt travis

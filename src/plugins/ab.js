@@ -1,6 +1,6 @@
-var AB = function(client) {
+var HookAB = function(client) {
   this.client = client;
 };
 
 // Register plugin
-Hook.Plugin.Manager.register('AB', AB);
+Hook.Plugins.register('AB', HookAB);

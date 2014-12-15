@@ -1,5 +1,0 @@
-files:
-- 'src/**.js'
-- 'src/**/**.js'
-tasks:
-- default
