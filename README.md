@@ -47,10 +47,8 @@ How to build
 You'll need [nodejs](http://nodejs.org/) installed first. Then run the following
 commands:
 
-    $ npm install -g grunt-cli bower
     $ npm install
-    $ bower install
-    $ grunt
+    $ npm run build
 
 To build and publish the docs:
 

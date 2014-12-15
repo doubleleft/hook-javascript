@@ -3,29 +3,29 @@ module.exports = function (grunt) {
   console.log(browsers);
 
   grunt.initConfig({
-      connect: {
-          server: {
-              options: {
-                  base: "",
-                  port: 9999
-              }
-          }
-      },
+    connect: {
+      server: {
+        options: {
+          base: "",
+          port: 9999
+        }
+      }
+    },
 
-      'saucelabs-qunit': {
-          all: {
-              options: {
-                  urls: ["http://127.0.0.1:9999/tests/index.html"],
-                  tunnelTimeout: 5,
-                  build: process.env.TRAVIS_JOB_ID,
-                  concurrency: 3,
-                  browsers: browsers,
-                  testname: "hook qunit tests",
-                  tags: ["master"]
-              }
-          }
-      },
-      watch: {}
+    'saucelabs-qunit': {
+      all: {
+        options: {
+          'max-duration': 360,
+          urls: ["http://127.0.0.1:9999/tests/index.html"],
+          tunnelTimeout: 5,
+          build: process.env.TRAVIS_JOB_ID,
+          concurrency: 3,
+          browsers: browsers,
+          testname: "hook-javascript qunit tests"
+        }
+      }
+    },
+    watch: {}
   });
 
   // Loading dependencies
