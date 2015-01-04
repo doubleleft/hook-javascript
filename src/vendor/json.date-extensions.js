@@ -9,7 +9,7 @@
  * https://github.com/RickStrahl/json.date-extensions
  */
 (function(undefined) {
-    if (this.JSON && !this.JSON.dateParser) {
+    if (JSON && !JSON.dateParser) {
         var reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.{0,1}\d*))(?:Z|(\+|-)([\d|:]*))?$/;
         var reMsAjax = /^\/Date\((d|-|.*)\)[\/|\\]$/;
 
@@ -46,7 +46,7 @@
         /// </summary>
         /// <param name="chainFilter" type="Function">property name that is parsed</param>
         /// <returns type="Function">returns a new chainning filter for dates</returns>
-        function createDateParser(chainFilter) {
+        var createDateParser = function(chainFilter) {
             return function(key, value) {
                 var parsedValue = value;
                 if (typeof value === 'string') {

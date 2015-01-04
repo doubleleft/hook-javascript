@@ -4,15 +4,15 @@
   "description": "hook javascript client",
   "version": "0.3.0",
   "homepage": "http://github.com/doubleleft/hook-javascript",
-  "main": "build/hook.js",
+  "main": "dist/hook.js",
   "authors": [{
     "name": "Endel Dreyer",
     "email": "edreyer@doubleleft.com"
   }],
   "scripts": {
-    "watch": "watchify -t 6to5ify src/hook.js -s Hook -o build/hook.js",
-    "build": "browserify -t 6to5ify src/hook.js -s Hook  -o build/hook.js && npm run uglifyjs",
-    "uglifyjs": "uglifyjs build/hook.js -o build/hook.min.js"
+    "watch": "watchify -t 6to5ify src/hook.js -s Hook -o dist/hook.js",
+    "build": "browserify -t 6to5ify src/hook.js -s Hook  -o dist/hook.js && npm run uglifyjs",
+    "uglifyjs": "uglifyjs dist/hook.js -o dist/hook.min.js"
   },
   "keywords": ["hook", "javascript", "client"],
   "repository": {
@@ -36,6 +36,7 @@
     "uglify-js": "~2.4.16",
     "grunt": "0.4.1",
     "grunt-saucelabs": "~8.3.2",
-    "grunt-contrib-connect": "*"
+    "grunt-contrib-connect": "*",
+    "grunt-shell": "*"
   }
 }

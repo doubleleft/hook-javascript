@@ -1,6 +1,13 @@
 /**
  * @module HookCordova
  * @class Cordova
+ *
+ * Dependency cordova plugins:
+ * ---
+ *
+ * - https://github.com/phonegap-build/PushPlugin
+ * - https://github.com/apache/cordova-plugin-device
+ * - https://github.com/danmichaelo/cordova-plugin-appinfo
  */
 var HookCordova = function(client) {
   this.client = client;
@@ -14,15 +21,6 @@ var HookCordova = function(client) {
 
 // Register plugin
 Hook.Plugins.register('cordova', HookCordova);
-
-/**
- * -------------
- * Dependency plugins:
- * -------------
- * - https://github.com/phonegap-build/PushPlugin
- * - https://github.com/apache/cordova-plugin-device
- * - https://github.com/danmichaelo/cordova-plugin-appinfo
- */
 
 /**
  * @class HookCordova.PushNotification

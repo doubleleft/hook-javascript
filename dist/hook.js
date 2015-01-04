@@ -1675,6 +1675,7 @@ var Auth = (function (Events) {
    * @constructor
    */
   function Auth(client) {
+    Events.call(this);
     this.client = client;
 
     /**
@@ -1778,6 +1779,10 @@ var Auth = (function (Events) {
 
   Auth.prototype.logout = function () {
     return this.setCurrentUser(null);
+  };
+
+  Auth.prototype.isLogged = function () {
+    return this.currentUser !== null;
   };
 
   Auth.prototype.getToken = function () {
@@ -2760,7 +2765,7 @@ module.exports = Events;
  * https://github.com/RickStrahl/json.date-extensions
  */
 (function (undefined) {
-  if (this.JSON && !this.JSON.dateParser) {
+  if (JSON && !JSON.dateParser) {
     var reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.{0,1}\d*))(?:Z|(\+|-)([\d|:]*))?$/;
     var reMsAjax = /^\/Date\((d|-|.*)\)[\/|\\]$/;
 
@@ -2797,7 +2802,7 @@ module.exports = Events;
     /// </summary>
     /// <param name="chainFilter" type="Function">property name that is parsed</param>
     /// <returns type="Function">returns a new chainning filter for dates</returns>
-    function createDateParser(chainFilter) {
+    var createDateParser = function (chainFilter) {
       return function (key, value) {
         var parsedValue = value;
         if (typeof value === "string") {
@@ -2814,7 +2819,7 @@ module.exports = Events;
         }
         if (chainFilter !== undefined) return chainFilter(key, parsedValue);else return parsedValue;
       };
-    }
+    };
 
     /// <summary>
     /// A filter that can be used with JSON.parse to convert dates.

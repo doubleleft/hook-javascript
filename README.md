@@ -5,6 +5,7 @@ hook-javascript client ![Build status](https://travis-ci.org/doubleleft/hook-jav
 
 JavaScript client for [hook](https://github.com/doubleleft/hook).
 
+- [Features with dependencies](https://github.com/doubleleft/hook-javascript/wiki/Features-with-dependencies)
 - [Documentation](http://doubleleft.github.io/hook-javascript/classes/Hook.Client.html).
 - [Plugins](https://github.com/doubleleft/hook-javascript/wiki/Plugins).
 

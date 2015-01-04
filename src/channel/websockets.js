@@ -23,6 +23,7 @@ class Websockets extends Events {
    *     });
    */
   constructor(client, collection, options) {
+    super();
     var that = this;
 
     this.client = client;

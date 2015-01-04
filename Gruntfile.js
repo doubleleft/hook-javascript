@@ -3,11 +3,18 @@ module.exports = function (grunt) {
   console.log(browsers);
 
   grunt.initConfig({
+    shell: {
+      build: {
+        command: 'npm run build'
+      }
+    },
+
     connect: {
       server: {
         options: {
           base: "",
-          port: 9999
+          port: 9999,
+          // keepalive: true
         }
       }
     },
@@ -17,15 +24,13 @@ module.exports = function (grunt) {
         options: {
           'max-duration': 360,
           urls: ["http://127.0.0.1:9999/tests/index.html"],
-          tunnelTimeout: 5,
           build: process.env.TRAVIS_JOB_ID,
           concurrency: 3,
           browsers: browsers,
           testname: "hook-javascript qunit tests"
         }
       }
-    },
-    watch: {}
+    }
   });
 
   // Loading dependencies
@@ -33,5 +38,5 @@ module.exports = function (grunt) {
       if (key !== "grunt" && key.indexOf("grunt") === 0) grunt.loadNpmTasks(key);
   }
 
-  grunt.registerTask("test", ["connect", "saucelabs-qunit"]);
+  grunt.registerTask("test", ["shell", "connect", "saucelabs-qunit"]);
 }

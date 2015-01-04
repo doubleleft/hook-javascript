@@ -63,6 +63,15 @@
         }
       });
     });
+
+    window.ascii_rand = function(length) {
+      var str = "";
+      for (var i=0; i < length; i++) {
+        var charCode = 97 + Math.floor((Math.random() * 25));
+        str += String.fromCharCode(charCode);
+      }
+      return str; //  + ((new Date()).getTime().toString().substr(8))
+    }
   </script>
 
 	<script src="api.js"></script>
@@ -77,7 +86,6 @@
 	<!-- <script src="pagination.js"></script> -->
 	<script src="key_value.js"></script>
 	<script src="system.js"></script>
-	<script src="files.js"></script>
 
   <!-- Authentication -->
 	<script src="auth/email.js"></script>
@@ -89,6 +97,7 @@
 	<!-- <script src="channels/sse.js"></script> -->
 
   <!-- Plugin: backbone -->
+	<script type="text/javascript" src="../bower_components/underscore/underscore.js"></script>
 	<script type="text/javascript" src="../bower_components/backbone/backbone.js"></script>
 	<script type="text/javascript" src="../src/plugins/backbone.js"></script>
 	<script type="text/javascript" src="plugins/backbone.model.js"></script>

@@ -14,17 +14,16 @@
     "node_modules",
     "bower_components"
   ],
-  "dependencies" : {
-    "json.date": "RickStrahl/json.date-extensions#f16379c45f0150047c547ab821e94aad00b2c2a9",
+  "devDependencies": {
     "qunit": "~1.9.0",
+    "jquery": "~2.1.0",
 
+    "json.date": "RickStrahl/json.date-extensions#f16379c45f0150047c547ab821e94aad00b2c2a9",
     "blueimp-canvas-to-blob": "~2.1.0",
     "eventsource": "Yaffle/EventSource",
-    "AutobahnJS": "tavendo/AutobahnJS#v0.8.2"
-  },
-  "devDependencies": {
+    "AutobahnJS": "tavendo/AutobahnJS#v0.8.2",
+
     "backbone": "~1.1.2",
-    "jquery": "~2.1.0",
     "winchan": "mozilla/winchan#ac4b142c34daa84bbcb5d8663fad19ce6394cb18"
   }
 }

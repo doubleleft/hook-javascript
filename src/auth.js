@@ -10,6 +10,7 @@ class Auth extends Events {
    * @constructor
    */
   constructor(client) {
+    super();
     this.client = client;
 
     /**
