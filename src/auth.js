@@ -199,6 +199,14 @@ class Auth extends Events {
   }
 
   /**
+   * @method isLogged
+   * @return {Boolean}
+   */
+  isLogged() {
+    return this.currentUser !== null;
+  }
+
+  /**
    * @method getToken
    * @return {String|null}
    */

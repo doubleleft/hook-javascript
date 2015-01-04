@@ -1,5 +1,7 @@
 asyncTest("Authentication: Email login (success)", function() {
-  expect(4);
+  expect(6);
+
+  ok(client.auth.isLogged() == false, "isLogged should be false");
 
   // register dummy user first
   var email = ascii_rand(8) + "@" + ascii_rand(5) + ".com";
@@ -8,6 +10,7 @@ asyncTest("Authentication: Email login (success)", function() {
     name: "Endel Dreyer",
     password: "teste"
   }).done(function() {
+    ok(client.auth.isLogged() == true, "isLogged should be true");
 
     client.auth.logout();
     ok(client.auth.currentUser == null, "should have clean session before login");
