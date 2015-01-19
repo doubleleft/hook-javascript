@@ -1,9 +1,9 @@
 /*
- * hook-javascript v0.2.1
+ * hook-javascript v0.3.0
  * https://github.com/doubleleft/hook-javascript
  *
- * @copyright 2014 Doubleleft
- * @build 11/11/2014
+ * @copyright 2015 Doubleleft
+ * @build 1/19/2015
  */
 (function(window) {
   //
@@ -9872,7 +9872,7 @@ Hook.Client.prototype.request = function(segments, method, data) {
 
   if (typeof(XDomainRequest) !== "undefined") {
     // XMLHttpRequest#setRequestHeader isn't implemented on Internet Explorer's XDomainRequest
-    segments += "?X-App-Id=" + this.app_id + "&X-App-Key=" + this.key;
+    segments += "?X-App-Id=" + this.app_id + "&X-App-Key=" + this.key + "&r=" + Math.floor(Math.random()*1000);
     var auth_token = this.auth.getToken();
     if (auth_token) { segments += '&X-Auth-Token=' + auth_token; }
   }
@@ -10475,7 +10475,8 @@ Hook.Collection.prototype.constructor = Hook.Collection;
  *
  */
 Hook.Collection.prototype.create = function(data) {
-  return this.client.post(this.segments, data);
+  this.options.data = data;
+  return this.client.post(this.segments, this.buildQuery());
 };
 
 /**
@@ -11039,7 +11040,7 @@ Hook.Collection.prototype.update = function(_id, data) {
  *     });
  */
 Hook.Collection.prototype.increment = function(field, value) {
-  this.options.operation = { method: 'increment', field: field, value: value };
+  this.options.operation = { method: 'increment', field: field, value: value || 1 };
   var promise = this.client.put(this.segments, this.buildQuery());
   if (arguments.length > 0) {
     promise.then.apply(promise, arguments);
@@ -11061,7 +11062,7 @@ Hook.Collection.prototype.increment = function(field, value) {
  *     });
  */
 Hook.Collection.prototype.decrement = function(field, value) {
-  this.options.operation = { method: 'decrement', field: field, value: value };
+  this.options.operation = { method: 'decrement', field: field, value: value || 1 };
   var promise = this.client.put(this.segments, this.buildQuery());
   if (arguments.length > 0) {
     promise.then.apply(promise, arguments);
@@ -11136,7 +11137,7 @@ Hook.Collection.prototype.buildQuery = function() {
     aggregation: 'aggr',  // min / max / count / avg / sum
     operation: 'op',      // increment / decrement
     data: 'data',         // updateAll / firstOrCreate
-    with: 'with',         // join / relationships
+    'with': 'with',         // join / relationships
     select: 'select',     // fields to return
     distinct: 'distinct'  // use distinct operation
   };

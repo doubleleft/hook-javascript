@@ -49,7 +49,8 @@ Hook.Collection.prototype.constructor = Hook.Collection;
  *
  */
 Hook.Collection.prototype.create = function(data) {
-  return this.client.post(this.segments, data);
+  this.options.data = data;
+  return this.client.post(this.segments, this.buildQuery());
 };
 
 /**
