@@ -2,7 +2,7 @@
 	"name": "hook-javascript",
 	"title": "JavaScript Client for hook",
 	"description": "JavaScript client to hook",
-	"version": "0.2.1",
+	"version": "0.2.2",
 	"homepage": "http://github.com/doubleleft/hook-javascript",
 	"main": "dist/hook.js",
 	"authors": [{

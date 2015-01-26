@@ -16,25 +16,31 @@ Hook.Plugin.OAuth.prototype.popup = function(provider, options) {
 
   href += "&" + this.client.serialize({options: options});
 
-  WinChan.open({
-    url: href,
-    relay_url: href_relay,
-    window_features: "menubar=0,location=0,resizable=0,scrollbars=0,status=0,dialog=1,width=700,height=375",
-  }, function(err, r) {
-    // err is a string on failure, otherwise r is the response object
+  // auto-resolve promise when user is already logged in.
+  if (this.client.auth.currentUser) {
+    deferred.resolver.resolve(this.client.auth.currentUser);
 
-    if (!err && r) {
-      // register user token
-      self.client.auth._registerToken(r);
+  } else {
+    WinChan.open({
+      url: href,
+      relay_url: href_relay,
+      window_features: "menubar=0,location=0,resizable=0,scrollbars=0,status=0,dialog=1,width=700,height=375",
+    }, function(err, r) {
+      // err is a string on failure, otherwise r is the response object
 
-      // resolve oauth promise
-      deferred.resolver.resolve(r);
-    }
+      if (!err && r) {
+        // register user token
+        self.client.auth._registerToken(r);
 
-    if (err && err == "unknown closed window") {
-      deferred.resolver.reject("canceled");
-    }
-  });
+        // resolve oauth promise
+        deferred.resolver.resolve(r);
+      }
+
+      if (err && err == "unknown closed window") {
+        deferred.resolver.reject("canceled");
+      }
+    });
+  }
 
   return deferred.promise;
 };

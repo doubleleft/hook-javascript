@@ -174,12 +174,15 @@ Hook.Client.prototype.request = function(segments, method, data) {
     if (auth_token) { segments += '&X-Auth-Token=' + auth_token; }
   }
 
-  deferred.promise.xhr = uxhr(this.url + segments, payload, {
+  var xhr = deferred.promise.xhr = uxhr(this.url + segments, payload, {
     method: method,
     headers: request_headers,
     sync: synchronous,
     success: function(response) {
-      var data = null;
+      var total,
+          data = null,
+          responseHeaders = xhr.getAllResponseHeaders();
+
       try {
         data = JSON.parseWithDate(response);
       } catch(e) { }
@@ -189,6 +192,11 @@ Hook.Client.prototype.request = function(segments, method, data) {
         if (data && data.error) { console.error(data.error); }
         deferred.resolver.reject(data);
       } else {
+
+        // get X-Total-Count for pagination
+        total = responseHeaders.match(/x-total-count: ([^\n]+)/i);
+        if (total) { data.total = parseInt(total[1]); }
+
         deferred.resolver.resolve(data);
       }
     },
