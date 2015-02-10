@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/hook-javascript
  *
  * @copyright 2015 Doubleleft
- * @build 1/26/2015
+ * @build 2/10/2015
  */
 (function(window) {
   //
@@ -11160,6 +11160,26 @@ Hook.Collection.prototype.buildQuery = function() {
   this.reset();
 
   return query;
+};
+
+/**
+ * Return a new copy of the collection.
+ * @method clone
+ * @return {Collection}
+ */
+Hook.Collection.prototype.clone = function() {
+  var clone = this.client.collection(this.name);
+
+  // copy attributes to the new instance
+  clone.options = _.clone(this.options);
+  clone.wheres = _.clone(this.wheres);
+  clone.ordering = _.clone(this.ordering);
+  clone._group = _.clone(this._group);
+  clone._limit = _.clone(this._limit);
+  clone._offset = _.clone(this._offset);
+  clone._remember = _.clone(this._remember);
+
+  return clone;
 };
 
 /**
