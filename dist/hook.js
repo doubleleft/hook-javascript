@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/hook-javascript
  *
  * @copyright 2015 Doubleleft
- * @build 2/10/2015
+ * @build 2/11/2015
  */
 (function(window) {
   //
@@ -9884,7 +9884,8 @@ Hook.Client.prototype.request = function(segments, method, data) {
     success: function(response) {
       var total,
           data = null,
-          responseHeaders = xhr.getAllResponseHeaders();
+          // IE<10 doesn't have 'getAllResponseHeaders' method.
+          responseHeaders = (xhr.getAllResponseHeaders && xhr.getAllResponseHeaders()) || "";
 
       try {
         data = JSON.parseWithDate(response);

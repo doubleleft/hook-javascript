@@ -181,7 +181,8 @@ Hook.Client.prototype.request = function(segments, method, data) {
     success: function(response) {
       var total,
           data = null,
-          responseHeaders = xhr.getAllResponseHeaders();
+          // IE<10 doesn't have 'getAllResponseHeaders' method.
+          responseHeaders = (xhr.getAllResponseHeaders && xhr.getAllResponseHeaders()) || "";
 
       try {
         data = JSON.parseWithDate(response);
