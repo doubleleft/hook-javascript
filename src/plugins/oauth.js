@@ -10,8 +10,8 @@ Hook.Plugin.OAuth = function(client) {
 
 Hook.Plugin.OAuth.prototype.popup = function(provider, options) {
   var self = this,
-      href = this.client.url + "oauth/" + provider + "?X-App-Id=" + this.client.app_id + "&X-App-Key=" + this.client.key,
-      href_relay = this.client.url + "oauth/relay_frame" + "?X-App-Id=" + this.client.app_id + "&X-App-Key=" + this.client.key,
+      href = this.client.url("oauth/" + provider),
+      href_relay = this.client.url("oauth/relay_frame"),
       deferred = when.defer(),
       window_width = 500,
       window_height = 500,
