@@ -17,16 +17,20 @@
 	"bugs": {
 		"url": "https://github.com/doubleleft/hook-javascript/issues"
 	},
+	"scripts": {
+		"postinstall": "bower install"
+	},
 	"devDependencies": {
-		"grunt": "0.4.1",
+		"bower": "~1.3.12",
+		"grunt": "~0.4.5",
 		"grunt-contrib-yuidoc": "*",
 		"grunt-contrib-concat": "*",
 		"grunt-contrib-watch": "*",
 		"grunt-contrib-jshint": "*",
 		"grunt-contrib-uglify": "*",
-		"grunt-contrib-qunit": "*",
 		"grunt-contrib-connect": "*",
-		"grunt-saucelabs": "~8.3.2",
+		"grunt-contrib-qunit": "~0.5.2",
+		"grunt-saucelabs": "~8.6.0",
 		"grunt-loader": "0.2.1"
 	}
 }

@@ -526,31 +526,6 @@ Hook.Collection.prototype.channel = function(options) {
 };
 
 /**
- * @method paginate
- * @return {Hook.Pagination}
- *
- * @param {Mixed} perpage_or_callback
- * @param {Function} onComplete
- * @param {Function} onError (optional)
- */
-Hook.Collection.prototype.paginate = function(perPage, onComplete, onError) {
-  var pagination = new Hook.Pagination(this);
-
-  if (!onComplete) {
-    onComplete = perPage;
-    perPage = Hook.defaults.perPage;
-  }
-
-  this.options.paginate = perPage;
-  this.then(function(data) {
-    pagination._fetchComplete(data);
-    if (onComplete) { onComplete(pagination); }
-  }, onError);
-
-  return pagination;
-};
-
-/**
  * Drop entire collection. This operation is irreversible.
  * @return {Promise}
  */
