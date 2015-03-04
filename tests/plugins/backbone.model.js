@@ -6,7 +6,7 @@ asyncTest("Plugin: Backbone.HookModel", function() {
   var Post = Backbone.HookModel.extend({name: "posts"});
   var entry = new Post({
     title: "I'm a Backbone model",
-    description: "Syncing with hook."
+    content: "Syncing with hook."
   });
 
   entry.on('created', function(model) {

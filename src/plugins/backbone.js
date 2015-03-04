@@ -36,11 +36,11 @@
     },
 
     url: function() {
-      var url = Backbone.hook.url + this.remote.segments
+      var endpoint = Backbone.hook.endpoint + this.remote.segments
       if (this.get('_id')) {
-        url += '/' + this.get('_id');
+        endpoint += '/' + this.get('_id');
       }
-      return url;
+      return endpoint;
     }
   });
 
@@ -84,7 +84,7 @@
     },
 
     url: function() {
-      return Backbone.hook.url + this.remote.segments;
+      return Backbone.hook.endpoint + this.remote.segments;
     }
   });
 

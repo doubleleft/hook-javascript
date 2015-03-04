@@ -23,7 +23,7 @@
     "when": "~2.8.0",
     "lodash": "~2.4.0",
     "blueimp-canvas-to-blob": "~2.1.0",
-    "eventsource": "Yaffle/EventSource",
+    "event-source-polyfill": "0.0.1",
     "AutobahnJS": "tavendo/AutobahnJS#v0.8.2",
     "backbone": "~1.1.2",
     "jquery": "~2.1.0",
