@@ -129,7 +129,7 @@ Hook.Auth.prototype.update = function(data) {
   }
 
   var that = this;
-  var promise = this.client.collection('auth').update(this.currentUser._id, data);
+  var promise = this.client.post('auth/update', data);
 
   // update localStorage info
   promise.then(function(data) { that.setCurrentUser(data); });
