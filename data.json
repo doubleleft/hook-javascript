@@ -1,0 +1,2337 @@
+{
+    "project": {
+        "name": "hook-javascript",
+        "description": "hook javascript client",
+        "version": "0.2.1",
+        "url": "https://github.com/doubleleft/hook-javascript",
+        "nocode": "true",
+        "themedir": "yuidoc-theme"
+    },
+    "files": {
+        "src/channel/sse.js": {
+            "name": "src/channel/sse.js",
+            "modules": {},
+            "classes": {
+                "Hook.Channel.SSE": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/channel/websockets.js": {
+            "name": "src/channel/websockets.js",
+            "modules": {},
+            "classes": {
+                "Hook.Channel.WEBSOCKETS": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/core/api.js": {
+            "name": "src/core/api.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/core/client.js": {
+            "name": "src/core/client.js",
+            "modules": {},
+            "classes": {
+                "Hook.Client": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/core/events.js": {
+            "name": "src/core/events.js",
+            "modules": {},
+            "classes": {
+                "Hook.Events": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/core/iterable.js": {
+            "name": "src/core/iterable.js",
+            "modules": {},
+            "classes": {
+                "Hook.Iterable": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/core/plugin_manager.js": {
+            "name": "src/core/plugin_manager.js",
+            "modules": {},
+            "classes": {
+                "Hook.PluginManager": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/plugins/cordova/cordova.js": {
+            "name": "src/plugins/cordova/cordova.js",
+            "modules": {},
+            "classes": {
+                "Cordova": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/plugins/cordova/push_notification.js": {
+            "name": "src/plugins/cordova/push_notification.js",
+            "modules": {},
+            "classes": {
+                "Hook.Plugin.Cordova.PushNotification": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/plugins/backbone.js": {
+            "name": "src/plugins/backbone.js",
+            "modules": {
+                "Backbone": 1
+            },
+            "classes": {
+                "Backbone.HookModel": 1,
+                "Backbone.HookCollection": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/plugins/oauth.js": {
+            "name": "src/plugins/oauth.js",
+            "modules": {
+                "Hook.Plugin": 1
+            },
+            "classes": {
+                "OAuth": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/auth.js": {
+            "name": "src/auth.js",
+            "modules": {
+                "Hook": 1
+            },
+            "classes": {
+                "Hook.Auth": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/channel.js": {
+            "name": "src/channel.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/collection.js": {
+            "name": "src/collection.js",
+            "modules": {},
+            "classes": {
+                "Hook.Collection": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/collection_item.js": {
+            "name": "src/collection_item.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/key_values.js": {
+            "name": "src/key_values.js",
+            "modules": {},
+            "classes": {
+                "Hook.KeyValues": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/pagination.js": {
+            "name": "src/pagination.js",
+            "modules": {},
+            "classes": {
+                "Hook.Pagination": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/system.js": {
+            "name": "src/system.js",
+            "modules": {},
+            "classes": {
+                "Hook.System": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "Hook": {
+            "name": "Hook",
+            "submodules": {},
+            "classes": {
+                "Hook.Channel.SSE": 1,
+                "Hook.Channel.WEBSOCKETS": 1,
+                "Hook.Client": 1,
+                "Hook.Events": 1,
+                "Hook.Iterable": 1,
+                "Hook.PluginManager": 1,
+                "Hook.Auth": 1,
+                "Hook.Collection": 1,
+                "Hook.KeyValues": 1,
+                "Hook.Pagination": 1,
+                "Hook.System": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src/system.js",
+            "line": 1,
+            "description": "Deals with user registration/authentication",
+            "params": [
+                {
+                    "name": "client",
+                    "description": "",
+                    "type": "Client"
+                },
+                {
+                    "name": "namespace",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "options",
+                    "description": "optional",
+                    "type": "Object"
+                }
+            ],
+            "is_constructor": 1,
+            "example": [
+                " Connecting through websockets.\n\n    var channel = client.channel('messages', { transport: \"websockets\" });",
+                " Force socket server endpoint.\n\n    var channel = client.channel('messages', {\n      transport: \"websockets\",\n      url: \"ws://localhost:8080\"\n    });"
+            ],
+            "static": 1,
+            "extends": "Hook.Events"
+        },
+        "Hook.Plugin": {
+            "name": "Hook.Plugin",
+            "submodules": {},
+            "classes": {
+                "Cordova": 1,
+                "Hook.Plugin.Cordova.PushNotification": 1,
+                "OAuth": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src/plugins/oauth.js",
+            "line": 1,
+            "requires": [
+                "winchan ~ac4b142c"
+            ]
+        },
+        "Backbone": {
+            "name": "Backbone",
+            "submodules": {},
+            "classes": {
+                "Backbone.HookModel": 1,
+                "Backbone.HookCollection": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src/plugins/backbone.js",
+            "line": 47,
+            "requires": [
+                "backbone.js ~1.1.2"
+            ]
+        }
+    },
+    "classes": {
+        "Hook.Channel.SSE": {
+            "name": "Hook.Channel.SSE",
+            "shortname": "Hook.Channel.SSE",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Hook",
+            "namespace": "",
+            "file": "src/channel/sse.js",
+            "line": 1
+        },
+        "Hook.Channel.WEBSOCKETS": {
+            "name": "Hook.Channel.WEBSOCKETS",
+            "shortname": "Hook.Channel.WEBSOCKETS",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Hook",
+            "namespace": "",
+            "file": "src/channel/websockets.js",
+            "line": 1
+        },
+        "Hook.Client": {
+            "name": "Hook.Client",
+            "shortname": "Hook.Client",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Hook",
+            "namespace": "",
+            "file": "src/core/client.js",
+            "line": 1,
+            "description": "Hook.Client is the entry-point for using hook.\n\nYou should instantiate a global javascript client for consuming hook.\n\n```javascript\nvar client = new Hook.Client({\n  url: \"http://local-or-remote-hook-address.com/public/index.php/\",\n  app_id: 1,   // your app's id\n  key: 'test'  // your app's public key\n});\n```"
+        },
+        "Hook.Events": {
+            "name": "Hook.Events",
+            "shortname": "Hook.Events",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Hook",
+            "namespace": "",
+            "file": "src/core/events.js",
+            "line": 1
+        },
+        "Hook.Iterable": {
+            "name": "Hook.Iterable",
+            "shortname": "Hook.Iterable",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Hook",
+            "namespace": "",
+            "file": "src/core/iterable.js",
+            "line": 1,
+            "description": "Iterable is for internal use only."
+        },
+        "Hook.PluginManager": {
+            "name": "Hook.PluginManager",
+            "shortname": "Hook.PluginManager",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Hook",
+            "namespace": "",
+            "file": "src/core/plugin_manager.js",
+            "line": 1
+        },
+        "Cordova": {
+            "name": "Cordova",
+            "shortname": "Cordova",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Hook.Plugin",
+            "namespace": "",
+            "file": "src/plugins/cordova/cordova.js",
+            "line": 1
+        },
+        "Hook.Plugin.Cordova.PushNotification": {
+            "name": "Hook.Plugin.Cordova.PushNotification",
+            "shortname": "Hook.Plugin.Cordova.PushNotification",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Hook.Plugin",
+            "namespace": "",
+            "file": "src/plugins/cordova/push_notification.js",
+            "line": 10,
+            "extends": "Hook.Events"
+        },
+        "Backbone.HookModel": {
+            "name": "Backbone.HookModel",
+            "shortname": "Backbone.HookModel",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Backbone",
+            "namespace": "",
+            "file": "src/plugins/backbone.js",
+            "line": 8
+        },
+        "Backbone.HookCollection": {
+            "name": "Backbone.HookCollection",
+            "shortname": "Backbone.HookCollection",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Backbone",
+            "namespace": "",
+            "file": "src/plugins/backbone.js",
+            "line": 47
+        },
+        "OAuth": {
+            "name": "OAuth",
+            "shortname": "OAuth",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Hook.Plugin",
+            "namespace": "",
+            "file": "src/plugins/oauth.js",
+            "line": 1
+        },
+        "Hook.Auth": {
+            "name": "Hook.Auth",
+            "shortname": "Hook.Auth",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Hook",
+            "namespace": "",
+            "file": "src/auth.js",
+            "line": 1,
+            "description": "Deals with user registration/authentication"
+        },
+        "Hook.Collection": {
+            "name": "Hook.Collection",
+            "shortname": "Hook.Collection",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Hook",
+            "namespace": "",
+            "file": "src/collection.js",
+            "line": 1
+        },
+        "Hook.KeyValues": {
+            "name": "Hook.KeyValues",
+            "shortname": "Hook.KeyValues",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Hook",
+            "namespace": "",
+            "file": "src/key_values.js",
+            "line": 1
+        },
+        "Hook.Pagination": {
+            "name": "Hook.Pagination",
+            "shortname": "Hook.Pagination",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Hook",
+            "namespace": "",
+            "file": "src/pagination.js",
+            "line": 1
+        },
+        "Hook.System": {
+            "name": "Hook.System",
+            "shortname": "Hook.System",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Hook",
+            "namespace": "",
+            "file": "src/system.js",
+            "line": 1
+        }
+    },
+    "classitems": [
+        {
+            "file": "src/channel/sse.js",
+            "line": 19,
+            "description": "Subscribe to channel. Publishes a 'connected' message on the first time.",
+            "itemtype": "method",
+            "name": "subscribe",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "(optional)",
+                    "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "example": [
+                " Registering for all messages\n\n    channel.subscribe(function(event, data) {\n      console.log(\"Message: \", event, data);\n    })",
+                " Registering for a single custom event\n\n    channel.subscribe('some-event', function(data) {\n      console.log(\"Custom event triggered: \", data);\n    })",
+                " Registering for client connected/disconnected events\n\n    channel.subscribe('connected', function(data) {\n      console.log(\"New client connected: \", data.client_id);\n    });\n    channel.subscribe('disconnected', function(data) {\n      console.log(\"Client disconnected: \", data.client_id);\n    });",
+                " Registering error event\n\n    channel.subscribe('state:open', function(e) {\n      console.log(\"Error: \", e);\n    });\n    channel.subscribe('state:error', function(e) {\n      console.log(\"Error: \", e);\n    });\n\n"
+            ],
+            "class": "Hook.Channel.SSE",
+            "module": "Hook"
+        },
+        {
+            "file": "src/channel/sse.js",
+            "line": 91,
+            "class": "Hook.Channel.SSE",
+            "module": "Hook"
+        },
+        {
+            "file": "src/channel/sse.js",
+            "line": 105,
+            "description": "Is EventSource listenning to messages?",
+            "itemtype": "method",
+            "name": "isConnected",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "Hook.Channel.SSE",
+            "module": "Hook"
+        },
+        {
+            "file": "src/channel/sse.js",
+            "line": 114,
+            "description": "Unsubscribe to a event listener",
+            "itemtype": "method",
+            "name": "unsubscribe",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "Hook.Channel.SSE",
+            "module": "Hook"
+        },
+        {
+            "file": "src/channel/sse.js",
+            "line": 125,
+            "description": "Publish event message",
+            "itemtype": "method",
+            "name": "publish",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "message",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Hook.Channel.SSE",
+            "module": "Hook"
+        },
+        {
+            "file": "src/channel/sse.js",
+            "line": 187,
+            "description": "Disconnect from channel, publishing a 'disconnected' message.",
+            "itemtype": "method",
+            "name": "disconnect",
+            "params": [
+                {
+                    "name": "synchronous",
+                    "description": "default = false",
+                    "type": "Boolean"
+                }
+            ],
+            "return": {
+                "description": "this",
+                "type": "Hook.Channel"
+            },
+            "class": "Hook.Channel.SSE",
+            "module": "Hook"
+        },
+        {
+            "file": "src/channel/sse.js",
+            "line": 203,
+            "description": "Close event source connection.",
+            "itemtype": "method",
+            "name": "close",
+            "return": {
+                "description": "this",
+                "type": "Channel"
+            },
+            "class": "Hook.Channel.SSE",
+            "module": "Hook"
+        },
+        {
+            "file": "src/channel/websockets.js",
+            "line": 78,
+            "description": "Subscribe to channel. Publishes a 'connected' message on the first time.",
+            "itemtype": "method",
+            "name": "subscribe",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "(optional)",
+                    "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Hook.Channel"
+            },
+            "example": [
+                " Registering for a single custom event\n\n    channel.subscribe('some-event', function(data) {\n      console.log(\"Custom event triggered: \", data);\n    })",
+                " Registering for client connected/disconnected events\n\n    channel.subscribe('connected', function(data) {\n      console.log(\"New client connected: \", data.client_id);\n    });\n    channel.subscribe('disconnected', function(data) {\n      console.log(\"Client disconnected: \", data.client_id);\n    });\n"
+            ],
+            "class": "Hook.Channel.WEBSOCKETS",
+            "module": "Hook"
+        },
+        {
+            "file": "src/channel/websockets.js",
+            "line": 114,
+            "description": "Is EventSource listenning to messages?",
+            "itemtype": "method",
+            "name": "isConnected",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "Hook.Channel.WEBSOCKETS",
+            "module": "Hook"
+        },
+        {
+            "file": "src/channel/websockets.js",
+            "line": 123,
+            "description": "Unsubscribe to a event listener",
+            "itemtype": "method",
+            "name": "unsubscribe",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Hook.Channel"
+            },
+            "class": "Hook.Channel.WEBSOCKETS",
+            "module": "Hook"
+        },
+        {
+            "file": "src/channel/websockets.js",
+            "line": 136,
+            "description": "Publish event message",
+            "itemtype": "method",
+            "name": "publish",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "message",
+                    "description": "",
+                    "type": "Object"
+                },
+                {
+                    "name": "options",
+                    "description": "'exclude' and 'elegible' are optional options.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Hook.Channel"
+            },
+            "class": "Hook.Channel.WEBSOCKETS",
+            "module": "Hook"
+        },
+        {
+            "file": "src/channel/websockets.js",
+            "line": 163,
+            "description": "Disconnect from channel, publishing a 'disconnected' message.",
+            "itemtype": "method",
+            "name": "disconnect",
+            "return": {
+                "description": "this",
+                "type": "Hook.Channel"
+            },
+            "class": "Hook.Channel.WEBSOCKETS",
+            "module": "Hook"
+        },
+        {
+            "file": "src/channel/websockets.js",
+            "line": 173,
+            "itemtype": "method",
+            "name": "call",
+            "params": [
+                {
+                    "name": "procedure",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Hook.Channel.WEBSOCKETS",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/client.js",
+            "line": 38,
+            "itemtype": "property",
+            "name": "keys",
+            "type": "Hook.KeyValues",
+            "class": "Hook.Client",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/client.js",
+            "line": 43,
+            "itemtype": "property",
+            "name": "auth",
+            "type": "Hook.Auth",
+            "class": "Hook.Client",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/client.js",
+            "line": 48,
+            "itemtype": "property",
+            "name": "system",
+            "type": "Hook.System",
+            "class": "Hook.Client",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/client.js",
+            "line": 57,
+            "description": "Get collection instance.",
+            "itemtype": "method",
+            "name": "collection",
+            "params": [
+                {
+                    "name": "collectionName",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Hook.Collection"
+            },
+            "example": [
+                " Retrieve a collection reference. Your collection tables are created on demand.\n\n    // Users collection\n    var users = client.collection('users');\n\n    // Highscores\n    var highscores = client.collection('highscores');\n"
+            ],
+            "class": "Hook.Client",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/client.js",
+            "line": 76,
+            "description": "Get channel instance.",
+            "itemtype": "method",
+            "name": "channel",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "options",
+                    "description": "(optional)",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Hook.Channel"
+            },
+            "example": [
+                " Create a channel using Servet-Sent Events transport.\n\n    var channel = client.channel('messages');",
+                " Create a channel using WebSockets transport.\n\n    var channel = client.channel('messages', { transport: \"websockets\" });\n"
+            ],
+            "class": "Hook.Client",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/client.js",
+            "line": 105,
+            "description": "Get remote URL string.",
+            "itemtype": "method",
+            "name": "url",
+            "params": [
+                {
+                    "name": "route",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "example": [
+                " Downloading data from a hook route\n\n    location.href = client.url('download', { something: \"hey\" })",
+                " Using custom hook route for image catpcha\n\n    // Implementing custom route for captcha: https://github.com/doubleleft/hook/wiki/Composer-dependencies\n    var img = new Image();\n    img.src = client.url('captcha');\n"
+            ],
+            "class": "Hook.Client",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/client.js",
+            "line": 128,
+            "description": "Create resource",
+            "itemtype": "method",
+            "name": "post",
+            "params": [
+                {
+                    "name": "segments",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "Hook.Client",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/client.js",
+            "line": 141,
+            "description": "Retrieve a resource",
+            "itemtype": "method",
+            "name": "get",
+            "params": [
+                {
+                    "name": "segments",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "Hook.Client",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/client.js",
+            "line": 151,
+            "description": "Update existing resource",
+            "itemtype": "method",
+            "name": "put",
+            "params": [
+                {
+                    "name": "segments",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "Hook.Client",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/client.js",
+            "line": 161,
+            "description": "Delete existing resource.",
+            "itemtype": "method",
+            "name": "delete",
+            "params": [
+                {
+                    "name": "segments",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "Hook.Client",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/client.js",
+            "line": 170,
+            "itemtype": "method",
+            "name": "request",
+            "params": [
+                {
+                    "name": "segments",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "method",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "Hook.Client",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/client.js",
+            "line": 246,
+            "description": "Get XHR headers for app/auth context.",
+            "itemtype": "method",
+            "name": "getHeaders",
+            "return": {
+                "description": "",
+                "type": "Object"
+            },
+            "class": "Hook.Client",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/client.js",
+            "line": 266,
+            "description": "Get payload of given data",
+            "itemtype": "method",
+            "name": "getPayload",
+            "params": [
+                {
+                    "name": "requestMethod",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String|FormData"
+            },
+            "class": "Hook.Client",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/iterable.js",
+            "line": 8,
+            "itemtype": "method",
+            "name": "each",
+            "params": [
+                {
+                    "name": "func",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Hook.Iterable",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/iterable.js",
+            "line": 15,
+            "itemtype": "method",
+            "name": "find",
+            "params": [
+                {
+                    "name": "func",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Hook.Iterable",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/iterable.js",
+            "line": 22,
+            "itemtype": "method",
+            "name": "filter",
+            "params": [
+                {
+                    "name": "func",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Hook.Iterable",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/iterable.js",
+            "line": 29,
+            "itemtype": "method",
+            "name": "max",
+            "params": [
+                {
+                    "name": "func",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Hook.Iterable",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/iterable.js",
+            "line": 36,
+            "itemtype": "method",
+            "name": "min",
+            "params": [
+                {
+                    "name": "func",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Hook.Iterable",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/iterable.js",
+            "line": 43,
+            "itemtype": "method",
+            "name": "every",
+            "params": [
+                {
+                    "name": "func",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Hook.Iterable",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/iterable.js",
+            "line": 50,
+            "itemtype": "method",
+            "name": "reject",
+            "params": [
+                {
+                    "name": "func",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Hook.Iterable",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/iterable.js",
+            "line": 57,
+            "itemtype": "method",
+            "name": "groupBy",
+            "params": [
+                {
+                    "name": "func",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Hook.Iterable",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/iterable.js",
+            "line": 64,
+            "description": "Iterate using lodash function",
+            "itemtype": "method",
+            "name": "_iterate",
+            "params": [
+                {
+                    "name": "method",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "func",
+                    "description": "",
+                    "type": "Function"
+                },
+                {
+                    "name": "argument",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Hook.Iterable",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/plugin_manager.js",
+            "line": 10,
+            "description": "Register plugin to be instantiated on Hook.Client",
+            "itemtype": "method",
+            "name": "register",
+            "params": [
+                {
+                    "name": "class",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "static": 1,
+            "class": "Hook.PluginManager",
+            "module": "Hook"
+        },
+        {
+            "file": "src/core/plugin_manager.js",
+            "line": 20,
+            "description": "Register all plugins on target Hook.Client",
+            "itemtype": "method",
+            "name": "setup",
+            "params": [
+                {
+                    "name": "client",
+                    "description": "",
+                    "type": "Hook.Client"
+                }
+            ],
+            "static": 1,
+            "class": "Hook.PluginManager",
+            "module": "Hook"
+        },
+        {
+            "file": "src/plugins/cordova/cordova.js",
+            "line": 8,
+            "itemtype": "property",
+            "name": "push",
+            "type": "Hook.Plugin.Cordova.PushNotification",
+            "class": "Cordova",
+            "module": "Hook.Plugin"
+        },
+        {
+            "file": "src/plugins/cordova/push_notification.js",
+            "line": 1,
+            "description": "-------------\nDependency plugins:\n-------------\n- https://github.com/phonegap-build/PushPlugin\n- https://github.com/apache/cordova-plugin-device\n- https://github.com/danmichaelo/cordova-plugin-appinfo",
+            "class": "Hook.Plugin.Cordova.PushNotification",
+            "module": "Hook.Plugin"
+        },
+        {
+            "file": "src/plugins/cordova/push_notification.js",
+            "line": 41,
+            "description": "Register device for Push Notifications",
+            "itemtype": "method",
+            "name": "register",
+            "return": {
+                "description": "Hook.Plugin.Cordova.PushNotification"
+            },
+            "example": [
+                " Registering for push notifications on Android\n\n    //\n    // Get a senderID on your app's Google Console\n    // - https://developers.google.com/console\n    //\n    dl.cordova.push.register({senderID: \"xxxx\"}).on('notification', function(e) {\n      console.log(\"Notification: \", e);\n    });",
+                " Registering for push notifications on iOS\n\n    dl.cordova.push.register().on('notification', function(e) {\n      console.log(\"Notification: \", e);\n    });"
+            ],
+            "class": "Hook.Plugin.Cordova.PushNotification",
+            "module": "Hook.Plugin"
+        },
+        {
+            "file": "src/plugins/cordova/push_notification.js",
+            "line": 205,
+            "description": "Unregister device for Push Notifications",
+            "itemtype": "method",
+            "name": "unregister",
+            "class": "Hook.Plugin.Cordova.PushNotification",
+            "module": "Hook.Plugin"
+        },
+        {
+            "file": "src/plugins/cordova/push_notification.js",
+            "line": 212,
+            "description": "method _registerDevice",
+            "class": "Hook.Plugin.Cordova.PushNotification",
+            "module": "Hook.Plugin"
+        },
+        {
+            "file": "src/plugins/backbone.js",
+            "line": 60,
+            "description": "Reset collection data and triggers 'fetch' event.",
+            "itemtype": "method",
+            "name": "fetchRemote",
+            "params": [
+                {
+                    "name": "models",
+                    "description": "",
+                    "type": "Array"
+                }
+            ],
+            "class": "Backbone.HookCollection",
+            "module": "Backbone"
+        },
+        {
+            "file": "src/auth.js",
+            "line": 12,
+            "itemtype": "property",
+            "name": "currentUser",
+            "type": "{Object}",
+            "class": "Hook.Auth",
+            "module": "Hook"
+        },
+        {
+            "file": "src/auth.js",
+            "line": 37,
+            "itemtype": "method",
+            "name": "setUserData",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "this",
+                "type": "Hook.Auth"
+            },
+            "class": "Hook.Auth",
+            "module": "Hook"
+        },
+        {
+            "file": "src/auth.js",
+            "line": 61,
+            "description": "Register a user.",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "itemtype": "method",
+            "name": "register",
+            "example": [
+                " Register with email address\n\n    client.auth.register({\n      email: \"endel@doubleleft.com\",\n      password: \"12345\",\n      name: \"Endel Dreyer\"\n    }).then(function(user) {\n      console.log(\"Registered user: \", user);\n    });\n"
+            ],
+            "class": "Hook.Auth",
+            "module": "Hook"
+        },
+        {
+            "file": "src/auth.js",
+            "line": 87,
+            "description": "Verify if user is already registered, and log-in if succeed.",
+            "itemtype": "method",
+            "name": "login",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "example": [
+                "\n\n    client.auth.login({email: \"edreyer@doubleleft.com\", password: \"123\"}).then(function(data){\n      console.log(\"User found: \", data);\n    }, function(data){\n      console.log(\"User not found or password invalid.\", data);\n    });"
+            ],
+            "class": "Hook.Auth",
+            "module": "Hook"
+        },
+        {
+            "file": "src/auth.js",
+            "line": 111,
+            "description": "Update current user info.",
+            "itemtype": "method",
+            "name": "update",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "example": [
+                "\n\n    client.auth.update({ score: 100 }).then(function(data){\n      console.log(\"updated successfully: \", data);\n    }).otherwise(function(data){\n      console.log(\"error: \", data);\n    });"
+            ],
+            "class": "Hook.Auth",
+            "module": "Hook"
+        },
+        {
+            "file": "src/auth.js",
+            "line": 140,
+            "description": "Send a 'forgot password' confirmation email to target user email address.",
+            "itemtype": "method",
+            "name": "forgotPassword",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "example": [
+                "\n\n    client.auth.forgotPassword({\n      email: \"edreyer@doubleleft.com\",\n      subject: \"Project name: Forgot your password?\",\n      template: \"Hi {{name}}, click here to reset your password http://custom-project.com/pass-recovery-path.html?token={{token}}\"\n    }).then(function(data){\n      console.log(\"Email enviado!\", data);\n    }, function(data){\n      console.log(\"User not found: \", data);\n    });"
+            ],
+            "class": "Hook.Auth",
+            "module": "Hook"
+        },
+        {
+            "file": "src/auth.js",
+            "line": 163,
+            "description": "Reset user password",
+            "itemtype": "method",
+            "name": "resetPassword",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object",
+                    "props": [
+                        {
+                            "name": "password",
+                            "description": "",
+                            "type": "Object"
+                        },
+                        {
+                            "name": "token",
+                            "description": "[optional]",
+                            "type": "Object"
+                        }
+                    ]
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "example": [
+                " Getting token automatically from query string\n\n    client.auth.resetPassword(\"my-new-password-123\").then(function(data){\n      console.log(\"Password reseted! \", data);\n    }, function(data){\n      console.log(\"Error\", data.error);\n    });",
+                " Providing a token manually\n\n    client.auth.resetPassword({token: \"xxx\", password: \"my-new-password-123\"}).then(function(data){\n      console.log(\"Password reseted! \", data);\n    }, function(data){\n      console.log(\"Error\", data.error);\n    });\n"
+            ],
+            "class": "Hook.Auth",
+            "module": "Hook"
+        },
+        {
+            "file": "src/auth.js",
+            "line": 199,
+            "itemtype": "method",
+            "name": "logout",
+            "return": {
+                "description": "this",
+                "type": "Hook.Auth"
+            },
+            "class": "Hook.Auth",
+            "module": "Hook"
+        },
+        {
+            "file": "src/auth.js",
+            "line": 207,
+            "itemtype": "method",
+            "name": "getToken",
+            "return": {
+                "description": "",
+                "type": "String|null"
+            },
+            "class": "Hook.Auth",
+            "module": "Hook"
+        },
+        {
+            "file": "src/channel.js",
+            "line": 1,
+            "description": "Channel implementations",
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 22,
+            "description": "Create a new resource",
+            "itemtype": "method",
+            "name": "create",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "this",
+                "type": "Hook.Collection"
+            },
+            "example": [
+                " Creating an entry\n\n    client.collection('posts').create({\n      title: \"Post name\",\n      summary: \"My awesome new post\",\n      stars: 5\n    });",
+                " Listening to complete event\n\n    // Verbose way\n    var c = client.collection('posts');\n    var promise = c.create({ title: \"Post name\", summary: \"Something\", stars: 5 });\n    promise.then(function(data) {\n        console.log(data);\n    });\n\n    // Short way\n    client.collection('posts').create({ title: \"Post name\", summary: \"Something\", stars: 5 }).then(function(data) {\n        console.log(data);\n    });\n"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 56,
+            "description": "Fields that should be retrieved from the database",
+            "itemtype": "method",
+            "name": "select",
+            "return": {
+                "description": "this",
+                "type": "Hook.Collection"
+            },
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 66,
+            "description": "Get collection data, based on `where` params.",
+            "itemtype": "method",
+            "name": "get",
+            "return": {
+                "description": "this",
+                "type": "Hook.Collection"
+            },
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 75,
+            "description": "Add `where` param",
+            "itemtype": "method",
+            "name": "where",
+            "params": [
+                {
+                    "name": "where",
+                    "description": "params or field name",
+                    "type": "Object | String"
+                },
+                {
+                    "name": "operation",
+                    "description": "'<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between', 'like', 'not_null'",
+                    "type": "String"
+                },
+                {
+                    "name": "value",
+                    "description": "value",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "this",
+                "type": "Hook.Collection"
+            },
+            "example": [
+                " Multiple 'where' calls\n\n    var c = client.collection('posts');\n    c.where('author','Vicente'); // equal operator may be omitted\n    c.where('stars','>',10);     // support '<' and '>' operators\n    c.then(function(result) {\n      console.log(result);\n    });",
+                " One 'where' call\n\n    client.collection('posts').where({\n      author: 'Vicente',\n      stars: ['>', 10]\n    }).then(function(result) {\n      console.log(result);\n    })",
+                " Filtering 'in' value list.\n\n    client.collection('posts').where('author_id', 'in', [500, 501]).then(function(result) {\n      console.log(result);\n    })",
+                " Partial String matching\n\n    client.collection('posts').where('author', 'like', '%Silva%').then(function(result) {\n      console.log(result);\n    })\n"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 140,
+            "description": "Add OR query param",
+            "itemtype": "method",
+            "name": "orWhere",
+            "params": [
+                {
+                    "name": "where",
+                    "description": "params or field name",
+                    "type": "Object | String"
+                },
+                {
+                    "name": "operation",
+                    "description": "'<', '<=', '>', '>=', '!=', 'in', 'between', 'not_in', 'not_between', 'like', 'not_null'",
+                    "type": "String"
+                },
+                {
+                    "name": "value",
+                    "description": "value",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "this",
+                "type": "Hook.Collection"
+            },
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 152,
+            "description": "Find first item by _id",
+            "itemtype": "method",
+            "name": "find",
+            "params": [
+                {
+                    "name": "_id",
+                    "description": "",
+                    "type": "Number"
+                },
+                {
+                    "name": "callback",
+                    "description": "[optional]",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "example": [
+                " Finding first item by _id, with 'success' callback as param.\n\n    client.collection('posts').find(50, function(data) {\n      console.log(\"Row:\", data);\n    });",
+                " Catching 'not found' error.\n\n    client.collection('posts').find(128371923).then(function(data) {\n      console.log(\"Row:\", data); // will never execute this\n    }).otherwise(function(e) {\n      console.log(\"Not found.\");\n    });\n"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 182,
+            "description": "Set the relationships that should be eager loaded.",
+            "itemtype": "method",
+            "name": "join",
+            "params": [
+                {
+                    "name": "...",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Hook.Collection"
+            },
+            "example": [
+                " Simple relationship\n\n    client.collection('books').join('author').each(function(book) {\n      console.log(\"Author: \", book.author.name);\n    });",
+                " Multiple relationships\n\n    client.collection('books').join('author', 'publisher').each(function(book) {\n      console.log(\"Author: \", book.author.name);\n      console.log(\"Publisher: \", book.publisher.name);\n    });",
+                " Nested relationships\n\n    client.collection('books').join('author.contacts').each(function(book) {\n      console.log(\"Author: \", book.author.name);\n      console.log(\"Contacts: \", book.author.contacts);\n    });\n"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 215,
+            "description": "The 'distinct' can be used to return only distinct (different) values.",
+            "itemtype": "method",
+            "name": "distinct",
+            "params": [
+                {
+                    "name": "field",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "...",
+                    "description": "more fields",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "this",
+                "type": "Hook.Collection"
+            },
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 227,
+            "description": "Group results by field",
+            "itemtype": "method",
+            "name": "group",
+            "params": [
+                {
+                    "name": "field",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "...",
+                    "description": "more fields",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "this",
+                "type": "Hook.Collection"
+            },
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 239,
+            "description": "Count the number of items on this collection",
+            "itemtype": "method",
+            "name": "count",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "[optional]",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "example": [
+                " Count the elements of the current query\n\n    client.collection('posts').where('author','Vicente').count(function(total) {\n      console.log(\"Total:\", total);\n    });"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 261,
+            "description": "Aggregate field with 'max' values",
+            "itemtype": "method",
+            "name": "max",
+            "params": [
+                {
+                    "name": "field",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "[optional]",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "example": [
+                " Get the max value from highscore collection\n\n    client.collection('highscore').max('score', function(data) {\n      console.log(\"max: \", data);\n    });"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 283,
+            "description": "Aggregate field with 'min' values",
+            "itemtype": "method",
+            "name": "min",
+            "params": [
+                {
+                    "name": "field",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "[optional]",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "example": [
+                " Get the min value from highscore collection\n\n    client.collection('highscore').min('score', function(data) {\n      console.log(\"min: \", data);\n    });"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 305,
+            "description": "Aggregate field with 'avg' values",
+            "itemtype": "method",
+            "name": "avg",
+            "params": [
+                {
+                    "name": "field",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "[optional]",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "example": [
+                " Get the average value from highscore collection\n\n    client.collection('highscore').avg('score', function(data) {\n      console.log(\"avg: \", data);\n    });"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 327,
+            "description": "Aggregate field with 'sum' values",
+            "itemtype": "method",
+            "name": "sum",
+            "params": [
+                {
+                    "name": "field",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "[optional]",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "example": [
+                " Get the sum value from highscore collection\n\n    client.collection('highscore').sum('score', function(data) {\n      console.log(\"sum: \", data);\n    });"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 349,
+            "description": "Query only the first result",
+            "itemtype": "method",
+            "name": "first",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "[optional]",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "example": [
+                " Return just the first element for current query\n\n    client.collection('users').sort('created_at', -1).first(function(data) {\n      console.log(\"Last created user:\", data);\n    });"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 368,
+            "description": "First or create",
+            "itemtype": "method",
+            "name": "firstOrCreate",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                },
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "example Return the first match for 'data' param, or create it.\n\n    client.collection('uniques').firstOrCreate({type: \"something\"}).then(function(data) {\n      console.log(\"Unique row: \", data);\n    });",
+                "type": "Promise"
+            },
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 388,
+            "description": "Alias for get & then",
+            "itemtype": "method",
+            "name": "then",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 399,
+            "description": "Alias for then & console.log.bind(console)",
+            "itemtype": "method",
+            "name": "debug",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 409,
+            "description": "Clear collection filtering state",
+            "itemtype": "method",
+            "name": "reset",
+            "return": {
+                "description": "this",
+                "type": "Hook.Collection"
+            },
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 425,
+            "itemtype": "method",
+            "name": "sort",
+            "params": [
+                {
+                    "name": "field",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "direction",
+                    "description": "",
+                    "type": "Number|String"
+                }
+            ],
+            "return": {
+                "description": "this",
+                "type": "Hook.Collection"
+            },
+            "example": [
+                " Return just the first element for current query\n\n    // Ommit the second argument for ascending order:\n    client.collection('users').sort('created_at').then(function(data){ });\n\n    // Use 1 or 'asc' to specify ascending order:\n    client.collection('users').sort('created_at', 1).then(function(data){  });\n    client.collection('users').sort('created_at', 'asc').then(function(data){  });\n\n    // Use -1 or 'desc' for descending order:\n    client.collection('users').sort('created_at', -1).then(function(data) {  });\n    client.collection('users').sort('created_at', 'desc').then(function(data) {  });"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 454,
+            "itemtype": "method",
+            "name": "limit",
+            "params": [
+                {
+                    "name": "int",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "this",
+                "type": "Hook.Collection"
+            },
+            "example": [
+                " Limit the number of rows to retrieve\n\n    client.collection('posts').sort('updated_at', -1).limit(5).then(function(data) {\n      console.log(\"Last 5 rows updated: \", data);\n    });",
+                " Limit and offset\n\n    client.collection('posts').sort('updated_at', -1).limit(5).offset(5).then(function(data) {\n      console.log(\"last 5 rows updated, after 5 lastest: \", data);\n    });"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 476,
+            "itemtype": "method",
+            "name": "offset",
+            "see": [
+                "limit"
+            ],
+            "params": [
+                {
+                    "name": "int",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "this",
+                "type": "Hook.Collection"
+            },
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 488,
+            "description": "Indicate that the query results should be cached.",
+            "itemtype": "method",
+            "name": "remember",
+            "params": [
+                {
+                    "name": "minutes",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "this",
+                "type": "Hook.Collection"
+            },
+            "example": [
+                " Caching a query\n\n    client.collection('posts').sort('updated_at', -1).limit(5).remember(10).then(function(data) {\n      // ...\n    });\n"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 507,
+            "description": "Get channel for this collection.",
+            "itemtype": "method",
+            "name": "channel",
+            "params": [
+                {
+                    "name": "options",
+                    "description": "(optional)",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Hook.Channel"
+            },
+            "example": [
+                " Streaming collection data\n\n    client.collection('messages').where('type', 'new-game').channel().subscribe(function(event, data) {\n      console.log(\"Received new-game message: \", data);\n    });\n\n    client.collection('messages').create({type: 'sad', text: \"i'm sad because streaming won't catch me\"});\n    client.collection('messages').create({type: 'new-game', text: \"yey, streaming will catch me!\"});\n"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 528,
+            "description": "Drop entire collection. This operation is irreversible.",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 536,
+            "description": "Remove a single row by id",
+            "itemtype": "method",
+            "name": "remove",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "[optional]",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "example": [
+                " Deleting a row by id\n\n    client.collection('posts').remove(1).then(function(data) {\n      console.log(\"Success:\", data.success);\n    });",
+                " Deleting multiple rows\n\n    client.collection('ranking').where('score', 0).remove().then(function(data) {\n      console.log(\"Success:\", data.success);\n    });"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 562,
+            "description": "Update a single collection entry",
+            "itemtype": "method",
+            "name": "update",
+            "params": [
+                {
+                    "name": "_id",
+                    "description": "",
+                    "type": "Number | String"
+                },
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "example": [
+                " Updating a single row\n\n    client.collection('posts').update(1, { title: \"Changing post title\" }).then(function(data) {\n      console.log(\"Success:\", data.success);\n    });"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 578,
+            "description": "Increment a value from 'field' from all rows matching current filter.",
+            "itemtype": "method",
+            "name": "increment",
+            "params": [
+                {
+                    "name": "field",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "value",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "example": [
+                " Increment user score\n\n    client.collection('users').where('_id', user_id).increment('score', 10).then(function(numRows) {\n      console.log(numRows, \" users has been updated\");\n    });"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 600,
+            "description": "Decrement a value from 'field' from all rows matching current filter.",
+            "itemtype": "method",
+            "name": "decrement",
+            "params": [
+                {
+                    "name": "field",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "value",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "example": [
+                " Decrement user score\n\n    client.collection('users').where('_id', user_id).decrement('score', 10).then(function(numRows) {\n      console.log(numRows, \" users has been updated\");\n    });"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 622,
+            "description": "Update all collection's data based on `where` params.",
+            "itemtype": "method",
+            "name": "updateAll",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "key-value data to update from matched rows [optional]",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "example": [
+                " Updating all rows of the collection\n\n    client.collection('users').updateAll({category: 'everybody'}).then(function(numRows) {\n      console.log(numRows, \" users has been updated\");\n    });",
+                " Updating collection filters\n\n    client.collection('users').where('age','<',18).updateAll({category: 'baby'}).then(function(numRows) {\n      console.log(numRows, \" users has been updated\");\n    });"
+            ],
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection.js",
+            "line": 706,
+            "description": "Return a new copy of the collection.",
+            "itemtype": "method",
+            "name": "clone",
+            "return": {
+                "description": "",
+                "type": "Collection"
+            },
+            "class": "Hook.Collection",
+            "module": "Hook"
+        },
+        {
+            "file": "src/collection_item.js",
+            "line": 1,
+            "description": "module Hook\nclass Hook.CollectionItem\n\nparam {Hook.Collection} collection\nparam {Number|String} _id\nconstructor",
+            "class": "Hook.KeyValues",
+            "module": "Hook"
+        },
+        {
+            "file": "src/key_values.js",
+            "line": 12,
+            "itemtype": "method",
+            "name": "get",
+            "params": [
+                {
+                    "name": "key",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "example": [
+                " Get a key value\n\n    client.keys.get('my-custom-key', function(key) {\n      console.log(key.value);\n    });"
+            ],
+            "class": "Hook.KeyValues",
+            "module": "Hook"
+        },
+        {
+            "file": "src/key_values.js",
+            "line": 32,
+            "itemtype": "method",
+            "name": "set",
+            "params": [
+                {
+                    "name": "key",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "value",
+                    "description": "",
+                    "type": "String|Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "example": [
+                " Set a key value\n\n    client.keys.set('my-custom-key', 'custom value').then(function(key) {\n      console.log(key);\n    });"
+            ],
+            "class": "Hook.KeyValues",
+            "module": "Hook"
+        },
+        {
+            "file": "src/pagination.js",
+            "line": 12,
+            "itemtype": "property",
+            "name": "collection",
+            "type": "{Hook.Collection}",
+            "class": "Hook.Pagination",
+            "module": "Hook"
+        },
+        {
+            "file": "src/pagination.js",
+            "line": 22,
+            "itemtype": "property",
+            "name": "total",
+            "type": "{Number}",
+            "class": "Hook.Pagination",
+            "module": "Hook"
+        },
+        {
+            "file": "src/pagination.js",
+            "line": 28,
+            "itemtype": "property",
+            "name": "per_page",
+            "type": "{Number}",
+            "class": "Hook.Pagination",
+            "module": "Hook"
+        },
+        {
+            "file": "src/pagination.js",
+            "line": 34,
+            "itemtype": "property",
+            "name": "current_page",
+            "type": "{Number}",
+            "class": "Hook.Pagination",
+            "module": "Hook"
+        },
+        {
+            "file": "src/pagination.js",
+            "line": 40,
+            "itemtype": "property",
+            "name": "last_page",
+            "type": "{Number}",
+            "class": "Hook.Pagination",
+            "module": "Hook"
+        },
+        {
+            "file": "src/pagination.js",
+            "line": 46,
+            "itemtype": "property",
+            "name": "from",
+            "type": "{Number}",
+            "class": "Hook.Pagination",
+            "module": "Hook"
+        },
+        {
+            "file": "src/pagination.js",
+            "line": 52,
+            "itemtype": "property",
+            "name": "to",
+            "type": "{Number}",
+            "class": "Hook.Pagination",
+            "module": "Hook"
+        },
+        {
+            "file": "src/pagination.js",
+            "line": 58,
+            "itemtype": "property",
+            "name": "items",
+            "type": "{Object}",
+            "class": "Hook.Pagination",
+            "module": "Hook"
+        },
+        {
+            "file": "src/pagination.js",
+            "line": 65,
+            "itemtype": "method",
+            "name": "hasNext",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "Hook.Pagination",
+            "module": "Hook"
+        },
+        {
+            "file": "src/pagination.js",
+            "line": 73,
+            "itemtype": "method",
+            "name": "isFetching",
+            "return": {
+                "description": "",
+                "type": "Booelan"
+            },
+            "class": "Hook.Pagination",
+            "module": "Hook"
+        },
+        {
+            "file": "src/system.js",
+            "line": 12,
+            "description": "Return server's system time.",
+            "itemtype": "method",
+            "name": "time",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Hook.System",
+            "module": "Hook"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "Missing item type",
+            "line": " src/channel/sse.js:91"
+        },
+        {
+            "message": "Missing item type\n-------------\nDependency plugins:\n-------------\n- https://github.com/phonegap-build/PushPlugin\n- https://github.com/apache/cordova-plugin-device\n- https://github.com/danmichaelo/cordova-plugin-appinfo",
+            "line": " src/plugins/cordova/push_notification.js:1"
+        },
+        {
+            "message": "Missing item type\nmethod _registerDevice",
+            "line": " src/plugins/cordova/push_notification.js:212"
+        },
+        {
+            "message": "Missing item type\nChannel implementations",
+            "line": " src/channel.js:1"
+        },
+        {
+            "message": "Missing item type\nDrop entire collection. This operation is irreversible.",
+            "line": " src/collection.js:528"
+        },
+        {
+            "message": "Missing item type\nmodule Hook\nclass Hook.CollectionItem\n\nparam {Hook.Collection} collection\nparam {Number|String} _id\nconstructor",
+            "line": " src/collection_item.js:1"
+        }
+    ]
+}
