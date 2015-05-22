@@ -277,55 +277,72 @@ Hook.Client.prototype.getPayload = function(method, data) {
     if (data instanceof FormData){
       payload = data;
     } else if (method !== "GET") {
-      var field, value, filename,
-          formdata = new FormData(),
+      var formdata = new FormData(),
           worth = false;
 
-      for (field in data) {
-        value = data[field];
-        filename = null;
+      var getFieldName = function(nested) {
+          var name = nested.shift();
+          return (nested.length > 0) ? name + '[' + getFieldName(nested) + ']' : name;
+      };
 
-        if (typeof(value)==='undefined' || value === null) {
-          continue;
+      var appendFormdataRecursively = function(formdata, data, previous) {
+        var field, value, filename, isFile = false;
 
-        } else if (typeof(value)==='boolean' || typeof(value)==='number' || typeof(value)==="string") {
-          value = value.toString();
+        for (field in data) {
+          value = data[field];
+          filename = null;
 
-        // IE8 can't compare instanceof String with HTMLInputElement.
-        } else if (value instanceof HTMLInputElement && value.files && value.files.length > 0) {
-          filename = value.files[0].name;
-          value = value.files[0];
-          worth = true;
+          if (typeof(value)==='undefined' || value === null) {
+            continue;
 
-        } else if (value instanceof HTMLInputElement) {
-          value = value.value;
+          } else if (typeof(value)==='boolean' || typeof(value)==='number' || typeof(value)==="string") {
+            value = value.toString();
 
-        } else if (value instanceof HTMLCanvasElement) {
-          value = dataURLtoBlob(value.toDataURL());
-          worth = true;
-          filename = 'canvas.png';
+          // IE8 can't compare instanceof String with HTMLInputElement.
+          } else if (value instanceof HTMLInputElement && value.files && value.files.length > 0) {
+            filename = value.files[0].name;
+            value = value.files[0];
+            worth = true;
+            isFile = true;
 
-        } else if (typeof(Blob) !== "undefined" && value instanceof Blob) {
-          worth = true;
-          filename = 'blob.' + value.type.match(/\/(.*)/)[1]; // get extension from blob mime/type
-        }
+          } else if (value instanceof HTMLInputElement) {
+            value = value.value;
 
-        //
-        // Consider serialization to keep data types here: http://phpjs.org/functions/serialize/
-        //
-        if (!(value instanceof Array)) { // fixme
-          if (typeof(value)==="string") {
-            formdata.append(field, value);
-          } else {
-            try {
-              formdata.append(field, value, filename || "file");
-            } catch (e) {
-              // TODO:
-              // Node.js (CLI console) throws exception here
+          } else if (value instanceof HTMLCanvasElement) {
+            value = dataURLtoBlob(value.toDataURL());
+            worth = true;
+            filename = 'canvas.png';
+
+          } else if (typeof(Blob) !== "undefined" && value instanceof Blob) {
+            worth = true;
+            filename = 'blob.' + value.type.match(/\/(.*)/)[1]; // get extension from blob mime/type
+
+          } else if (typeof(value)==="object") {
+            appendFormdataRecursively(formdata, value, previous.concat(field));
+            continue;
+          }
+
+          //
+          // Consider serialization to keep data types here: http://phpjs.org/functions/serialize/
+          //
+          if (!(value instanceof Array)) { // fixme
+            var fieldname = (isFile) ? field : getFieldName(previous.concat(field));
+
+            if (typeof(value)==="string") {
+              formdata.append(fieldname, value);
+            } else {
+              try {
+                formdata.append(fieldname, value, filename || "file");
+              } catch (e) {
+                // TODO:
+                // Node.js (CLI console) throws exception here
+              }
             }
           }
         }
-      }
+      };
+
+      appendFormdataRecursively(formdata, data, []);
 
       if (worth) {
         payload = formdata;

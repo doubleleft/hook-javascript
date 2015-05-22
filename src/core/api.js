@@ -2,7 +2,7 @@
  * @module Hook
  */
 var Hook = {
-  VERSION: "0.1.0",
+  VERSION: "0.3.4",
   defaults: {
     perPage: 50
   }

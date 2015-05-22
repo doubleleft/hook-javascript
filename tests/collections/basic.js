@@ -42,3 +42,25 @@ asyncTest("Collections: listing without where", function() {
   });
 
 });
+
+asyncTest("Collections: firstOrCreate", function() {
+  //
+  // Get without where
+  //
+  client.collection('posts').firstOrCreate({name: "First or create"}).then(function(response) {
+    ok(response.name === "First or create", "firstOrCreate should create an entry");
+
+    var previousId = response._id;
+
+    client.collection('posts').firstOrCreate({name: "First or create"}).then(function(response) {
+      ok(response._id === previousId, "firstOrCreate should find already created item");
+    }).otherwise(function(response) {
+      ok(false, "couldn't find existing item");
+    }).done(function() {
+      start();
+    });
+
+  }).otherwise(function(response) {
+    ok(false, "couldn't create");
+  });
+});

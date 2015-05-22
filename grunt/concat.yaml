@@ -17,9 +17,9 @@ javascripts:
     - 'bower_components/uxhr/uxhr.js'
     - 'bower_components/lodash/dist/lodash.js'
 
-    - 'bower_components/blueimp-canvas-to-blob/js/canvas-to-blob.min.js'
-    - 'bower_components/eventsource/eventsource.js'
-    - 'bower_components/AutobahnJS/autobahn/autobahn.js'
+    # - 'bower_components/blueimp-canvas-to-blob/js/canvas-to-blob.min.js'
+    # - 'bower_components/eventsource/eventsource.js'
+    # - 'bower_components/AutobahnJS/autobahn/autobahn.js'
 
     - 'src/core/*.js'
     - 'src/*.js'
