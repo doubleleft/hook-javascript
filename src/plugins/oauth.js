@@ -21,7 +21,7 @@ Hook.Plugin.OAuth.prototype.popup = function(provider, options) {
   href += "&" + this.client.serialize({options: options});
 
   // auto-resolve promise when user is already logged in.
-  if (this.client.auth.currentUser) {
+  if (this.client.auth.currentUser && this.client.auth.currentUser[provider + '_id']) {
     deferred.resolver.resolve(this.client.auth.currentUser);
 
   } else {
