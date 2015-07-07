@@ -13,6 +13,23 @@ asyncTest("Collections: create", function() {
   });
 });
 
+asyncTest("Collections: exception", function() {
+  expect(1);
+
+  //
+  // Create
+  //
+  client.collection('posts').then(function() {
+    start();
+    try {
+      throw new Error("woops!");
+    } catch (e) {
+      ok(true, "error handled successfully")
+      return;
+    }
+    ok(false, "can't handle error");
+  })
+});
 
 asyncTest("Collections: create with data types", function() {
   expect(4);
@@ -47,12 +64,12 @@ asyncTest("Collections: firstOrCreate", function() {
   //
   // Get without where
   //
-  client.collection('posts').firstOrCreate({name: "First or create"}).then(function(response) {
-    ok(response.name === "First or create", "firstOrCreate should create an entry");
+  client.collection('posts').firstOrCreate({title: "First or create"}).then(function(response) {
+    ok(response.title === "First or create", "firstOrCreate should create an entry");
 
     var previousId = response._id;
 
-    client.collection('posts').firstOrCreate({name: "First or create"}).then(function(response) {
+    client.collection('posts').firstOrCreate({title: "First or create"}).then(function(response) {
       ok(response._id === previousId, "firstOrCreate should find already created item");
     }).otherwise(function(response) {
       ok(false, "couldn't find existing item");

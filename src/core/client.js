@@ -5,9 +5,9 @@
  *
  * ```javascript
  * var client = new Hook.Client({
- *   url: "http://local-or-remote-hook-address.com/public/index.php/",
- *   app_id: 1,   // your app's id
- *   key: 'test'  // your app's public key
+ *   endpoint: "http://local-or-remote-hook-address.com/public/index.php/",
+ *   app_id: 1,   // your application id
+ *   key: 'browser credential'  // your hook-ext/credentials/{environment}/browser.json
  * });
  * ```
  *
@@ -17,13 +17,13 @@
  * @param {Object} options
  *   @param {String} options.app_id
  *   @param {String} options.key
- *   @param {String} options.endpoint default: http://hook.dev
+ *   @param {String} options.endpoint default: window.location.origin
  *
  * @constructor
  */
-
 Hook.Client = function(options) {
   if (!options) { options = {}; }
+
   this.endpoint = options.endpoint || options.url || window.location.origin;
   this.app_id = options.app_id || options.appId || "";
   this.key = options.key || "";
@@ -174,8 +174,9 @@ Hook.Client.prototype.remove = function(segments, data) {
  * @param {Object} data
  */
 Hook.Client.prototype.request = function(segments, method, data) {
-  var payload, request_headers, deferred = when.defer(),
-      synchronous = false;
+  var payload
+    , request_headers
+    , synchronous = false;
 
   // FIXME: find a better way to write this
   if (data && data._sync) {
@@ -203,44 +204,47 @@ Hook.Client.prototype.request = function(segments, method, data) {
     segments += this._getCredentialsParams() + "&r=" + Math.floor(Math.random()*1000);
   }
 
-  var xhr = deferred.promise.xhr = uxhr(this.endpoint + segments, payload, {
-    method: method,
-    headers: request_headers,
-    sync: synchronous,
-    success: function(response) {
-      var total,
-          data = null,
-          // IE<10 doesn't have 'getAllResponseHeaders' method.
-          responseHeaders = (xhr.getAllResponseHeaders && xhr.getAllResponseHeaders()) || "";
+  var promise = new Promise(function(resolve, reject) {
+    var xhr = uxhr(this.endpoint + segments, payload, {
+      method: method,
+      headers: request_headers,
+      sync: synchronous,
+      success: function(response) {
+        var total,
+            data = null,
+            // IE<10 doesn't have 'getAllResponseHeaders' method.
+            responseHeaders = (xhr.getAllResponseHeaders && xhr.getAllResponseHeaders()) || "";
 
-      try {
-        data = JSON.parseWithDate(response);
-      } catch(e) { }
+        try {
+          data = JSON.parseWithDate(response);
+        } catch(e) { }
 
-      if (data === false || data === null || data.error) {
-        // log error on console
-        if (data && data.error) { console.error(data.error); }
-        deferred.resolver.reject(data);
-      } else {
+        if (data === false || data === null || data.error) {
+          // log error on console
+          if (data && data.error) { console.error(data.error); }
+          reject(data);
+        } else {
 
-        // get X-Total-Count for pagination
-        total = responseHeaders.match(/x-total-count: ([^\n]+)/i);
-        if (total) { data.total = parseInt(total[1]); }
+          // get X-Total-Count for pagination
+          total = responseHeaders.match(/x-total-count: ([^\n]+)/i);
+          if (total) { data.total = parseInt(total[1]); }
 
-        deferred.resolver.resolve(data);
+          resolve(data);
+        }
+      },
+      error: function(response) {
+        var data = null;
+        try {
+          data = JSON.parseWithDate(response);
+        } catch(e) { }
+        console.log("Error: ", data || "Invalid JSON response.");
+        reject(data);
       }
-    },
-    error: function(response) {
-      var data = null;
-      try {
-        data = JSON.parseWithDate(response);
-      } catch(e) { }
-      console.log("Error: ", data || "Invalid JSON response.");
-      deferred.resolver.reject(data);
-    }
-  });
+    });
 
-  return deferred.promise;
+  }.bind(this));
+
+  return promise;
 };
 
 /**
