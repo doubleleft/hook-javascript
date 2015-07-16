@@ -7,7 +7,7 @@
 	"main": "dist/hook.js",
 	"authors": [{
 		"name": "Endel Dreyer",
-		"email": "edreyer@doubleleft.com"
+		"email": "endel.dreyer@gmail.com"
 	}],
 	"keywords": ["hook", "javascript", "client"],
 	"repository": {
