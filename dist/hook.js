@@ -3,7 +3,7 @@
  * https://github.com/doubleleft/hook-javascript
  *
  * @copyright 2015 Doubleleft
- * @build 7/7/2015
+ * @build 7/17/2015
  */
 (function(window) {
 
@@ -10111,4 +10111,4 @@ Hook.Channel.WEBSOCKETS.prototype.connect = function() {
   return this;
 };
 
-})(this);
+})(window);

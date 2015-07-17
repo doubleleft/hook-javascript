@@ -16,9 +16,9 @@ Initialize with your app's credentials:
 
 ```javascript
 var hook = new Hook.Client({
-  endpoint:   "http://local-or-remote-hook.com/index.php/",
-  app_id: 1,    // your app's id
-  key: 'test'  // your app's public key
+  endpoint:   "http://localhost:4665/",
+  app_id: 1,   // your app id
+  key: 'test'  // browser credentials of your app
 });
 ```
 
