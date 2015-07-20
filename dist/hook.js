@@ -1,9 +1,9 @@
 /*
- * hook-javascript v
+ * hook-javascript v0.3.8
  * https://github.com/doubleleft/hook-javascript
  *
  * @copyright 2015 Doubleleft
- * @build 7/17/2015
+ * @build 7/20/2015
  */
 (function(window) {
 
@@ -1217,12 +1217,12 @@
 
 /**
  * @license
- * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Lo-Dash 2.4.2 (Custom Build) <https://lodash.com/>
  * Build: `lodash modern -o ./dist/lodash.js`
  * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
  * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
  * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <http://lodash.com/license>
+ * Available under MIT license <https://lodash.com/license>
  */
 ;(function() {
 
@@ -2711,6 +2711,7 @@
     var setBindData = !defineProperty ? noop : function(func, value) {
       descriptor.value = value;
       defineProperty(func, '__bindData__', descriptor);
+      descriptor.value = null;
     };
 
     /**
@@ -7356,7 +7357,7 @@
      * debugging. See http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/#toc-sourceurl
      *
      * For more information on precompiling templates see:
-     * http://lodash.com/custom-builds
+     * https://lodash.com/custom-builds
      *
      * For more information on Chrome extension sandboxes see:
      * http://developer.chrome.com/stable/extensions/sandboxingEval.html
@@ -7925,7 +7926,7 @@
      * @memberOf _
      * @type string
      */
-    lodash.VERSION = '2.4.1';
+    lodash.VERSION = '2.4.2';
 
     // add "Chaining" functions to the wrapper
     lodash.prototype.chain = wrapperChain;
@@ -8108,7 +8109,7 @@ Hook.Client.prototype.channel = function(name, options) {
   if (typeof(options)==="undefined") { options = {}; }
 
   var collection = this.collection(name);
-  collection.segments = collection.segments.replace('collection/', 'channels/');
+  collection.segments = collection.segments.replace('collection/', 'channel/');
 
   // Use 'SSE' as default transport layer
   if (!options.transport) { options.transport = 'sse'; }
@@ -9380,17 +9381,36 @@ Hook.Collection.prototype.remove = function(_id) {
 /**
  * Update a single collection entry
  * @method update
- * @param {Number | String} _id
- * @param {Object} data
+ * @param {Number | String | Object} _id or data
+ * @param {Object} data or null
  *
  * @example Updating a single row
  *
  *     client.collection('posts').update(1, { title: "Changing post title" }).then(function(data) {
  *       console.log("Success:", data.success);
  *     });
+ *
+ * @example Updating all rows of the collection
+ *
+ *     client.collection('users').update({category: 'everybody'}).then(function(numRows) {
+ *       console.log(numRows, " users has been updated");
+ *     });
+ *
+ * @example Updating collection filters
+ *
+ *     client.collection('users').where('age','<',18).update({category: 'baby'}).then(function(numRows) {
+ *       console.log(numRows, " users has been updated");
+ *     });
+ *
  */
 Hook.Collection.prototype.update = function(_id, data) {
-  return this.client.post(this.segments + '/' + _id, data);
+  if (!data && typeof(_id)==="object") {
+    this.options.data = data;
+    return this.client.put(this.segments, this.buildQuery());
+  } else {
+    console.log(".update(_id, data) method will be deprecated. Please use .update(data) instead.");
+    return this.client.post(this.segments + '/' + _id, data);
+  }
 };
 
 /**
@@ -9456,6 +9476,7 @@ Hook.Collection.prototype.decrement = function(field, value) {
  *     });
  */
 Hook.Collection.prototype.updateAll = function(data) {
+  console.log(".updateAll() method will be deprecated. Please use .update() instead.");
   this.options.data = data;
   return this.client.put(this.segments, this.buildQuery());
 };
@@ -9542,16 +9563,6 @@ Hook.Collection.prototype.clone = function() {
 };
 
 /**
- * module Hook
- * class Hook.CollectionItem
- *
- * param {Hook.Collection} collection
- * param {Number|String} _id
- * constructor
- */
-Hook.CollectionItem = function(collection, _id) {};
-
-/**
  * @module Hook
  * @class Hook.KeyValues
  *
@@ -9600,90 +9611,6 @@ Hook.KeyValues.prototype.set = function(key, value) {
 
 Hook.Model = function() {
 };
-
-/**
- * @module Hook
- * @class Hook.Pagination
- *
- * @param {Hook.Collection} collection
- * @param {Number} perPage
- * @constructor
- */
-Hook.Pagination = function(collection) {
-  this.fetching = true;
-
-  /**
-   * @property collection
-   * @type {Hook.Collection}
-   */
-  this.collection = collection;
-};
-
-Hook.Pagination.prototype._fetchComplete = function(response) {
-  this.fetching = false;
-
-  /**
-   * @property total
-   * @type {Number}
-   */
-  this.total = response.total;
-
-  /**
-   * @property per_page
-   * @type {Number}
-   */
-  this.per_page = response.per_page;
-
-  /**
-   * @property current_page
-   * @type {Number}
-   */
-  this.current_page = response.current_page;
-
-  /**
-   * @property last_page
-   * @type {Number}
-   */
-  this.last_page = response.last_page;
-
-  /**
-   * @property from
-   * @type {Number}
-   */
-  this.from = response.from;
-
-  /**
-   * @property to
-   * @type {Number}
-   */
-  this.to = response.to;
-
-  /**
-   * @property items
-   * @type {Object}
-   */
-  this.items = response.data;
-};
-
-/**
- * @method hasNext
- * @return {Boolean}
- */
-Hook.Pagination.prototype.hasNext = function() {
-  return (this.current_page < this.to);
-};
-
-/**
- * @method isFetching
- * @return {Booelan}
- */
-Hook.Pagination.prototype.isFetching = function() {
-  return this.fetching;
-};
-
-Hook.Pagination.prototype.then = function() {
-};
-
 
 /**
  * @module Hook
@@ -9863,15 +9790,6 @@ Hook.Channel.SSE.prototype.connect = function() {
   return this.publish('connected').then(function(data) {
     that.collection.where('updated_at', '>', data.updated_at);
 
-    var queryString = 'X-App-Id=' + that.collection.client.appId +
-      '&X-App-Key=' + that.collection.client.key;
-
-    // Forward user authentication token, if it is set
-    var auth_token = that.collection.client.auth.getToken();
-    if (auth_token) {
-      queryString += '&X-Auth-Token=' + auth_token;
-    }
-
     // time to wait for retry, after connection closes
     var query = that.collection.buildQuery();
     query.stream = {
@@ -9880,7 +9798,7 @@ Hook.Channel.SSE.prototype.connect = function() {
     };
 
     that.client_id = data.client_id;
-    that.event_source = new EventSource(that.collection.client.url + that.collection.segments + "?" + queryString + "&" + JSON.stringify(query), {
+    that.event_source = new EventSource(that.collection.client.url(that.collection.segments) + "&" + JSON.stringify(query), {
       withCredentials: true
     });
 

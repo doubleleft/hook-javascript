@@ -93,7 +93,7 @@ Hook.Client.prototype.channel = function(name, options) {
   if (typeof(options)==="undefined") { options = {}; }
 
   var collection = this.collection(name);
-  collection.segments = collection.segments.replace('collection/', 'channels/');
+  collection.segments = collection.segments.replace('collection/', 'channel/');
 
   // Use 'SSE' as default transport layer
   if (!options.transport) { options.transport = 'sse'; }

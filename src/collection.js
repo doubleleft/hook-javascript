@@ -562,17 +562,36 @@ Hook.Collection.prototype.remove = function(_id) {
 /**
  * Update a single collection entry
  * @method update
- * @param {Number | String} _id
- * @param {Object} data
+ * @param {Number | String | Object} _id or data
+ * @param {Object} data or null
  *
  * @example Updating a single row
  *
  *     client.collection('posts').update(1, { title: "Changing post title" }).then(function(data) {
  *       console.log("Success:", data.success);
  *     });
+ *
+ * @example Updating all rows of the collection
+ *
+ *     client.collection('users').update({category: 'everybody'}).then(function(numRows) {
+ *       console.log(numRows, " users has been updated");
+ *     });
+ *
+ * @example Updating collection filters
+ *
+ *     client.collection('users').where('age','<',18).update({category: 'baby'}).then(function(numRows) {
+ *       console.log(numRows, " users has been updated");
+ *     });
+ *
  */
 Hook.Collection.prototype.update = function(_id, data) {
-  return this.client.post(this.segments + '/' + _id, data);
+  if (!data && typeof(_id)==="object") {
+    this.options.data = data;
+    return this.client.put(this.segments, this.buildQuery());
+  } else {
+    console.log(".update(_id, data) method will be deprecated. Please use .update(data) instead.");
+    return this.client.post(this.segments + '/' + _id, data);
+  }
 };
 
 /**
@@ -638,6 +657,7 @@ Hook.Collection.prototype.decrement = function(field, value) {
  *     });
  */
 Hook.Collection.prototype.updateAll = function(data) {
+  console.log(".updateAll() method will be deprecated. Please use .update() instead.");
   this.options.data = data;
   return this.client.put(this.segments, this.buildQuery());
 };

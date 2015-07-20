@@ -1,7 +1,7 @@
 options:
   banner: |
     /*
-     * <%= bower_file.name %> v<%= bower_file.version %>
+     * <%= bower_file.name %> v<%= package_file.version %>
      * <%= bower_file.homepage %>
      *
      * @copyright <%= grunt.template.today("yyyy") %> Doubleleft
