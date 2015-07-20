@@ -152,15 +152,6 @@ Hook.Channel.SSE.prototype.connect = function() {
   return this.publish('connected').then(function(data) {
     that.collection.where('updated_at', '>', data.updated_at);
 
-    var queryString = 'X-App-Id=' + that.collection.client.appId +
-      '&X-App-Key=' + that.collection.client.key;
-
-    // Forward user authentication token, if it is set
-    var auth_token = that.collection.client.auth.getToken();
-    if (auth_token) {
-      queryString += '&X-Auth-Token=' + auth_token;
-    }
-
     // time to wait for retry, after connection closes
     var query = that.collection.buildQuery();
     query.stream = {
@@ -169,7 +160,7 @@ Hook.Channel.SSE.prototype.connect = function() {
     };
 
     that.client_id = data.client_id;
-    that.event_source = new EventSource(that.collection.client.url + that.collection.segments + "?" + queryString + "&" + JSON.stringify(query), {
+    that.event_source = new EventSource(that.collection.client.url(that.collection.segments) + "&" + JSON.stringify(query), {
       withCredentials: true
     });
 
