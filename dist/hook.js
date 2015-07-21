@@ -1,5 +1,5 @@
 /*
- * hook-javascript v0.3.8
+ * hook-javascript v0.3.9
  * https://github.com/doubleleft/hook-javascript
  *
  * @copyright 2015 Doubleleft
@@ -9405,7 +9405,7 @@ Hook.Collection.prototype.remove = function(_id) {
  */
 Hook.Collection.prototype.update = function(_id, data) {
   if (!data && typeof(_id)==="object") {
-    this.options.data = data;
+    this.options.data = _id;
     return this.client.put(this.segments, this.buildQuery());
   } else {
     console.log(".update(_id, data) method will be deprecated. Please use .update(data) instead.");
